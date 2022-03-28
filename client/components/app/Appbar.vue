@@ -6,7 +6,7 @@
         <a v-if="showBack" @click="back" class="rounded-full h-12 w-12 flex items-center justify-center hover:bg-white hover:bg-opacity-10 mr-4 cursor-pointer">
           <span class="material-icons text-4xl text-white">arrow_back</span>
         </a>
-        <h1 class="text-2xl font-book mr-6 hidden lg:block">audiobookshelf</h1>
+        <h1 class="text-2xl font-book mr-6 hidden lg:block">The Book Shelf</h1>
 
         <ui-libraries-dropdown />
 
@@ -182,7 +182,7 @@ export default {
     },
     batchDeleteClick() {
       var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
-      var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
+      var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
       if (confirm(confirmMsg)) {
         this.processingBatchDelete = true
         this.$store.commit('setProcessingBatch', true)

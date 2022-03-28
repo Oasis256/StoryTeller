@@ -26,7 +26,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Audiobookshelf version
+      label: The Book Shelf version
       placeholder: "e.g. v1.6.60"
     validations:
       required: true
