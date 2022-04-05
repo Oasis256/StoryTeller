@@ -31,7 +31,7 @@ The Book Shelf is a self-hosted audiobook server for managing and playing your a
 
 Is there a feature you are looking for? [Suggest it](https://github.com/advplyr/audiobookshelf/issues/new/choose)
 
-Join us on [discord](https://discord.gg/pJsjuNCKRq)
+Join us on [Discord](https://discord.gg/pJsjuNCKRq)
 
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
@@ -49,7 +49,7 @@ Available using Test Flight: https://testflight.apple.com/join/wiic7QIW - [Join 
 
 #### Directory structure and folder names are important to The Book Shelf!
 
- See [documentation](https://audiobookshelf.org/docs) for supported directory structure, folder naming conventions, and audio file metadata usage.
+ See [Documentation](https://audiobookshelf.org/docs) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
 <br />
 
