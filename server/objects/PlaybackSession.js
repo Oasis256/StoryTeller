@@ -13,10 +13,14 @@ class PlaybackSession {
 
     this.mediaType = null
     this.mediaMetadata = null
+    this.chapters = null
+    this.displayTitle = null
+    this.displayAuthor = null
     this.coverPath = null
     this.duration = null
 
     this.playMethod = null
+    this.mediaPlayer = null
 
     this.date = null
     this.dayOfWeek = null
@@ -45,9 +49,13 @@ class PlaybackSession {
       episodeId: this.episodeId,
       mediaType: this.mediaType,
       mediaMetadata: this.mediaMetadata ? this.mediaMetadata.toJSON() : null,
+      chapters: (this.chapters || []).map(c => ({ ...c })),
+      displayTitle: this.displayTitle,
+      displayAuthor: this.displayAuthor,
       coverPath: this.coverPath,
       duration: this.duration,
       playMethod: this.playMethod,
+      mediaPlayer: this.mediaPlayer,
       date: this.date,
       dayOfWeek: this.dayOfWeek,
       timeListening: this.timeListening,
@@ -65,9 +73,13 @@ class PlaybackSession {
       episodeId: this.episodeId,
       mediaType: this.mediaType,
       mediaMetadata: this.mediaMetadata ? this.mediaMetadata.toJSON() : null,
+      chapters: (this.chapters || []).map(c => ({ ...c })),
+      displayTitle: this.displayTitle,
+      displayAuthor: this.displayAuthor,
       coverPath: this.coverPath,
       duration: this.duration,
       playMethod: this.playMethod,
+      mediaPlayer: this.mediaPlayer,
       date: this.date,
       dayOfWeek: this.dayOfWeek,
       timeListening: this.timeListening,
@@ -84,10 +96,12 @@ class PlaybackSession {
     this.sessionType = session.sessionType
     this.userId = session.userId
     this.libraryItemId = session.libraryItemId
-    this.episodeId = session.episodeId,
-      this.mediaType = session.mediaType
+    this.episodeId = session.episodeId
+    this.mediaType = session.mediaType
     this.duration = session.duration
     this.playMethod = session.playMethod
+    this.mediaPlayer = session.mediaPlayer || null
+    this.chapters = session.chapters || []
 
     this.mediaMetadata = null
     if (session.mediaMetadata) {
@@ -97,6 +111,8 @@ class PlaybackSession {
         this.mediaMetadata = new PodcastMetadata(session.mediaMetadata)
       }
     }
+    this.displayTitle = session.displayTitle || ''
+    this.displayAuthor = session.displayAuthor || ''
     this.coverPath = session.coverPath
     this.date = session.date
     this.dayOfWeek = session.dayOfWeek
@@ -111,15 +127,20 @@ class PlaybackSession {
     return Math.max(0, Math.min(this.currentTime / this.duration, 1))
   }
 
-  setData(libraryItem, user, episodeId = null) {
+  setData(libraryItem, user, mediaPlayer, episodeId = null) {
     this.id = getId('play')
     this.userId = user.id
     this.libraryItemId = libraryItem.id
     this.episodeId = episodeId
     this.mediaType = libraryItem.mediaType
     this.mediaMetadata = libraryItem.media.metadata.clone()
+    this.chapters = (libraryItem.media.chapters || []).map(c => ({ ...c })) // Only book mediaType has chapters
+    this.displayTitle = libraryItem.media.getPlaybackTitle(episodeId)
+    this.displayAuthor = libraryItem.media.getPlaybackAuthor(episodeId)
     this.coverPath = libraryItem.media.coverPath
     this.duration = libraryItem.media.duration
+
+    this.mediaPlayer = mediaPlayer
 
     this.timeListening = 0
     this.date = date.format(new Date(), 'YYYY-MM-DD')
