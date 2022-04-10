@@ -247,14 +247,14 @@ class User {
     if (!this.mediaProgress) return null
     return this.mediaProgress.find(lip => {
       if (episodeId && lip.episodeId !== episodeId) return false
-      return lip.id === libraryItemId
+      return lip.libraryItemId === libraryItemId
     })
   }
 
   createUpdateMediaProgress(libraryItem, updatePayload, episodeId = null) {
     var itemProgress = this.mediaProgress.find(li => {
       if (episodeId && li.episodeId !== episodeId) return false
-      return li.id === libraryItem.id
+      return li.libraryItemId === libraryItem.id
     })
     if (!itemProgress) {
       var newItemProgress = new MediaProgress()
@@ -264,12 +264,14 @@ class User {
       return true
     }
     var wasUpdated = itemProgress.update(updatePayload)
+
+    if (updatePayload.lastUpdate) itemProgress.lastUpdate = updatePayload.lastUpdate // For local to keep update times in sync
     return wasUpdated
   }
 
   removeMediaProgress(libraryItemId) {
-    if (!this.mediaProgress.some(lip => lip.id == libraryItemId)) return false
-    this.mediaProgress = this.mediaProgress.filter(lip => lip.id != libraryItemId)
+    if (!this.mediaProgress.some(lip => lip.libraryItemId == libraryItemId)) return false
+    this.mediaProgress = this.mediaProgress.filter(lip => lip.libraryItemId != libraryItemId)
     return true
   }
 
@@ -339,33 +341,6 @@ class User {
 
   removeBookmark(libraryItemId, time) {
     this.bookmarks = this.bookmarks.filter(bm => (bm.libraryItemId !== libraryItemId || bm.time !== time))
-  }
-
-  // TODO: re-do mobile sync
-  syncLocalUserAudiobookData(localUserAudiobookData, audiobook) {
-    // if (!localUserAudiobookData || !localUserAudiobookData.audiobookId) {
-    //   Logger.error(`[User] Invalid local user audiobook data`, localUserAudiobookData)
-    //   return false
-    // }
-    // if (!this.audiobooks) this.audiobooks = {}
-
-    // if (!this.audiobooks[localUserAudiobookData.audiobookId]) {
-    //   this.audiobooks[localUserAudiobookData.audiobookId] = new UserAudiobookData(localUserAudiobookData)
-    //   return true
-    // }
-
-    // var userAbD = this.audiobooks[localUserAudiobookData.audiobookId]
-    // if (userAbD.lastUpdate >= localUserAudiobookData.lastUpdate) {
-    //   // Server audiobook data is more recent
-    //   return false
-    // }
-
-    // // Local Data More recent
-    // var wasUpdated = this.audiobooks[localUserAudiobookData.audiobookId].update(localUserAudiobookData)
-    // if (wasUpdated) {
-    //   Logger.debug(`[User] syncLocalUserAudiobookData local data was more recent for "${audiobook.title}"`)
-    // }
-    // return wasUpdated
   }
 }
 module.exports = User
