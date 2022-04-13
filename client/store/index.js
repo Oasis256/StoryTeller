@@ -11,7 +11,6 @@ export const state = () => ({
   showEditModal: false,
   showEReader: false,
   selectedLibraryItem: null,
-  selectedAudiobookFile: null,
   developerMode: false,
   selectedLibraryItems: [],
   processingBatch: false,
@@ -34,7 +33,7 @@ export const getters = {
     return state.serverSettings[key]
   },
   getBookCoverAspectRatio: state => {
-    if (!state.serverSettings || !state.serverSettings.coverAspectRatio) return 1.6
+    if (!state.serverSettings || !state.serverSettings.coverAspectRatio) return 1
     return state.serverSettings.coverAspectRatio === 0 ? 1.6 : 1
   },
   getNumLibraryItemsSelected: state => state.selectedLibraryItems.length,
@@ -141,13 +140,6 @@ export const mutations = {
     state.showEditModal = val
   },
   showEReader(state, libraryItem) {
-    state.selectedAudiobookFile = null
-    state.selectedLibraryItem = libraryItem
-
-    state.showEReader = true
-  },
-  showEReaderForFile(state, { libraryItem, file }) {
-    state.selectedAudiobookFile = file
     state.selectedLibraryItem = libraryItem
 
     state.showEReader = true
