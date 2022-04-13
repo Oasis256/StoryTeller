@@ -1,7 +1,7 @@
 <template>
   <div class="w-full px-2 py-3 overflow-hidden relative border-b border-white border-opacity-10" @mouseover="mouseover" @mouseleave="mouseleave">
     <div v-if="episode" class="flex items-center h-24">
-      <div class="w-12 min-w-12 max-w-16 h-full">
+      <div v-show="userCanUpdate" class="w-12 min-w-12 max-w-16 h-full">
         <div class="flex h-full items-center justify-center">
           <span class="material-icons drag-handle text-lg text-white text-opacity-50 hover:text-opacity-100">menu</span>
         </div>
@@ -22,7 +22,7 @@
           <ui-tooltip :text="userIsFinished ? 'Mark as Not Finished' : 'Mark as Finished'" direction="top">
             <ui-read-icon-btn :disabled="isProcessingReadUpdate" :is-read="userIsFinished" borderless class="mx-1 mt-0.5" @click="toggleFinished" />
           </ui-tooltip>
-
+          <p v-if="episode.episode" class="px-4 text-sm text-gray-300">Episode #{{ episode.episode }}</p>
           <p v-if="publishedAt" class="px-4 text-sm text-gray-300">Published {{ $formatDate(publishedAt, 'MMM do, yyyy') }}</p>
         </div>
       </div>
@@ -31,10 +31,10 @@
     <div class="w-24 min-w-24 -right-0 absolute top-0 h-full transform transition-transform" :class="!isHovering ? 'translate-x-32' : 'translate-x-0'">
       <div class="flex h-full items-center">
         <div class="mx-1">
-          <ui-icon-btn icon="edit" borderless @click="clickEdit" />
+          <ui-icon-btn v-if="userCanUpdate" icon="edit" borderless @click="clickEdit" />
         </div>
         <div class="mx-1">
-          <ui-icon-btn icon="close" borderless @click="removeClick" />
+          <ui-icon-btn v-if="userCanDelete" icon="close" borderless @click="removeClick" />
         </div>
       </div>
     </div>
@@ -70,6 +70,12 @@ export default {
     }
   },
   computed: {
+    userCanUpdate() {
+      return this.$store.getters['user/getUserCanUpdate']
+    },
+    userCanDelete() {
+      return this.$store.getters['user/getUserCanDelete']
+    },
     audioFile() {
       return this.episode.audioFile
     },
