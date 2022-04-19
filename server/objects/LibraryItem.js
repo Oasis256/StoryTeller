@@ -144,6 +144,8 @@ class LibraryItem {
     }
   }
 
+  get isPodcast() { return this.mediaType === 'podcast' }
+  get isBook() { return this.mediaType === 'book' }
   get size() {
     var total = 0
     this.libraryFiles.forEach((lf) => total += lf.metadata.size)
@@ -240,8 +242,6 @@ class LibraryItem {
     this.lastScan = Date.now()
     this.scanVersion = version
   }
-
-  saveMetadata() { }
 
   // Returns null if file not found, true if file was updated, false if up to date
   //  updates existing LibraryFile, AudioFile, EBookFile's

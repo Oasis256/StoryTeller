@@ -1,5 +1,6 @@
 const Logger = require('../Logger')
 const { xmlToJSON } = require('./index')
+const { stripHtml } = require('string-strip-html')
 
 function extractFirstArrayItem(json, key) {
   if (!json[key] || !json[key].length) return null
@@ -39,11 +40,26 @@ function extractCategories(channel) {
 }
 
 function extractPodcastMetadata(channel) {
-  var arrayFields = ['title', 'language', 'description', 'itunes:explicit', 'itunes:author']
   var metadata = {
     image: extractImage(channel),
-    categories: extractCategories(channel)
+    categories: extractCategories(channel),
+    feedUrl: null,
+    description: null,
+    descriptionPlain: null
   }
+
+  if (channel['itunes:new-feed-url']) {
+    metadata.feedUrl = extractFirstArrayItem(channel, 'itunes:new-feed-url')
+  } else if (channel['atom:link'] && channel['atom:link'].length && channel['atom:link'][0]['$']) {
+    metadata.feedUrl = channel['atom:link'][0]['$'].href || null
+  }
+
+  if (channel['description']) {
+    metadata.description = extractFirstArrayItem(channel, 'description')
+    metadata.descriptionPlain = stripHtml(metadata.description || '').result
+  }
+
+  var arrayFields = ['title', 'language', 'itunes:explicit', 'itunes:author', 'pubDate', 'link']
   arrayFields.forEach((key) => {
     var cleanKey = key.split(':').pop()
     metadata[cleanKey] = extractFirstArrayItem(channel, key)
@@ -57,12 +73,19 @@ function extractEpisodeData(item) {
     Logger.error(`[podcastUtils] Invalid podcast episode data`)
     return null
   }
-  var arrayFields = ['title', 'pubDate', 'description', 'itunes:episodeType', 'itunes:episode', 'itunes:author', 'itunes:duration', 'itunes:explicit', 'itunes:subtitle']
+
   var episode = {
     enclosure: {
       ...item.enclosure[0]['$']
     }
   }
+
+  if (item['description']) {
+    episode.description = extractFirstArrayItem(item, 'description')
+    episode.descriptionPlain = stripHtml(episode.description || '').result
+  }
+
+  var arrayFields = ['title', 'pubDate', 'itunes:episodeType', 'itunes:episode', 'itunes:author', 'itunes:duration', 'itunes:explicit', 'itunes:subtitle']
   arrayFields.forEach((key) => {
     var cleanKey = key.split(':').pop()
     episode[cleanKey] = extractFirstArrayItem(item, key)
@@ -75,6 +98,7 @@ function cleanEpisodeData(data) {
     title: data.title,
     subtitle: data.subtitle || '',
     description: data.description || '',
+    descriptionPlain: data.descriptionPlain || '',
     pubDate: data.pubDate || '',
     episodeType: data.episodeType || '',
     episode: data.episode || '',
@@ -114,12 +138,25 @@ function cleanPodcastJson(rssJson) {
   return podcast
 }
 
-module.exports.parsePodcastRssFeedXml = async (xml) => {
+module.exports.parsePodcastRssFeedXml = async (xml, includeRaw = false) => {
   if (!xml) return null
   var json = await xmlToJSON(xml)
   if (!json || !json.rss) {
     Logger.error('[podcastUtils] Invalid XML or RSS feed')
     return null
   }
-  return cleanPodcastJson(json.rss)
+
+  const podcast = cleanPodcastJson(json.rss)
+  if (!podcast) return null
+
+  if (includeRaw) {
+    return {
+      podcast,
+      rawJson: json
+    }
+  } else {
+    return {
+      podcast
+    }
+  }
 }

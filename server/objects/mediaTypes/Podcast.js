@@ -210,6 +210,7 @@ class Podcast {
   addNewEpisodeFromAudioFile(audioFile, index) {
     var pe = new PodcastEpisode()
     pe.libraryItemId = this.libraryItemId
+    audioFile.index = 1 // Only 1 audio file per episode
     pe.setDataFromAudioFile(audioFile, index)
     this.episodes.push(pe)
   }
@@ -249,6 +250,12 @@ class Podcast {
 
   getPlaybackAuthor() {
     return this.metadata.author
+  }
+
+  getEpisodeDuration(episodeId) {
+    var episode = this.episodes.find(ep => ep.id == episodeId)
+    if (!episode) return 0
+    return episode.duration
   }
 }
 module.exports = Podcast
