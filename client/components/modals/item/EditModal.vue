@@ -5,7 +5,7 @@
         <p class="font-book text-3xl text-white truncate pointer-events-none">{{ title }}</p>
       </div>
     </template>
-    <div class="absolute -top-10 left-0 w-full flex">
+    <div class="absolute -top-10 left-0 z-10 w-full flex">
       <template v-for="tab in availableTabs">
         <div :key="tab.id" class="w-28 rounded-t-lg flex items-center justify-center mr-1 cursor-pointer hover:bg-bg font-book border-t border-l border-r border-black-300 tab text-xs sm:text-base" :class="selectedTab === tab.id ? 'tab-selected bg-bg pb-px' : 'bg-primary text-gray-400'" @click="selectTab(tab.id)">{{ tab.title }}</div>
       </template>
@@ -116,19 +116,16 @@ export default {
     userCanDownload() {
       return this.$store.getters['user/getUserCanDownload']
     },
-    showExperimentalFeatures() {
-      return this.$store.state.showExperimentalFeatures
-    },
     availableTabs() {
       if (!this.userCanUpdate && !this.userCanDownload) return []
       return this.tabs.filter((tab) => {
         if (tab.id === 'download' && this.isMissing) return false
-        if (this.mediaType == 'podcast' && (tab.id == 'match' || tab.id == 'chapters')) return false
+        if (this.mediaType == 'podcast' && tab.id == 'chapters') return false
         if (this.mediaType == 'book' && tab.id == 'episodes') return false
 
         if ((tab.id === 'download' || tab.id === 'files') && this.userCanDownload) return true
         if (tab.id !== 'download' && tab.id !== 'files' && this.userCanUpdate) return true
-        if (tab.id === 'match' && this.userCanUpdate && this.showExperimentalFeatures) return true
+        if (tab.id === 'match' && this.userCanUpdate) return true
         return false
       })
     },
@@ -255,7 +252,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .tab {
   height: 40px;
 }
