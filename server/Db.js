@@ -109,6 +109,20 @@ class Db {
     return this.init()
   }
 
+  // Get previous server version before loading DB to check whether a db migration is required
+  //   returns null if server was not upgraded
+  checkPreviousVersion() {
+    return this.settingsDb.select(() => true).then((results) => {
+      if (results.data && results.data.length) {
+        var serverSettings = results.data.find(s => s.id === 'server-settings')
+        if (serverSettings && serverSettings.version && serverSettings.version !== version) {
+          return serverSettings.version
+        }
+      }
+      return null
+    })
+  }
+
   async init() {
     await this.load()
 
@@ -185,6 +199,9 @@ class Db {
 
   getLibraryItem(id) {
     return this.libraryItems.find(li => li.id === id)
+  }
+  getLibraryItemsInLibrary(libraryId) {
+    return this.libraryItems.filter(li => li.libraryId === libraryId)
   }
   getPlaybackSession(id) {
     return this.sessionsDb.select((pb) => pb.id == id).then((results) => {
@@ -297,6 +314,39 @@ class Db {
       Logger.error(`[DB] Failed to insert ${entityName}`, error)
       return false
     })
+  }
+
+  async bulkInsertEntities(entityName, entities, batchSize = 500) {
+    // Group entities in batches of size batchSize
+    var entityBatches = []
+    var batch = []
+    var index = 0
+    entities.forEach((ent) => {
+      batch.push(ent)
+      index++
+      if (index >= batchSize) {
+        entityBatches.push(batch)
+        index = 0
+        batch = []
+      }
+    })
+    if (batch.length) entityBatches.push(batch)
+
+    Logger.info(`[Db] bulkInsertEntities: ${entities.length} ${entityName} to ${entityBatches.length} batches of max size ${batchSize}`)
+
+    // Start inserting batches
+    var batchIndex = 1
+    for (const entityBatch of entityBatches) {
+      Logger.info(`[Db] bulkInsertEntities: Start inserting batch ${batchIndex} of ${entityBatch.length} for ${entityName}`)
+      var success = await this.insertEntities(entityName, entityBatch)
+      if (success) {
+        Logger.info(`[Db] bulkInsertEntities: Success inserting batch ${batchIndex} for ${entityName}`)
+      } else {
+        Logger.info(`[Db] bulkInsertEntities: Failed inserting batch ${batchIndex} for ${entityName}`)
+      }
+      batchIndex++
+    }
+    return true
   }
 
   updateEntities(entityName, entities) {

@@ -23,7 +23,7 @@ const HlsRouter = require('./routers/HlsRouter')
 const StaticRouter = require('./routers/StaticRouter')
 
 const CoverManager = require('./managers/CoverManager')
-const DownloadManager = require('./managers/DownloadManager')
+const AbMergeManager = require('./managers/AbMergeManager')
 const CacheManager = require('./managers/CacheManager')
 const LogManager = require('./managers/LogManager')
 const BackupManager = require('./managers/BackupManager')
@@ -58,7 +58,7 @@ class Server {
     this.backupManager = new BackupManager(this.db, this.emitter.bind(this))
     this.logManager = new LogManager(this.db)
     this.cacheManager = new CacheManager()
-    this.downloadManager = new DownloadManager(this.db)
+    this.abMergeManager = new AbMergeManager(this.db, this.clientEmitter.bind(this))
     this.playbackSessionManager = new PlaybackSessionManager(this.db, this.emitter.bind(this), this.clientEmitter.bind(this))
     this.coverManager = new CoverManager(this.db, this.cacheManager)
     this.podcastManager = new PodcastManager(this.db, this.watcher, this.emitter.bind(this))
@@ -66,7 +66,7 @@ class Server {
     this.scanner = new Scanner(this.db, this.coverManager, this.emitter.bind(this))
 
     // Routers
-    this.apiRouter = new ApiRouter(this.db, this.auth, this.scanner, this.playbackSessionManager, this.downloadManager, this.coverManager, this.backupManager, this.watcher, this.cacheManager, this.podcastManager, this.emitter.bind(this), this.clientEmitter.bind(this))
+    this.apiRouter = new ApiRouter(this.db, this.auth, this.scanner, this.playbackSessionManager, this.abMergeManager, this.coverManager, this.backupManager, this.watcher, this.cacheManager, this.podcastManager, this.emitter.bind(this), this.clientEmitter.bind(this))
     this.hlsRouter = new HlsRouter(this.db, this.auth, this.playbackSessionManager, this.emitter.bind(this))
     this.staticRouter = new StaticRouter(this.db)
 
@@ -112,12 +112,15 @@ class Server {
 
   async init() {
     Logger.info('[Server] Init v' + version)
-    // TODO: Remove orphan streams from playback session manager
-    // await this.streamManager.ensureStreamsDir()
+    await this.abMergeManager.removeOrphanDownloads()
     await this.playbackSessionManager.removeOrphanStreams()
-    await this.downloadManager.removeOrphanDownloads()
 
-    if (version.localeCompare('2.0.0') < 0) { // Old version data model migration
+    var previousVersion = await this.db.checkPreviousVersion() // Returns null if same server version
+    if (previousVersion) {
+      Logger.debug(`[Server] Upgraded from previous version ${previousVersion}`)
+    }
+    if (previousVersion && previousVersion.localeCompare('2.0.0') < 0) { // Old version data model migration
+      Logger.debug(`[Server] Previous version was < 2.0.0 - migration required`)
       await dbMigration.migrate(this.db)
     } else {
       await this.db.init()
@@ -150,8 +153,8 @@ class Server {
 
     app.use(this.auth.cors)
     app.use(fileUpload())
-    app.use(express.urlencoded({ extended: true, limit: "3mb" }));
-    app.use(express.json({ limit: "3mb" }))
+    app.use(express.urlencoded({ extended: true, limit: "5mb" }));
+    app.use(express.json({ limit: "5mb" }))
 
     // Static path to generated nuxt
     const distPath = Path.join(global.appRoot, '/client/dist')

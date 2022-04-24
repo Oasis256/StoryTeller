@@ -41,9 +41,10 @@ async function writeConcatFile(tracks, outputPath, startTime = 0) {
 module.exports.writeConcatFile = writeConcatFile
 
 
-async function writeMetadataFile(audiobook, outputPath) {
+async function writeMetadataFile(libraryItem, outputPath) {
   var inputstrs = [
     ';FFMETADATA1',
+<<<<<<< HEAD
     `title=${audiobook.title}`,
     `artist=${audiobook.authorFL}`,
     `album_artist=${audiobook.authorFL}`,
@@ -51,10 +52,18 @@ async function writeMetadataFile(audiobook, outputPath) {
     `description=${audiobook.book.description}`,
     `genre=${audiobook.book._genres.join(';')}`,
     `comment=The Book Shelf v${package.version}`
+=======
+    `title=${libraryItem.media.metadata.title}`,
+    `artist=${libraryItem.media.metadata.authorName}`,
+    `album_artist=${libraryItem.media.metadata.authorName}`,
+    `date=${libraryItem.media.metadata.publishedYear || ''}`,
+    `description=${libraryItem.media.metadata.description}`,
+    `genre=${libraryItem.media.metadata.genres.join(';')}`
+>>>>>>> fc8fec62a08e30898963148d34fe8182b43458d6
   ]
 
-  if (audiobook.chapters) {
-    audiobook.chapters.forEach((chap) => {
+  if (libraryItem.media.chapters) {
+    libraryItem.media.chapters.forEach((chap) => {
       const chapterstrs = [
         '[CHAPTER]',
         'TIMEBASE=1/1000',

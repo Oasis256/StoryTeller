@@ -51,11 +51,12 @@ class CoverManager {
   async removeOldCovers(dirpath, newCoverExt) {
     var filesInDir = await this.getFilesInDirectory(dirpath)
 
+    const imageExtensions = ['.jpeg', '.jpg', '.png', '.webp', '.jiff']
     for (let i = 0; i < filesInDir.length; i++) {
       var file = filesInDir[i]
-      var _extname = Path.extname(file)
+      var _extname = Path.extname(file).toLowerCase()
       var _filename = Path.basename(file, _extname)
-      if (_filename === 'cover' && _extname !== newCoverExt) {
+      if (_filename === 'cover' && _extname !== newCoverExt && imageExtensions.includes(_extname)) {
         var filepath = Path.join(dirpath, file)
         Logger.debug(`[CoverManager] Removing old cover from metadata "${filepath}"`)
         await this.removeFile(filepath)
@@ -118,9 +119,10 @@ class CoverManager {
     }
   }
 
-  async downloadCoverFromUrl(libraryItem, url) {
+  async downloadCoverFromUrl(libraryItem, url, forceLibraryItemFolder = false) {
     try {
-      var coverDirPath = this.getCoverDirectory(libraryItem)
+      // Force save cover with library item is used for adding new podcasts
+      var coverDirPath = forceLibraryItemFolder ? libraryItem.path : this.getCoverDirectory(libraryItem)
       await fs.ensureDir(coverDirPath)
 
       var temppath = Path.posix.join(coverDirPath, 'cover')

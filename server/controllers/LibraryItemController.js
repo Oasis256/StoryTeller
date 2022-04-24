@@ -21,6 +21,9 @@ class LibraryItemController {
             }
           }).filter(au => au)
         }
+      } else if (includeEntities.includes('downloads')) {
+        var downloadsInQueue = this.podcastManager.getEpisodeDownloadsInQueue(req.libraryItem.id)
+        item.episodesDownloading = downloadsInQueue.map(d => d.toJSONForClient())
       }
 
       return res.json(item)
@@ -247,7 +250,7 @@ class LibraryItemController {
     var libraryItem = req.libraryItem
 
     var options = req.body || {}
-    var matchResult = await this.scanner.quickMatchBook(libraryItem, options)
+    var matchResult = await this.scanner.quickMatchLibraryItem(libraryItem, options)
     res.json(matchResult)
   }
 
@@ -353,11 +356,13 @@ class LibraryItemController {
       return res.sendStatus(403)
     }
 
-    if (req.method == 'DELETE' && !req.user.canDelete) {
+    if (req.path.includes('/play')) {
+      // allow POST requests using /play and /play/:episodeId
+    } else if (req.method == 'DELETE' && !req.user.canDelete) {
       Logger.warn(`[LibraryItemController] User attempted to delete without permission`, req.user)
       return res.sendStatus(403)
     } else if ((req.method == 'PATCH' || req.method == 'POST') && !req.user.canUpdate) {
-      Logger.warn('[LibraryItemController] User attempted to update without permission', req.user)
+      Logger.warn('[LibraryItemController] User attempted to update without permission', req.user.username)
       return res.sendStatus(403)
     }
 

@@ -251,6 +251,11 @@ class User {
     })
   }
 
+  getAllMediaProgressForLibraryItem(libraryItemId) {
+    if (!this.mediaProgress) return []
+    return this.mediaProgress.filter(li => li.libraryItemId === libraryItemId)
+  }
+
   createUpdateMediaProgress(libraryItem, updatePayload, episodeId = null) {
     var itemProgress = this.mediaProgress.find(li => {
       if (episodeId && li.episodeId !== episodeId) return false
@@ -308,7 +313,8 @@ class User {
   }
 
   checkCanAccessLibraryItemWithTags(tags) {
-    if (this.permissions.accessAllTags || !tags || !tags.length) return true
+    if (this.permissions.accessAllTags) return true
+    if (!tags || !tags.length) return false
     return this.itemTagsAccessible.some(tag => tags.includes(tag))
   }
 

@@ -26,14 +26,15 @@ class LibraryController {
       return f
     })
     for (var folder of newLibraryPayload.folders) {
-      var success = await fs.ensureDir(folder.fullPath).then(() => true).catch((error) => {
+      try {
+        var direxists = await fs.pathExists(folder.fullPath)
+        if (!direxists) { // If folder does not exist try to make it and set file permissions/owner
+          await fs.mkdir(folder.fullPath)
+          await filePerms.setDefault(folder.fullPath)
+        }
+      } catch (error) {
         Logger.error(`[LibraryController] Failed to ensure folder dir "${folder.fullPath}"`, error)
-        return false
-      })
-      if (!success) {
         return res.status(400).send(`Invalid folder directory "${folder.fullPath}"`)
-      } else {
-        await filePerms.setDefault(folder.fullPath)
       }
     }
 
@@ -175,12 +176,29 @@ class LibraryController {
         sortKey += 'IgnorePrefix'
       }
 
+      // Start sort
       var direction = payload.sortDesc ? 'desc' : 'asc'
-      libraryItems = naturalSort(libraryItems)[direction]((li) => {
+      var sortArray = [
+        {
+          [direction]: (li) => {
+            // Supports dot notation strings i.e. "media.metadata.title"
+            return sortKey.split('.').reduce((a, b) => a[b], li)
+          }
+        }
+      ]
 
-        // Supports dot notation strings i.e. "media.metadata.title"
-        return sortKey.split('.').reduce((a, b) => a[b], li)
-      })
+      // Secondary sort when sorting by book author use series sort title
+      if (payload.mediaType === 'book' && payload.sortBy.includes('author')) {
+        sortArray.push({
+          asc: (li) => {
+            if (li.media.metadata.series && li.media.metadata.series.length) {
+              return li.media.metadata.getSeriesSortTitle(li.media.metadata.series[0])
+            }
+            return null
+          }
+        })
+      }
+      libraryItems = naturalSort(libraryItems).by(sortArray)
     }
 
     // TODO: Potentially implement collapse series again
@@ -223,12 +241,7 @@ class LibraryController {
     }
 
     var series = libraryHelpers.getSeriesFromBooks(libraryItems, payload.minified)
-
-    var sortingIgnorePrefix = this.db.serverSettings.sortingIgnorePrefix
     series = sort(series).asc(s => {
-      if (sortingIgnorePrefix && s.name.toLowerCase().startsWith('the ')) {
-        return s.name.substr(4)
-      }
       return s.name
     })
     payload.total = series.length
@@ -257,7 +270,13 @@ class LibraryController {
       minified: req.query.minified === '1'
     }
 
-    var collections = this.db.collections.filter(c => c.libraryId === req.library.id).map(c => c.toJSONExpanded(libraryItems, payload.minified))
+    var collections = this.db.collections.filter(c => c.libraryId === req.library.id).map(c => {
+      var expanded = c.toJSONExpanded(libraryItems, payload.minified)
+      // If all books restricted to user in this collection then hide this collection
+      if (!expanded.books.length && c.books.length) return null
+      return expanded
+    }).filter(c => !!c)
+
     payload.total = collections.length
 
     if (payload.limit) {
@@ -281,12 +300,12 @@ class LibraryController {
     var limitPerShelf = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 12
     var minified = req.query.minified === '1'
 
-    var itemsWithUserProgress = libraryHelpers.getItemsWithUserProgress(req.user, libraryItems)
+    var itemsWithUserProgress = libraryHelpers.getMediaProgressWithItems(req.user, libraryItems)
     var categories = [
       {
         id: 'continue-listening',
         label: 'Continue Listening',
-        type: req.library.mediaType,
+        type: isPodcastLibrary ? 'episode' : req.library.mediaType,
         entities: libraryHelpers.getItemsMostRecentlyListened(itemsWithUserProgress, limitPerShelf, minified)
       },
       {
@@ -298,7 +317,7 @@ class LibraryController {
       {
         id: 'listen-again',
         label: 'Listen Again',
-        type: req.library.mediaType,
+        type: isPodcastLibrary ? 'episode' : req.library.mediaType,
         entities: libraryHelpers.getItemsMostRecentlyFinished(itemsWithUserProgress, limitPerShelf, minified)
       }
     ].filter(cats => { // Remove categories with no items
@@ -353,57 +372,17 @@ class LibraryController {
           entities: authors
         })
       }
-    }
-
-    res.json(categories)
-  }
-
-  // LEGACY
-  // api/libraries/:id/books/categories
-  async getLibraryCategories(req, res) {
-    var library = req.library
-    var books = this.db.audiobooks.filter(ab => ab.libraryId === library.id)
-    var limitPerShelf = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 12
-    var minified = req.query.minified === '1'
-
-    var booksWithUserAb = libraryHelpers.getItemsWithUserProgress(req.user, books)
-    var series = libraryHelpers.getSeriesFromBooks(books, minified)
-    var seriesWithUserAb = libraryHelpers.getSeriesWithProgressFromBooks(req.user, books)
-
-    var categories = [
-      {
-        id: 'continue-reading',
-        label: 'Continue Reading',
-        type: 'books',
-        entities: libraryHelpers.getBooksMostRecentlyRead(booksWithUserAb, limitPerShelf, minified)
-      },
-      {
-        id: 'continue-series',
-        label: 'Continue Series',
-        type: 'books',
-        entities: libraryHelpers.getBooksNextInSeries(seriesWithUserAb, limitPerShelf, minified)
-      },
-      {
-        id: 'recently-added',
-        label: 'Recently Added',
-        type: 'books',
-        entities: libraryHelpers.getBooksMostRecentlyAdded(books, limitPerShelf, minified)
-      },
-      {
-        id: 'read-again',
-        label: 'Read Again',
-        type: 'books',
-        entities: libraryHelpers.getBooksMostRecentlyFinished(booksWithUserAb, limitPerShelf, minified)
-      },
-      {
-        id: 'recent-series',
-        label: 'Recent Series',
-        type: 'series',
-        entities: libraryHelpers.getSeriesMostRecentlyAdded(series, limitPerShelf)
+    } else {
+      var episodesRecentlyAdded = libraryHelpers.getEpisodesRecentlyAdded(libraryItems, limitPerShelf, minified)
+      if (episodesRecentlyAdded.length) {
+        categories.splice(1, 0, {
+          id: 'episodes-recently-added',
+          label: 'Newest Episodes',
+          type: 'episode',
+          entities: episodesRecentlyAdded
+        })
       }
-    ].filter(cats => { // Remove categories with no items
-      return cats.entities.length
-    })
+    }
 
     res.json(categories)
   }
@@ -545,12 +524,12 @@ class LibraryController {
     res.json(Object.values(authors))
   }
 
-  async matchBooks(req, res) {
+  async matchAll(req, res) {
     if (!req.user.isRoot) {
-      Logger.error(`[LibraryController] Non-root user attempted to match library books`, req.user)
+      Logger.error(`[LibraryController] Non-root user attempted to match library items`, req.user)
       return res.sendStatus(403)
     }
-    this.scanner.matchLibraryBooks(req.library)
+    this.scanner.matchLibraryItems(req.library)
     res.sendStatus(200)
   }
 

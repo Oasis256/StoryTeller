@@ -35,6 +35,23 @@ class PodcastManager {
     }
   }
 
+  getEpisodeDownloadsInQueue(libraryItemId) {
+    return this.downloadQueue.filter(d => d.libraryItemId === libraryItemId)
+  }
+
+  clearDownloadQueue(libraryItemId = null) {
+    if (!this.downloadQueue.length) return
+
+    if (!libraryItemId) {
+      Logger.info(`[PodcastManager] Clearing all downloads in queue (${this.downloadQueue.length})`)
+      this.downloadQueue = []
+    } else {
+      var itemDownloads = this.getEpisodeDownloadsInQueue(libraryItemId)
+      Logger.info(`[PodcastManager] Clearing downloads in queue for item "${libraryItemId}" (${itemDownloads.length})`)
+      this.downloadQueue = this.downloadQueue.filter(d => d.libraryItemId !== libraryItemId)
+    }
+  }
+
   async downloadPodcastEpisodes(libraryItem, episodesToDownload) {
     var index = libraryItem.media.episodes.length + 1
     episodesToDownload.forEach((ep) => {
@@ -50,8 +67,11 @@ class PodcastManager {
   async startPodcastEpisodeDownload(podcastEpisodeDownload) {
     if (this.currentDownload) {
       this.downloadQueue.push(podcastEpisodeDownload)
+      this.emitter('episode_download_queued', podcastEpisodeDownload.toJSONForClient())
       return
     }
+
+    this.emitter('episode_download_started', podcastEpisodeDownload.toJSONForClient())
     this.currentDownload = podcastEpisodeDownload
 
     // Ignores all added files to this dir
@@ -65,10 +85,16 @@ class PodcastManager {
       success = await this.scanAddPodcastEpisodeAudioFile()
       if (!success) {
         await fs.remove(this.currentDownload.targetPath)
+        this.currentDownload.setFinished(false)
       } else {
         Logger.info(`[PodcastManager] Successfully downloaded podcast episode "${this.currentDownload.podcastEpisode.title}"`)
+        this.currentDownload.setFinished(true)
       }
+    } else {
+      this.currentDownload.setFinished(false)
     }
+
+    this.emitter('episode_download_finished', this.currentDownload.toJSONForClient())
 
     this.watcher.removeIgnoreDir(this.currentDownload.libraryItem.path)
     this.currentDownload = null
@@ -168,12 +194,12 @@ class PodcastManager {
 
   async checkPodcastForNewEpisodes(podcastLibraryItem) {
     if (!podcastLibraryItem.media.metadata.feedUrl) {
-      Logger.error(`[PodcastManager] checkPodcastForNewEpisodes no feed url for item ${podcastLibraryItem.id} - disabling auto download`)
+      Logger.error(`[PodcastManager] checkPodcastForNewEpisodes no feed url for ${podcastLibraryItem.media.metadata.title} (ID: ${podcastLibraryItem.id}) - disabling auto download`)
       return false
     }
     var feed = await this.getPodcastFeed(podcastLibraryItem.media.metadata.feedUrl)
     if (!feed || !feed.episodes) {
-      Logger.error(`[PodcastManager] checkPodcastForNewEpisodes invalid feed payload ${podcastLibraryItem.id} - disabling auto download`)
+      Logger.error(`[PodcastManager] checkPodcastForNewEpisodes invalid feed payload for ${podcastLibraryItem.media.metadata.title} (ID: ${podcastLibraryItem.id}) - disabling auto download`)
       return false
     }
     // Filter new and not already has
