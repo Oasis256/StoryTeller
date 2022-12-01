@@ -54,8 +54,10 @@
 
     <prompt-dialog v-model="showConfirmApply" :width="675">
       <div v-if="selectedBackup" class="px-4 w-full text-sm py-6 rounded-lg bg-bg shadow-lg border border-black-300">
-        <p class="text-error text-lg font-semibold">{{ $strings.MessageImportantNotice }}</p>
-        <p class="text-base py-1" v-html="$strings.MessageRestoreBackupWarning" />
+        <p class="text-error text-lg font-semibold">Important Notice!</p>
+        <p class="text-base py-1">Applying a backup will overwrite users, user progress, book details, settings, and covers stored in metadata with the backed up data.</p>
+        <p class="text-base py-1">Backups <strong>do not</strong> modify any files in your library folders, only data in the The Book Shelf created <span class="font-mono">/config</span> and <span class="font-mono">/metadata</span> directories. If you have enabled server settings to store cover art and metadata in your library folders then those are not backup up or overwritten.</p>
+        <p class="text-base py-1">All clients using your server will be automatically refreshed.</p>
 
         <p class="text-lg text-center my-8">{{ $strings.MessageRestoreBackupConfirm }} {{ selectedBackup.datePretty }}?
         </p>

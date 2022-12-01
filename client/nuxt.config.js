@@ -18,7 +18,7 @@ module.exports = {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Audiobookshelf',
+    title: 'The Book Shelf',
     htmlAttrs: {
       lang: 'en'
     },
@@ -100,14 +100,14 @@ module.exports = {
     icon: false,
     meta: {
       appleStatusBarStyle: 'black',
-      name: 'Audiobookshelf',
+      name: 'The Book Shelf',
       theme_color: '#373838',
       mobileAppIOS: true,
       nativeUI: true
     },
     manifest: {
-      name: 'Audiobookshelf',
-      short_name: 'Audiobookshelf',
+      name: 'The Book Shelf',
+      short_name: 'The Book Shelf',
       display: 'standalone',
       background_color: '#373838',
       start_url: '',

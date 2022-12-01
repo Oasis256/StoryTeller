@@ -32,8 +32,12 @@ body:
   - type: input
     id: version
     attributes:
+<<<<<<< HEAD
       label: {{ $strings.Title }} version
       description: Do not put 'Latest version', please put the actual version here
+=======
+      label: The Book Shelf version
+>>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
       placeholder: "e.g. v1.6.60"
     validations:
       required: true
