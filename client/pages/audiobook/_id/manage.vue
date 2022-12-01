@@ -14,7 +14,7 @@
     <div class="flex justify-center">
       <div class="w-full max-w-2xl">
         <p class="text-xl mb-1">{{ $strings.HeaderMetadataToEmbed }}</p>
-        <p class="mb-2 text-base text-gray-300">audiobookshelf uses <a href="https://github.com/sandreas/tone" target="_blank" class="hover:underline text-blue-400 hover:text-blue-300">tone</a> to write metadata.</p>
+        <p class="mb-2 text-base text-gray-300">{{ $strings.Title }} uses <a href="https://github.com/sandreas/tone" target="_blank" class="hover:underline text-blue-400 hover:text-blue-300">tone</a> to write metadata.</p>
       </div>
       <div class="w-full max-w-2xl"></div>
     </div>

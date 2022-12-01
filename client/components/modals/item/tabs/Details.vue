@@ -185,7 +185,7 @@ export default {
       return false
     },
     removeItem() {
-      if (confirm(`Are you sure you want to remove this item?\n\n*Does not delete your files, only removes the item from audiobookshelf`)) {
+      if (confirm(`Are you sure you want to remove this item?\n\n*Does not delete your files, only removes the item from`)) { { $strings.Title } } {
         this.isProcessing = true
         this.$axios
           .$delete(`/api/items/${this.libraryItemId}`)

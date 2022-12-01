@@ -7,70 +7,100 @@
         </nuxt-link>
 
         <nuxt-link to="/">
-          <h1 class="text-2xl font-book mr-6 hidden lg:block hover:underline">audiobookshelf <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1">logo_dev</span></h1>
+          <!-- <h1 class="text-2xl font-book mr-6 hidden lg:block center">
+            <nlp class="above"></nlp>
+            <nlp class="text"> The&nbsp;Book&nbsp;Shelf </nlp>
+            </h1> -->
         </nuxt-link>
 
         <ui-libraries-dropdown class="mr-2" />
 
         <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
+        <h1 class="text-2xl font-book mr-6 hidden lg:block center">
+          <nuxt-link to="/">
+            <nlp class="above"></nlp>
+          </nuxt-link>
+          <nlp class="text">
+            {{ $strings.Title }}
+          </nlp>
+        </h1>
+
+        <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1">logo_dev</span>
+
         <div class="flex-grow" />
 
         <widgets-notification-widget class="hidden md:block" />
 
-        <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom" text="Casting requires a secure connection" class="flex items-center">
+        <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom"
+          text="Casting requires a secure connection" class="flex items-center">
           <span class="material-icons-outlined text-2xl text-warning text-opacity-50"> cast </span>
         </ui-tooltip>
         <div v-if="isChromecastInitialized" class="w-6 min-w-6 h-6 ml-2 mr-1 sm:mx-2 cursor-pointer">
           <google-cast-launcher></google-cast-launcher>
         </div>
 
-        <nuxt-link v-if="currentLibrary" to="/config/stats" class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
+        <nuxt-link v-if="currentLibrary" to="/config/stats"
+          class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
           <span class="material-icons text-2xl" aria-label="User Stats" role="button">equalizer</span>
         </nuxt-link>
 
-        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload" class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload"
+          class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <span class="material-icons text-2xl" aria-label="Upload Media" role="button">upload</span>
         </nuxt-link>
 
-        <nuxt-link v-if="userIsAdminOrUp" to="/config" class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userIsAdminOrUp" to="/config"
+          class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <span class="material-icons text-2xl" aria-label="System Settings" role="button">settings</span>
         </nuxt-link>
 
-        <nuxt-link to="/account" class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left focus:outline-none sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40" aria-haspopup="listbox" aria-expanded="true">
+        <nuxt-link to="/account"
+          class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left focus:outline-none sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40"
+          aria-haspopup="listbox" aria-expanded="true">
           <span class="items-center hidden md:flex">
             <span class="block truncate">{{ username }}</span>
           </span>
-          <span class="h-full md:ml-3 md:absolute inset-y-0 md:right-0 flex items-center justify-center md:pr-2 pointer-events-none">
+          <span
+            class="h-full md:ml-3 md:absolute inset-y-0 md:right-0 flex items-center justify-center md:pr-2 pointer-events-none">
             <span class="material-icons text-xl text-gray-100">person</span>
           </span>
         </nuxt-link>
       </div>
-      <div v-show="numLibraryItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
+      <div v-show="numLibraryItemsSelected"
+        class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numLibraryItemsSelected]) }}</h1>
         <div class="flex-grow" />
-        <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2" @click="playSelectedItems">
+        <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2"
+          @click="playSelectedItems">
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
         <ui-tooltip v-if="userIsAdminOrUp && !isPodcastLibrary" :text="$strings.ButtonQuickMatch" direction="bottom">
           <ui-icon-btn :disabled="processingBatch" icon="auto_awesome" @click="batchAutoMatchClick" class="mx-1.5" />
         </ui-tooltip>
-        <ui-tooltip v-if="!isPodcastLibrary" :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished" direction="bottom">
-          <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead" class="mx-1.5" />
+        <ui-tooltip v-if="!isPodcastLibrary"
+          :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished"
+          direction="bottom">
+          <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead"
+            class="mx-1.5" />
         </ui-tooltip>
         <ui-tooltip v-if="userCanUpdate && !isPodcastLibrary" :text="$strings.LabelAddToCollection" direction="bottom">
-          <ui-icon-btn :disabled="processingBatch" icon="collections_bookmark" @click="batchAddToCollectionClick" class="mx-1.5" />
+          <ui-icon-btn :disabled="processingBatch" icon="collections_bookmark" @click="batchAddToCollectionClick"
+            class="mx-1.5" />
         </ui-tooltip>
         <template v-if="userCanUpdate">
           <ui-tooltip text="Edit" direction="bottom">
-            <ui-icon-btn :disabled="processingBatch" icon="edit" bg-color="warning" class="mx-1.5" @click="batchEditClick" />
+            <ui-icon-btn :disabled="processingBatch" icon="edit" bg-color="warning" class="mx-1.5"
+              @click="batchEditClick" />
           </ui-tooltip>
         </template>
         <ui-tooltip v-if="userCanDelete" :text="$strings.ButtonRemove" direction="bottom">
-          <ui-icon-btn :disabled="processingBatch" icon="delete" bg-color="error" class="mx-1.5" @click="batchDeleteClick" />
+          <ui-icon-btn :disabled="processingBatch" icon="delete" bg-color="error" class="mx-1.5"
+            @click="batchDeleteClick" />
         </ui-tooltip>
         <ui-tooltip :text="$strings.LabelDeselectAll" direction="bottom">
-          <span class="material-icons text-4xl px-4 hover:text-gray-100 cursor-pointer" :class="processingBatch ? 'text-gray-400' : ''" @click="cancelSelectionMode">close</span>
+          <span class="material-icons text-4xl px-4 hover:text-gray-100 cursor-pointer"
+            :class="processingBatch ? 'text-gray-400' : ''" @click="cancelSelectionMode">close</span>
         </ui-tooltip>
       </div>
     </div>
@@ -219,7 +249,7 @@ export default {
     },
     batchDeleteClick() {
       var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
-      var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
+      var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
       if (confirm(confirmMsg)) {
         this.$store.commit('setProcessingBatch', true)
         this.$axios
@@ -261,8 +291,6 @@ export default {
 }
 </script>
 
-<style>
-#appbar {
-  box-shadow: 0px 5px 5px #11111155;
-}
+<style class="nlp-appbar">
+
 </style>

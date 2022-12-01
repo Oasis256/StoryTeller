@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-   <img alt="Audiobookshelf Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
+   <img alt="{{ $strings.Title }} Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
 
   <p align="center">
     <br />
@@ -14,7 +14,7 @@
 
 # About
 
-Audiobookshelf is a self-hosted audiobook and podcast server.
+{{ $strings.Title }}tle }} is a self-hosted audiobook and podcast server.
 
 ### Features
 
@@ -52,7 +52,7 @@ Available using Test Flight: https://testflight.apple.com/join/wiic7QIW - [Join 
 
 # Organizing your audiobooks
 
-#### Directory structure and folder names are important to Audiobookshelf!
+#### Directory structure and folder names are important to {{ $strings.Title }}!
 
  See [documentation](https://audiobookshelf.org/docs) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
@@ -159,7 +159,7 @@ Ffmpeg static build: `/usr/lib/audiobookshelf-ffmpeg/`
 
 # Reverse Proxy Set Up
 
-#### Important! Audiobookshelf requires a websocket connection.
+#### Important! {{ $strings.Title }} requires a websocket connection.
 
 ### NGINX Proxy Manager
 
