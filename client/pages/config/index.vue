@@ -1,10 +1,6 @@
 <template>
   <div>
-    <div class="bg-bg rounded-md shadow-lg border border-white border-opacity-5 p-4 mb-2">
-      <div class="mb-2">
-        <h1 class="text-xl">{{ $strings.HeaderSettings }}</h1>
-      </div>
-
+    <app-settings-content :header-text="$strings.HeaderSettings">
       <div class="lg:flex">
         <div class="flex-1">
           <div class="pt-4">
@@ -199,16 +195,17 @@
           </div> -->
         </div>
       </div>
-    </div>
+    </app-settings-content>
 
     <div class="h-0.5 bg-primary bg-opacity-30 w-full" />
 
     <div class="flex items-center py-4">
       <div class="flex-grow" />
-      <ui-btn color="bg" small :padding-x="4" class="hidden lg:block mr-2" :loading="isPurgingCache" @click.stop="purgeCache">{{ $strings.ButtonPurgeAllCache }}</ui-btn>
-      <ui-btn color="bg" small :padding-x="4" class="hidden lg:block mr-2" :loading="isPurgingCache" @click.stop="purgeItemsCache">{{ $strings.ButtonPurgeItemsCache }}</ui-btn>
-      <ui-btn color="bg" small :padding-x="4" class="hidden lg:block mr-2" :loading="isResettingLibraryItems" @click="resetLibraryItems">{{ $strings.ButtonRemoveAllLibraryItems }}</ui-btn>
+      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeCache">{{ $strings.ButtonPurgeAllCache }}</ui-btn>
+      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeItemsCache">{{ $strings.ButtonPurgeItemsCache }}</ui-btn>
+      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isResettingLibraryItems" @click="resetLibraryItems">{{ $strings.ButtonRemoveAllLibraryItems }}</ui-btn>
     </div>
+
     <div class="flex items-center py-4">
       <div class="flex-grow" />
       <p class="pr-2 text-sm font-book text-yellow-400">

@@ -17,11 +17,9 @@ export const state = () => ({
   showEReader: false,
   selectedLibraryItem: null,
   developerMode: false,
-  selectedLibraryItems: [],
   processingBatch: false,
   previousPath: '/',
   showExperimentalFeatures: false,
-  backups: [],
   bookshelfBookIds: [],
   openModal: null,
   innerModalOpen: false,
@@ -30,14 +28,10 @@ export const state = () => ({
 })
 
 export const getters = {
-  getIsLibraryItemSelected: state => libraryItemId => {
-    return !!state.selectedLibraryItems.includes(libraryItemId)
-  },
   getServerSetting: state => key => {
     if (!state.serverSettings) return null
     return state.serverSettings[key]
   },
-  getNumLibraryItemsSelected: state => state.selectedLibraryItems.length,
   getLibraryItemIdStreaming: state => {
     return state.streamLibraryItem ? state.streamLibraryItem.id : null
   },
@@ -218,35 +212,12 @@ export const mutations = {
   setSelectedLibraryItem(state, val) {
     Vue.set(state, 'selectedLibraryItem', val)
   },
-  setSelectedLibraryItems(state, items) {
-    Vue.set(state, 'selectedLibraryItems', items)
-  },
-  toggleLibraryItemSelected(state, itemId) {
-    if (state.selectedLibraryItems.includes(itemId)) {
-      state.selectedLibraryItems = state.selectedLibraryItems.filter(a => a !== itemId)
-    } else {
-      var newSel = state.selectedLibraryItems.concat([itemId])
-      Vue.set(state, 'selectedLibraryItems', newSel)
-    }
-  },
-  setLibraryItemSelected(state, { libraryItemId, selected }) {
-    var isThere = state.selectedLibraryItems.includes(libraryItemId)
-    if (isThere && !selected) {
-      state.selectedLibraryItems = state.selectedLibraryItems.filter(a => a !== libraryItemId)
-    } else if (selected && !isThere) {
-      var newSel = state.selectedLibraryItems.concat([libraryItemId])
-      Vue.set(state, 'selectedLibraryItems', newSel)
-    }
-  },
   setProcessingBatch(state, val) {
     state.processingBatch = val
   },
   setExperimentalFeatures(state, val) {
     state.showExperimentalFeatures = val
     localStorage.setItem('experimental', val ? 1 : 0)
-  },
-  setBackups(state, val) {
-    state.backups = val.sort((a, b) => b.createdAt - a.createdAt)
   },
   setOpenModal(state, val) {
     state.openModal = val

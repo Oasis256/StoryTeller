@@ -59,12 +59,19 @@
           </span>
         </nuxt-link>
       </div>
+<<<<<<< HEAD
       <div v-show="numLibraryItemsSelected"
         class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numLibraryItemsSelected]) }}</h1>
         <div class="flex-grow" />
         <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2"
           @click="playSelectedItems">
+=======
+      <div v-show="numMediaItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
+        <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numMediaItemsSelected]) }}</h1>
+        <div class="flex-grow" />
+        <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small class="flex items-center h-9 mr-2" @click="playSelectedItems">
+>>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
@@ -132,11 +139,14 @@ export default {
     username() {
       return this.user ? this.user.username : 'err'
     },
-    numLibraryItemsSelected() {
-      return this.selectedLibraryItems.length
+    numMediaItemsSelected() {
+      return this.selectedMediaItems.length
     },
-    selectedLibraryItems() {
-      return this.$store.state.selectedLibraryItems
+    selectedMediaItems() {
+      return this.$store.state.globals.selectedMediaItems
+    },
+    selectedMediaItemsArePlayable() {
+      return !this.selectedMediaItems.some(i => !i.hasTracks)
     },
     userMediaProgress() {
       return this.$store.state.user.user.mediaProgress || []
@@ -152,8 +162,8 @@ export default {
     },
     selectedIsFinished() {
       // Find an item that is not finished, if none then all items finished
-      return !this.selectedLibraryItems.find((libraryItemId) => {
-        var itemProgress = this.userMediaProgress.find((lip) => lip.libraryItemId === libraryItemId)
+      return !this.selectedMediaItems.find((item) => {
+        const itemProgress = this.userMediaProgress.find((lip) => lip.libraryItemId === item.id)
         return !itemProgress || !itemProgress.isFinished
       })
     },
@@ -177,8 +187,9 @@ export default {
     async playSelectedItems() {
       this.$store.commit('setProcessingBatch', true)
 
-      var libraryItems = await this.$axios.$post(`/api/items/batch/get`, { libraryItemIds: this.selectedLibraryItems }).catch((error) => {
-        var errorMsg = error.response.data || 'Failed to get items'
+      const libraryItemIds = this.selectedMediaItems.map((i) => i.id)
+      const libraryItems = await this.$axios.$post(`/api/items/batch/get`, { libraryItemIds }).catch((error) => {
+        const errorMsg = error.response.data || 'Failed to get items'
         console.error(errorMsg, error)
         this.$toast.error(errorMsg)
         return []
@@ -208,20 +219,20 @@ export default {
         queueItems
       })
       this.$store.commit('setProcessingBatch', false)
-      this.$store.commit('setSelectedLibraryItems', [])
+      this.$store.commit('globals/resetSelectedMediaItems', [])
       this.$eventBus.$emit('bookshelf_clear_selection')
     },
     cancelSelectionMode() {
       if (this.processingBatch) return
-      this.$store.commit('setSelectedLibraryItems', [])
+      this.$store.commit('globals/resetSelectedMediaItems', [])
       this.$eventBus.$emit('bookshelf_clear_selection')
     },
     toggleBatchRead() {
       this.$store.commit('setProcessingBatch', true)
-      var newIsFinished = !this.selectedIsFinished
-      var updateProgressPayloads = this.selectedLibraryItems.map((lid) => {
+      const newIsFinished = !this.selectedIsFinished
+      const updateProgressPayloads = this.selectedMediaItems.map((item) => {
         return {
-          libraryItemId: lid,
+          libraryItemId: item.id,
           isFinished: newIsFinished
         }
       })
@@ -231,7 +242,7 @@ export default {
         .then(() => {
           this.$toast.success('Batch update success!')
           this.$store.commit('setProcessingBatch', false)
-          this.$store.commit('setSelectedLibraryItems', [])
+          this.$store.commit('globals/resetSelectedMediaItems', [])
           this.$eventBus.$emit('bookshelf_clear_selection')
         })
         .catch((error) => {
@@ -241,18 +252,23 @@ export default {
         })
     },
     batchDeleteClick() {
+<<<<<<< HEAD
       var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
       var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
+=======
+      const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
+      const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
+>>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
       if (confirm(confirmMsg)) {
         this.$store.commit('setProcessingBatch', true)
         this.$axios
           .$post(`/api/items/batch/delete`, {
-            libraryItemIds: this.selectedLibraryItems
+            libraryItemIds: this.selectedMediaItems.map((i) => i.id)
           })
           .then(() => {
             this.$toast.success('Batch delete success!')
             this.$store.commit('setProcessingBatch', false)
-            this.$store.commit('setSelectedLibraryItems', [])
+            this.$store.commit('globals/resetSelectedMediaItems', [])
             this.$eventBus.$emit('bookshelf_clear_selection')
           })
           .catch((error) => {

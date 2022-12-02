@@ -15,7 +15,7 @@
         <div class="w-full overflow-y-auto overflow-x-hidden max-h-96">
           <transition-group name="list-complete" tag="div">
             <template v-for="collection in sortedCollections">
-              <modals-collections-user-collection-item :key="collection.id" :collection="collection" :book-cover-aspect-ratio="bookCoverAspectRatio" class="list-complete-item" @add="addToCollection" @remove="removeFromCollection" @close="show = false" />
+              <modals-collections-collection-item :key="collection.id" :collection="collection" :book-cover-aspect-ratio="bookCoverAspectRatio" class="list-complete-item" @add="addToCollection" @remove="removeFromCollection" @close="show = false" />
             </template>
           </transition-group>
         </div>
@@ -104,7 +104,7 @@ export default {
       return this.$store.state.globals.showBatchCollectionModal
     },
     selectedBookIds() {
-      return this.$store.state.selectedLibraryItems || []
+      return (this.$store.state.globals.selectedMediaItems || []).map((i) => i.id)
     },
     currentLibraryId() {
       return this.$store.state.libraries.currentLibraryId
@@ -112,23 +112,21 @@ export default {
   },
   methods: {
     loadCollections() {
-      if (!this.collections.length) {
-        this.processing = true
-        this.$axios
-          .$get(`/api/libraries/${this.currentLibraryId}/collections`)
-          .then((data) => {
-            if (data.results) {
-              this.$store.commit('libraries/setCollections', data.results || [])
-            }
-          })
-          .catch((error) => {
-            console.error('Failed to get collections', error)
-            this.$toast.error('Failed to load collections')
-          })
-          .finally(() => {
-            this.processing = false
-          })
-      }
+      this.processing = true
+      this.$axios
+        .$get(`/api/libraries/${this.currentLibraryId}/collections`)
+        .then((data) => {
+          if (data.results) {
+            this.$store.commit('libraries/setCollections', data.results || [])
+          }
+        })
+        .catch((error) => {
+          console.error('Failed to get collections', error)
+          this.$toast.error('Failed to load collections')
+        })
+        .finally(() => {
+          this.processing = false
+        })
     },
     removeFromCollection(collection) {
       if (!this.selectedLibraryItemId && !this.selectedBookIds.length) return
@@ -231,19 +229,3 @@ export default {
   mounted() {}
 }
 </script>
-
-<style>
-.list-complete-item {
-  transition: all 0.8s ease;
-}
-
-.list-complete-enter-from,
-.list-complete-leave-to {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-.list-complete-leave-active {
-  position: absolute;
-}
-</style>

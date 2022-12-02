@@ -11,7 +11,9 @@
 
     <modals-item-edit-modal />
     <modals-collections-add-create-modal />
-    <modals-edit-collection-modal />
+    <modals-collections-edit-modal />
+    <modals-playlists-add-create-modal />
+    <modals-playlists-edit-modal />
     <modals-podcast-edit-episode />
     <modals-podcast-view-episode />
     <modals-authors-edit-modal />
@@ -40,9 +42,8 @@ export default {
       if (this.$store.state.showEditModal) {
         this.$store.commit('setShowEditModal', false)
       }
-      if (this.$store.state.selectedLibraryItems) {
-        this.$store.commit('setSelectedLibraryItems', [])
-      }
+
+      this.$store.commit('globals/resetSelectedMediaItems', [])
       this.updateBodyClass()
     }
   },
@@ -53,9 +54,12 @@ export default {
     isCasting() {
       return this.$store.state.globals.isCasting
     },
+    currentLibraryId() {
+      return this.$store.state.libraries.currentLibraryId
+    },
     isShowingSideRail() {
       if (!this.$route.name) return false
-      return !this.$route.name.startsWith('config') && this.$store.state.libraries.currentLibraryId
+      return !this.$route.name.startsWith('config') && this.currentLibraryId
     },
     isShowingToolbar() {
       return this.isShowingSideRail && this.$route.name !== 'upload' && this.$route.name !== 'account'
@@ -132,14 +136,8 @@ export default {
         }
       })
 
-      if (payload.backups && payload.backups.length) {
-        this.$store.commit('setBackups', payload.backups)
-      }
       if (payload.usersOnline) {
-        this.$store.commit('users/resetUsers')
-        payload.usersOnline.forEach((user) => {
-          this.$store.commit('users/updateUser', user)
-        })
+        this.$store.commit('users/setUsersOnline', payload.usersOnline)
       }
 
       this.$eventBus.$emit('socket_init')
@@ -174,7 +172,7 @@ export default {
       this.$store.commit('libraries/remove', library)
 
       // When removed currently selected library then set next accessible library
-      const currLibraryId = this.$store.state.libraries.currentLibraryId
+      const currLibraryId = this.currentLibraryId
       if (currLibraryId === library.id) {
         var nextLibrary = this.$store.getters['libraries/getNextAccessibleLibrary']
         if (nextLibrary) {
@@ -213,7 +211,7 @@ export default {
     libraryItemRemoved(item) {
       if (this.$route.name.startsWith('item')) {
         if (this.$route.params.id === item.id) {
-          this.$router.replace(`/library/${this.$store.state.libraries.currentLibraryId}`)
+          this.$router.replace(`/library/${this.currentLibraryId}`)
         }
       }
     },
@@ -286,30 +284,51 @@ export default {
       }
     },
     userOnline(user) {
-      this.$store.commit('users/updateUser', user)
+      this.$store.commit('users/updateUserOnline', user)
     },
     userOffline(user) {
-      this.$store.commit('users/removeUser', user)
+      this.$store.commit('users/removeUserOnline', user)
     },
     userStreamUpdate(user) {
-      this.$store.commit('users/updateUser', user)
+      this.$store.commit('users/updateUserOnline', user)
     },
     userMediaProgressUpdate(payload) {
       this.$store.commit('user/updateMediaProgress', payload)
     },
     collectionAdded(collection) {
+      if (this.currentLibraryId !== collection.libraryId) return
       this.$store.commit('libraries/addUpdateCollection', collection)
     },
     collectionUpdated(collection) {
+      if (this.currentLibraryId !== collection.libraryId) return
       this.$store.commit('libraries/addUpdateCollection', collection)
     },
     collectionRemoved(collection) {
+      if (this.currentLibraryId !== collection.libraryId) return
       if (this.$route.name.startsWith('collection')) {
         if (this.$route.params.id === collection.id) {
-          this.$router.replace(`/library/${this.$store.state.libraries.currentLibraryId}/bookshelf/collections`)
+          this.$router.replace(`/library/${this.currentLibraryId}/bookshelf/collections`)
         }
       }
       this.$store.commit('libraries/removeCollection', collection)
+    },
+    playlistAdded(playlist) {
+      if (playlist.userId !== this.user.id || this.currentLibraryId !== playlist.libraryId) return
+      this.$store.commit('libraries/addUpdateUserPlaylist', playlist)
+    },
+    playlistUpdated(playlist) {
+      if (playlist.userId !== this.user.id || this.currentLibraryId !== playlist.libraryId) return
+      this.$store.commit('libraries/addUpdateUserPlaylist', playlist)
+    },
+    playlistRemoved(playlist) {
+      if (playlist.userId !== this.user.id || this.currentLibraryId !== playlist.libraryId) return
+
+      if (this.$route.name.startsWith('playlist')) {
+        if (this.$route.params.id === playlist.id) {
+          this.$router.replace(`/library/${this.currentLibraryId}/bookshelf/playlists`)
+        }
+      }
+      this.$store.commit('libraries/removeUserPlaylist', playlist)
     },
     rssFeedOpen(data) {
       this.$store.commit('feeds/addFeed', data)
@@ -333,6 +352,9 @@ export default {
         this.$toast.info(toast)
       }
     },
+    adminMessageEvt(message) {
+      this.$toast.info(message)
+    },
     initializeSocket() {
       this.socket = this.$nuxtSocket({
         name: process.env.NODE_ENV === 'development' ? 'dev' : 'prod',
@@ -345,6 +367,7 @@ export default {
       this.$root.socket = this.socket
       console.log('Socket initialized')
 
+      // Pre-defined socket events
       this.socket.on('connect', this.connect)
       this.socket.on('connect_error', this.connectError)
       this.socket.on('disconnect', this.disconnect)
@@ -353,6 +376,7 @@ export default {
       this.socket.io.on('reconnect_error', this.reconnectError)
       this.socket.io.on('reconnect_failed', this.reconnectFailed)
 
+      // Event received after authorizing socket
       this.socket.on('init', this.init)
 
       // Stream Listeners
@@ -382,10 +406,15 @@ export default {
       this.socket.on('user_stream_update', this.userStreamUpdate)
       this.socket.on('user_item_progress_updated', this.userMediaProgressUpdate)
 
-      // User Collection Listeners
+      // Collection Listeners
       this.socket.on('collection_added', this.collectionAdded)
       this.socket.on('collection_updated', this.collectionUpdated)
       this.socket.on('collection_removed', this.collectionRemoved)
+
+      // User Playlist Listeners
+      this.socket.on('playlist_added', this.playlistAdded)
+      this.socket.on('playlist_updated', this.playlistUpdated)
+      this.socket.on('playlist_removed', this.playlistRemoved)
 
       // Scan Listeners
       this.socket.on('scan_start', this.scanStart)
@@ -403,6 +432,8 @@ export default {
       this.socket.on('backup_applied', this.backupApplied)
 
       this.socket.on('batch_quickmatch_complete', this.batchQuickMatchComplete)
+
+      this.socket.on('admin_message', this.adminMessageEvt)
     },
     showUpdateToast(versionData) {
       var ignoreVersion = localStorage.getItem('ignoreVersion')
@@ -472,9 +503,9 @@ export default {
       }
 
       // Batch selecting
-      if (this.$store.getters['getNumLibraryItemsSelected'] && name === 'Escape') {
+      if (this.$store.getters['globals/getIsBatchSelectingMediaItems'] && name === 'Escape') {
         // ESCAPE key cancels batch selection
-        this.$store.commit('setSelectedLibraryItems', [])
+        this.$store.commit('globals/resetSelectedMediaItems', [])
         this.$eventBus.$emit('bookshelf_clear_selection')
         e.preventDefault()
         return

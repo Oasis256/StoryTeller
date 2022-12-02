@@ -1,12 +1,5 @@
 <template>
-  <div class="bg-bg rounded-md shadow-lg border border-white border-opacity-5 p-4 mb-8">
-    <div class="flex items-center mb-2">
-      <h1 class="text-xl">{{ $strings.HeaderUsers }}</h1>
-      <div class="mx-2 w-7 h-7 flex items-center justify-center rounded-full cursor-pointer hover:bg-white hover:bg-opacity-10 text-center" @click="clickAddUser">
-        <span class="material-icons" style="font-size: 1.4rem">add</span>
-      </div>
-    </div>
-
+  <div>
     <div class="text-center">
       <table id="accounts">
         <tr>
@@ -26,11 +19,9 @@
           </td>
           <td class="text-sm">{{ user.type }}</td>
           <td class="hidden lg:table-cell">
-            <div v-if="usersOnline[user.id] && usersOnline[user.id].session && usersOnline[user.id].session.libraryItem && usersOnline[user.id].session.libraryItem.media">
-              <p class="truncate text-xs">Listening: {{ usersOnline[user.id].session.libraryItem.media.metadata.title || '' }}</p>
-            </div>
-            <div v-else-if="user.mostRecent">
-              <p class="truncate text-xs">Last: {{ user.mostRecent.metadata.title }}</p>
+            <div v-if="usersOnline[user.id]">
+              <p v-if="usersOnline[user.id].session && usersOnline[user.id].session.libraryItem" class="truncate text-xs">Listening: {{ usersOnline[user.id].session.libraryItem.media.metadata.title || '' }}</p>
+              <p v-else-if="usersOnline[user.id].mostRecent && usersOnline[user.id].mostRecent.media" class="truncate text-xs">Last: {{ usersOnline[user.id].mostRecent.media.metadata.title }}</p>
             </div>
           </td>
           <td class="text-xs font-mono hidden sm:table-cell">
@@ -81,7 +72,7 @@ export default {
     },
     usersOnline() {
       var usermap = {}
-      this.$store.state.users.users.forEach((u) => (usermap[u.id] = { online: true, session: u.session }))
+      this.$store.state.users.usersOnline.forEach((u) => (usermap[u.id] = u))
       return usermap
     }
   },

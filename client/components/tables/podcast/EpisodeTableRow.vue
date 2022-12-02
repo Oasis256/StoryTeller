@@ -20,12 +20,20 @@
             <p class="pl-2 pr-1 text-sm font-semibold">{{ timeRemaining }}</p>
           </button>
 
-          <button v-if="libraryItemIdStreaming && !isStreamingFromDifferentLibrary" class="h-8 w-8 flex justify-center items-center mx-2" :class="isQueued ? 'text-success' : ''" @click.stop="queueBtnClick">
-            <span class="material-icons-outlined">{{ isQueued ? 'playlist_add_check' : 'playlist_add' }}</span>
-          </button>
+          <!-- <button v-if="libraryItemIdStreaming && !isStreamingFromDifferentLibrary" class="h-8 w-8 flex justify-center items-center mx-2" :class="isQueued ? 'text-success' : ''" @click.stop="queueBtnClick">
+            <span class="material-icons-outlined">{{ isQueued ? 'playlist_add_check' : 'queue' }}</span>
+          </button> -->
+
+          <ui-tooltip v-if="libraryItemIdStreaming && !isStreamingFromDifferentLibrary" :text="isQueued ? $strings.MessageRemoveFromPlayerQueue : $strings.MessageAddToPlayerQueue" :class="isQueued ? 'text-success' : ''" direction="top">
+            <ui-icon-btn :icon="isQueued ? 'playlist_add_check' : 'playlist_play'" borderless @click="queueBtnClick" />
+          </ui-tooltip>
 
           <ui-tooltip :text="userIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished" direction="top">
             <ui-read-icon-btn :disabled="isProcessingReadUpdate" :is-read="userIsFinished" borderless class="mx-1 mt-0.5" @click="toggleFinished" />
+          </ui-tooltip>
+
+          <ui-tooltip :text="$strings.LabelYourPlaylists" direction="top">
+            <ui-icon-btn icon="playlist_add" borderless @click="clickAddToPlaylist" />
           </ui-tooltip>
 
           <ui-icon-btn v-if="userCanUpdate" icon="edit" borderless @click="clickEdit" />
@@ -123,6 +131,9 @@ export default {
     }
   },
   methods: {
+    clickAddToPlaylist() {
+      this.$emit('addToPlaylist', this.episode)
+    },
     clickedEpisode() {
       this.$emit('view', this.episode)
     },

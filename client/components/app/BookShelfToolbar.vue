@@ -165,6 +165,9 @@ export default {
     isCollectionsPage() {
       return this.page === 'collections'
     },
+    isPlaylistsPage() {
+      return this.page === 'playlists'
+    },
     isHomePage() {
       return this.$route.name === 'library-library'
     },
@@ -185,6 +188,7 @@ export default {
       if (!this.page) return this.$strings.LabelBooks
       if (this.isSeriesPage) return this.$strings.LabelSeries
       if (this.isCollectionsPage) return this.$strings.LabelCollections
+      if (this.isPlaylistsPage) return this.$strings.LabelPlaylists
       return ''
     },
     seriesId() {
@@ -201,7 +205,7 @@ export default {
       return this.seriesProgress.libraryItemIds || []
     },
     isBatchSelecting() {
-      return this.$store.state.selectedLibraryItems.length
+      return this.$store.getters['globals/getIsBatchSelectingMediaItems']
     },
     isSeriesFinished() {
       return this.seriesProgress && !!this.seriesProgress.isFinished

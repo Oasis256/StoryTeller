@@ -1,4 +1,6 @@
 const Logger = require('../Logger')
+const SocketAuthority = require('../SocketAuthority')
+
 const User = require('../objects/user/User')
 
 const { getId, toNumber } = require('../utils/index')
@@ -9,7 +11,7 @@ class UserController {
   findAll(req, res) {
     if (!req.user.isAdminOrUp) return res.sendStatus(403)
     const hideRootToken = !req.user.isRoot
-    var users = this.db.users.map(u => this.userJsonWithItemProgressDetails(u, hideRootToken))
+    const users = this.db.users.map(u => this.userJsonWithItemProgressDetails(u, hideRootToken))
     res.json(users)
   }
 
@@ -19,7 +21,7 @@ class UserController {
       return res.sendStatus(403)
     }
 
-    var user = this.db.users.find(u => u.id === req.params.id)
+    const user = this.db.users.find(u => u.id === req.params.id)
     if (!user) {
       return res.sendStatus(404)
     }
@@ -44,7 +46,7 @@ class UserController {
     var newUser = new User(account)
     var success = await this.db.insertEntity('user', newUser)
     if (success) {
-      this.clientEmitter(req.user.id, 'user_added', newUser)
+      SocketAuthority.adminEmitter('user_added', newUser)
       res.json({
         user: newUser.toJSONForBrowser()
       })
@@ -85,7 +87,7 @@ class UserController {
         Logger.info(`[UserController] User ${user.username} was generated a new api token`)
       }
       await this.db.updateEntity('user', user)
-      this.clientEmitter(req.user.id, 'user_updated', user.toJSONForBrowser())
+      SocketAuthority.clientEmitter(req.user.id, 'user_updated', user.toJSONForBrowser())
     }
 
     res.json({
@@ -103,13 +105,19 @@ class UserController {
       Logger.error(`[UserController] ${req.user.username} is attempting to delete themselves... why? WHY?`)
       return res.sendStatus(500)
     }
-    var user = req.reqUser
+    const user = req.reqUser
 
     // Todo: check if user is logged in and cancel streams
 
-    var userJson = user.toJSONForBrowser()
+    // Remove user playlists
+    const userPlaylists = this.db.playlists.filter(p => p.userId === user.id)
+    for (const playlist of userPlaylists) {
+      await this.db.removeEntity('playlist', playlist.id)
+    }
+
+    const userJson = user.toJSONForBrowser()
     await this.db.removeEntity('user', user.id)
-    this.clientEmitter(req.user.id, 'user_removed', userJson)
+    SocketAuthority.adminEmitter('user_removed', userJson)
     res.json({
       success: true
     })
@@ -170,7 +178,7 @@ class UserController {
     if (progressPurged) {
       Logger.info(`[UserController] Purged ${progressPurged} media progress for user ${user.username}`)
       await this.db.updateEntity('user', user)
-      this.clientEmitter(req.user.id, 'user_updated', user.toJSONForBrowser())
+      SocketAuthority.adminEmitter('user_updated', user.toJSONForBrowser())
     }
 
     res.json(this.userJsonWithItemProgressDetails(user, !req.user.isRoot))
@@ -181,10 +189,9 @@ class UserController {
     if (!req.user.isAdminOrUp) {
       return res.sendStatus(403)
     }
-    const usersOnline = this.getUsersOnline()
 
     res.json({
-      usersOnline,
+      usersOnline: SocketAuthority.getUsersOnline(),
       openSessions: this.playbackSessionManager.sessions
     })
   }

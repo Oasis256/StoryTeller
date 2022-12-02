@@ -7,7 +7,7 @@
 
 <script>
 export default {
-  async asyncData({ params, query, store, app, redirect }) {
+  async asyncData({ params, query, store, redirect }) {
     var libraryId = params.library
     var libraryData = await store.dispatch('libraries/fetch', libraryId)
     if (!libraryData) {
@@ -16,7 +16,6 @@ export default {
 
     // Set series sort by
     if (params.id === 'series') {
-      console.log('Series page', query)
       if (query.sort) {
         store.commit('libraries/setSeriesSortBy', query.sort)
         store.commit('libraries/setSeriesSortDesc', !!query.desc)

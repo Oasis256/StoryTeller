@@ -9,10 +9,12 @@ export const state = () => ({
   issues: 0,
   folderLastUpdate: 0,
   filterData: null,
+  numUserPlaylists: 0,
   seriesSortBy: 'name',
   seriesSortDesc: false,
   seriesFilterBy: 'all',
-  collections: []
+  collections: [],
+  userPlaylists: []
 })
 
 export const getters = {
@@ -59,6 +61,9 @@ export const getters = {
   },
   getCollection: state => id => {
     return state.collections.find(c => c.id === id)
+  },
+  getPlaylist: state => id => {
+    return state.userPlaylists.find(p => p.id === id)
   }
 }
 
@@ -102,20 +107,26 @@ export const actions = {
       return false
     }
 
+    const libraryChanging = state.currentLibraryId !== libraryId
     return this.$axios
       .$get(`/api/libraries/${libraryId}?include=filterdata`)
       .then((data) => {
-        var library = data.library
-        var filterData = data.filterdata
-        var issues = data.issues || 0
+        const library = data.library
+        const filterData = data.filterdata
+        const issues = data.issues || 0
+        const numUserPlaylists = data.numUserPlaylists
 
         dispatch('user/checkUpdateLibrarySortFilter', library.mediaType, { root: true })
 
         commit('addUpdate', library)
         commit('setLibraryIssues', issues)
         commit('setLibraryFilterData', filterData)
+        commit('setNumUserPlaylists', numUserPlaylists)
         commit('setCurrentLibrary', libraryId)
-        commit('setCollections', [])
+        if (libraryChanging) {
+          commit('setCollections', [])
+          commit('setUserPlaylists', [])
+        }
         return data
       })
       .catch((error) => {
@@ -219,6 +230,9 @@ export const mutations = {
   setLibraryFilterData(state, filterData) {
     state.filterData = filterData
   },
+  setNumUserPlaylists(state, numUserPlaylists) {
+    state.numUserPlaylists = numUserPlaylists
+  },
   updateFilterDataWithItem(state, libraryItem) {
     if (!libraryItem || !state.filterData) return
     if (state.currentLibraryId !== libraryItem.libraryId) return
@@ -320,5 +334,22 @@ export const mutations = {
   },
   removeCollection(state, collection) {
     state.collections = state.collections.filter(c => c.id !== collection.id)
+  },
+  setUserPlaylists(state, playlists) {
+    state.userPlaylists = playlists
+    state.numUserPlaylists = playlists.length
+  },
+  addUpdateUserPlaylist(state, playlist) {
+    const index = state.userPlaylists.findIndex(p => p.id === playlist.id)
+    if (index >= 0) {
+      state.userPlaylists.splice(index, 1, playlist)
+    } else {
+      state.userPlaylists.push(playlist)
+      state.numUserPlaylists++
+    }
+  },
+  removeUserPlaylist(state, playlist) {
+    state.userPlaylists = state.userPlaylists.filter(p => p.id !== playlist.id)
+    state.numUserPlaylists = state.userPlaylists.length
   }
 }
