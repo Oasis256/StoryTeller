@@ -59,19 +59,19 @@
           </span>
         </nuxt-link>
       </div>
-<<<<<<< HEAD
+<!-- <<<<<<< HEAD -->
       <div v-show="numLibraryItemsSelected"
         class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numLibraryItemsSelected]) }}</h1>
         <div class="flex-grow" />
         <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2"
           @click="playSelectedItems">
-=======
+<!-- =======
       <div v-show="numMediaItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numMediaItemsSelected]) }}</h1>
         <div class="flex-grow" />
         <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small class="flex items-center h-9 mr-2" @click="playSelectedItems">
->>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
+>>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2 -->
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
@@ -252,13 +252,13 @@ export default {
         })
     },
     batchDeleteClick() {
-<<<<<<< HEAD
+// <<<<<<< HEAD
       var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
       var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
-=======
-      const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
-      const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
->>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
+// =======
+//       const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
+//       const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
+// >>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
       if (confirm(confirmMsg)) {
         this.$store.commit('setProcessingBatch', true)
         this.$axios
