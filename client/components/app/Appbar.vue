@@ -3,7 +3,8 @@
     <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-50">
       <div class="flex h-full items-center">
         <img v-if="!showBack" src="/icon48.png" class="w-10 h-10 md:w-12 md:h-12 mr-4" />
-        <a v-if="showBack" @click="back" class="rounded-full h-12 w-12 flex items-center justify-center hover:bg-white hover:bg-opacity-10 mr-4 cursor-pointer">
+        <a v-if="showBack" @click="back"
+          class="rounded-full h-12 w-12 flex items-center justify-center hover:bg-white hover:bg-opacity-10 mr-4 cursor-pointer">
           <span class="material-icons text-4xl text-white">arrow_back</span>
         </a>
         <h1 class="text-2xl font-book mr-6 hidden lg:block">The Book Shelf</h1>
@@ -34,17 +35,23 @@
 
         <nuxt-link v-if="currentLibrary" to="/config/stats"
           class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
-          <span class="material-icons text-2xl" aria-label="User Stats" role="button">equalizer</span>
+          <ui-tooltip :text="$strings.HeaderYourStats" direction="bottom" class="flex items-center">
+            <span class="material-icons text-2xl" aria-label="User Stats" role="button">equalizer</span>
+          </ui-tooltip>
         </nuxt-link>
 
         <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload"
           class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
-          <span class="material-icons text-2xl" aria-label="Upload Media" role="button">upload</span>
+          <ui-tooltip :text="$strings.ButtonUpload" direction="bottom" class="flex items-center">
+            <span class="material-icons text-2xl" aria-label="Upload Media" role="button">upload</span>
+          </ui-tooltip>
         </nuxt-link>
 
         <nuxt-link v-if="userIsAdminOrUp" to="/config"
           class="outline-none hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
-          <span class="material-icons text-2xl" aria-label="System Settings" role="button">settings</span>
+          <ui-tooltip :text="$strings.HeaderSettings" direction="bottom" class="flex items-center">
+            <span class="material-icons text-2xl" aria-label="System Settings" role="button">settings</span>
+          </ui-tooltip>
         </nuxt-link>
 
         <nuxt-link to="/account"
@@ -59,14 +66,14 @@
           </span>
         </nuxt-link>
       </div>
-<!-- <<<<<<< HEAD -->
+      <!-- <<<<<<< HEAD -->
       <div v-show="numLibraryItemsSelected"
         class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numLibraryItemsSelected]) }}</h1>
         <div class="flex-grow" />
         <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2"
           @click="playSelectedItems">
-<!-- =======
+          <!-- =======
       <div v-show="numMediaItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numMediaItemsSelected]) }}</h1>
         <div class="flex-grow" />
@@ -252,13 +259,13 @@ export default {
         })
     },
     batchDeleteClick() {
-// <<<<<<< HEAD
+      // <<<<<<< HEAD
       var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
       var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
-// =======
-//       const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
-//       const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
-// >>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
+      // =======
+      //       const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
+      //       const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
+      // >>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
       if (confirm(confirmMsg)) {
         this.$store.commit('setProcessingBatch', true)
         this.$axios
