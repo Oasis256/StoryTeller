@@ -143,7 +143,7 @@ class ApiRouter {
     //
     // Playlist Routes
     //
-    this.router.post('/playlists', PlaylistController.middleware.bind(this), PlaylistController.create.bind(this))
+    this.router.post('/playlists', PlaylistController.create.bind(this))
     this.router.get('/playlists', PlaylistController.findAllForUser.bind(this))
     this.router.get('/playlists/:id', PlaylistController.middleware.bind(this), PlaylistController.findOne.bind(this))
     this.router.patch('/playlists/:id', PlaylistController.middleware.bind(this), PlaylistController.update.bind(this))
@@ -152,6 +152,7 @@ class ApiRouter {
     this.router.delete('/playlists/:id/item/:libraryItemId/:episodeId?', PlaylistController.middleware.bind(this), PlaylistController.removeItem.bind(this))
     this.router.post('/playlists/:id/batch/add', PlaylistController.middleware.bind(this), PlaylistController.addBatch.bind(this))
     this.router.post('/playlists/:id/batch/remove', PlaylistController.middleware.bind(this), PlaylistController.removeBatch.bind(this))
+    this.router.post('/playlists/collection/:collectionId', PlaylistController.createFromCollection.bind(this))
 
     //
     // Current User Routes (Me)
@@ -168,7 +169,7 @@ class ApiRouter {
     this.router.patch('/me/item/:id/bookmark', MeController.updateBookmark.bind(this))
     this.router.delete('/me/item/:id/bookmark/:time', MeController.removeBookmark.bind(this))
     this.router.patch('/me/password', MeController.updatePassword.bind(this))
-    this.router.patch('/me/settings', MeController.updateSettings.bind(this))
+    this.router.patch('/me/settings', MeController.updateSettings.bind(this)) // TODO: Remove after mobile release v0.9.61-beta
     this.router.post('/me/sync-local-progress', MeController.syncLocalMediaProgress.bind(this))
     this.router.get('/me/items-in-progress', MeController.getAllLibraryItemsInProgress.bind(this))
     this.router.get('/me/series/:id/remove-from-continue-listening', MeController.removeSeriesFromContinueListening.bind(this))

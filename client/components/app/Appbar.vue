@@ -1,6 +1,6 @@
 <template>
   <div class="w-full h-16 bg-primary relative">
-    <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-50">
+    <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-60">
       <div class="flex h-full items-center">
         <nuxt-link to="/">
           <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1 dev">logo_dev
@@ -87,7 +87,7 @@
             class="mx-1.5" />
         </ui-tooltip>
         <template v-if="userCanUpdate">
-          <ui-tooltip text="Edit" direction="bottom">
+          <ui-tooltip :text="$strings.LabelEdit" direction="bottom">
             <ui-icon-btn :disabled="processingBatch" icon="edit" bg-color="warning" class="mx-1.5"
               @click="batchEditClick" />
           </ui-tooltip>

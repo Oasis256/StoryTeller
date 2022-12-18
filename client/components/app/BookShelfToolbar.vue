@@ -39,7 +39,7 @@
         <p class="text-sm">{{ $strings.ButtonSearch }}</p>
       </nuxt-link>
     </div>
-    <div id="toolbar" class="absolute top-10 md:top-0 left-0 w-full h-10 md:h-full z-30 flex items-center justify-end md:justify-start px-2 md:px-8">
+    <div id="toolbar" class="absolute top-10 md:top-0 left-0 w-full h-10 md:h-full z-40 flex items-center justify-end md:justify-start px-2 md:px-8">
       <!-- Series books page -->
       <template v-if="selectedSeries">
         <p class="pl-2 font-book text-base md:text-lg">
@@ -72,8 +72,8 @@
         <ui-checkbox v-if="isLibraryPage && !isPodcastLibrary && !isBatchSelecting" v-model="settings.collapseSeries" :label="$strings.LabelCollapseSeries" checkbox-bg="bg" check-color="white" small class="mr-2" @input="updateCollapseSeries" />
         <controls-library-filter-select v-if="isLibraryPage && !isBatchSelecting" v-model="settings.filterBy" class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateFilter" />
         <controls-library-sort-select v-if="isLibraryPage && !isBatchSelecting" v-model="settings.orderBy" :descending.sync="settings.orderDesc" class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateOrder" />
-        <controls-library-filter-select v-if="isSeriesPage && !isBatchSelecting" v-model="seriesFilterBy" is-series class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateSeriesFilter" />
-        <controls-sort-select v-if="isSeriesPage && !isBatchSelecting" v-model="seriesSortBy" :descending.sync="seriesSortDesc" :items="seriesSortItems" class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateSeriesSort" />
+        <controls-library-filter-select v-if="isSeriesPage && !isBatchSelecting" v-model="settings.seriesFilterBy" is-series class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateSeriesFilter" />
+        <controls-sort-select v-if="isSeriesPage && !isBatchSelecting" v-model="settings.seriesSortBy" :descending.sync="settings.seriesSortDesc" :items="seriesSortItems" class="w-36 sm:w-44 md:w-48 h-7.5 ml-1 sm:ml-4" @change="updateSeriesSort" />
 
         <ui-btn v-if="isIssuesFilter && userCanDelete && !isBatchSelecting" :loading="processingIssues" color="error" small class="ml-4" @click="removeAllIssues">{{ $strings.ButtonRemoveAll }} {{ numShowing }} {{ entityName }}</ui-btn>
       </template>
@@ -219,30 +219,6 @@ export default {
     },
     isIssuesFilter() {
       return this.filterBy === 'issues' && this.$route.query.filter === 'issues'
-    },
-    seriesSortBy: {
-      get() {
-        return this.$store.state.libraries.seriesSortBy
-      },
-      set(val) {
-        this.$store.commit('libraries/setSeriesSortBy', val)
-      }
-    },
-    seriesSortDesc: {
-      get() {
-        return this.$store.state.libraries.seriesSortDesc
-      },
-      set(val) {
-        this.$store.commit('libraries/setSeriesSortDesc', val)
-      }
-    },
-    seriesFilterBy: {
-      get() {
-        return this.$store.state.libraries.seriesFilterBy
-      },
-      set(val) {
-        this.$store.commit('libraries/setSeriesFilterBy', val)
-      }
     }
   },
   methods: {
@@ -339,10 +315,10 @@ export default {
       this.saveSettings()
     },
     updateSeriesSort() {
-      this.$eventBus.$emit('series-sort-updated')
+      this.saveSettings()
     },
     updateSeriesFilter() {
-      this.$eventBus.$emit('series-sort-updated')
+      this.saveSettings()
     },
     updateCollapseSeries() {
       this.saveSettings()
@@ -367,11 +343,11 @@ export default {
   },
   mounted() {
     this.init()
-    this.$store.commit('user/addSettingsListener', { id: 'bookshelftoolbar', meth: this.settingsUpdated })
+    this.$eventBus.$on('user-settings', this.settingsUpdated)
     this.$eventBus.$on('bookshelf-total-entities', this.setBookshelfTotalEntities)
   },
   beforeDestroy() {
-    this.$store.commit('user/removeSettingsListener', 'bookshelftoolbar')
+    this.$eventBus.$off('user-settings', this.settingsUpdated)
     this.$eventBus.$off('bookshelf-total-entities', this.setBookshelfTotalEntities)
   }
 }
