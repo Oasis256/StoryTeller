@@ -44,29 +44,14 @@ module.exports.writeConcatFile = writeConcatFile
 async function writeMetadataFile(libraryItem, outputPath) {
   var inputstrs = [
     ';FFMETADATA1',
-// <<<<<<< HEAD
-    `title=${audiobook.title}`,
-    `artist=${audiobook.authorFL}`,
-    `album_artist=${audiobook.authorFL}`,
-    `date=${audiobook.book.publishedYear || ''}`,
-    `description=${audiobook.book.description}`,
-    `genre=${audiobook.book._genres.join(';')}`,
-    `comment=The Book Shelf v${package.version}`
-// =======
-//     `title=${libraryItem.media.metadata.title}`,
-//     `artist=${libraryItem.media.metadata.authorName}`,
-//     `album_artist=${libraryItem.media.metadata.authorName}`,
-//     `date=${libraryItem.media.metadata.publishedYear || ''}`,
-// <<<<<<< HEAD
+    `title=${libraryItem.media.metadata.title}`,
+    `artist=${libraryItem.media.metadata.authorName}`,
+    `album_artist=${libraryItem.media.metadata.authorName}`,
+    `date=${libraryItem.media.metadata.publishedYear || ''}`,
     `description=${libraryItem.media.metadata.description || ''}`,
     `genre=${libraryItem.media.metadata.genres.join(';')}`,
     `performer=${libraryItem.media.metadata.narratorName || ''}`,
     `encoded_by=audiobookshelf:${package.version}`
-// =======
-//     `description=${libraryItem.media.metadata.description}`,
-//     `genre=${libraryItem.media.metadata.genres.join(';')}`
-// >>>>>>> fc8fec62a08e30898963148d34fe8182b43458d6
-// >>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
   ]
 
   if (libraryItem.media.metadata.asin) {

@@ -71,7 +71,7 @@ class BackupManager {
 
   async uploadBackup(req, res) {
     var backupFile = req.files.file
-    if (Path.extname(backupFile.name) !== '.audiobookshelf') {
+    if (Path.extname(backupFile.name) !== '.shelf') {
       Logger.error(`[BackupManager] Invalid backup file uploaded "${backupFile.name}"`)
       return res.status(500).send('Invalid backup file')
     }
@@ -138,7 +138,7 @@ class BackupManager {
       var filesInDir = await fs.readdir(this.BackupPath)
       for (let i = 0; i < filesInDir.length; i++) {
         var filename = filesInDir[i]
-        if (filename.endsWith('.audiobookshelf')) {
+        if (filename.endsWith('.shelf')) {
           var fullFilePath = Path.join(this.BackupPath, filename)
 
           let zip = null

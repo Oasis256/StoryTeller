@@ -9,13 +9,8 @@
   <Privileged>false</Privileged>
   <Support>https://forums.unraid.net/topic/112698-support-audiobookshelf/</Support>
   <Project>https://github.com/advplyr/audiobookshelf</Project>
-<<<<<<< HEAD
   <Overview>Self-hosted audiobook and podcast server and web app. Supports multi-user w/ permissions and keeps progress in sync across devices. Free &amp; open source mobile apps. Consider contributing by posting feedback, suggestions, feature requests on github or the forums.</Overview>
   <Category>MediaApp:Books MediaServer:Books MediaApp:Other MediaServer:Other</Category>
-=======
-  <Overview>**(Android app is live)** Audiobook manager and player. Saves your progress, supports multiple accounts, stream all audio formats on the fly. No more switching between dozens of audio files for a single audiobook, The Book Shelf shows you one audio track with skipping, seeking and adjustable playback speed. Free &amp; open source mobile apps under construction, consider contributing by posting feedback, suggestions, feature requests on github or the forums.</Overview>
-  <Category>MediaApp:Books MediaServer:Books</Category>
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
   <WebUI>http://[IP]:[PORT:80]</WebUI>
   <TemplateURL>https://raw.githubusercontent.com/advplyr/docker-templates/master/audiobookshelf.xml</TemplateURL>
   <Icon>https://github.com/advplyr/audiobookshelf/raw/master/client/static/Logo.png</Icon>
@@ -25,11 +20,7 @@
   <DateInstalled>1629238508</DateInstalled>
   <DonateText/>
   <DonateLink/>
-<<<<<<< HEAD
   <Description>Self-hosted audiobook and podcast server and web app. Supports multi-user w/ permissions and keeps progress in sync across devices. Free &amp; open source mobile apps. Consider contributing by posting feedback, suggestions, feature requests on github or the forums.</Description>
-=======
-  <Description>Audiobook manager and player. Saves your progress, supports multiple accounts, stream all audio formats on the fly. No more switching between dozens of audio files for a single audiobook, The Book Shelf shows you one audio track with skipping, seeking and adjustable playback speed. Free &amp; open source mobile apps under construction, consider contributing by posting feedback, suggestions, feature requests on github or the forums.</Description>
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
   <Networking>
     <Mode>bridge</Mode>
     <Publish>

@@ -245,10 +245,7 @@ Bookshelf Label
 .no-bars .Vue-Toastification__container.top-right {
   padding-top: 8px;
 }
-
-#appbar {
-  box-shadow: 0px 5px 5px #11111155;
-}
+/* For The Love Editah The Custom CSS */
 
 .above,
 .below {
@@ -262,10 +259,17 @@ Bookshelf Label
   color: #0ff;
   font-weight: bolder;
   position: fixed;
-  left: 40em;
+  left: 50%;
 }
 
 .text {
   left: 10%;
   position: relative;
+}
+
+.dev {
+  position: sticky;
+  top: 1.5%;
+  display: flex;
+  justify-content: flex-end;
 }

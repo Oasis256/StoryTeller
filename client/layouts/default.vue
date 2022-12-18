@@ -123,7 +123,7 @@ export default {
       // Start scans currently running
       if (payload.librariesScanning) {
         payload.librariesScanning.forEach((libraryScan) => {
-          this.scanStart(libraryScan)
+          this.scanS < script >tart(libraryScan)
         })
       }
 

@@ -1,10 +1,6 @@
 <br />
 <div align="center">
-<<<<<<< HEAD
-   <img alt="{{ $strings.Title }} Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
-=======
-   <img alt="The Book Shelf Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+   <img alt="Audiobookshelf Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
 
   <p align="center">
     <br />
@@ -18,11 +14,7 @@
 
 # About
 
-<<<<<<< HEAD
-{{ $strings.Title }}tle }} is a self-hosted audiobook and podcast server.
-=======
-The Book Shelf is a self-hosted audiobook server for managing and playing your audiobooks.
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+Audiobookshelf is a self-hosted audiobook and podcast server.
 
 ### Features
 
@@ -44,11 +36,7 @@ The Book Shelf is a self-hosted audiobook server for managing and playing your a
 
 Is there a feature you are looking for? [Suggest it](https://github.com/advplyr/audiobookshelf/issues/new/choose)
 
-<<<<<<< HEAD
 Join us on [discord](https://discord.gg/pJsjuNCKRq) or [matrix](https://matrix.to/#/#audiobookshelf:matrix.org)
-=======
-Join us on [Discord](https://discord.gg/pJsjuNCKRq)
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
 
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
@@ -64,13 +52,9 @@ Available using Test Flight: https://testflight.apple.com/join/wiic7QIW - [Join 
 
 # Organizing your audiobooks
 
-<<<<<<< HEAD
-#### Directory structure and folder names are important to {{ $strings.Title }}!
-=======
-#### Directory structure and folder names are important to The Book Shelf!
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+#### Directory structure and folder names are important to Audiobookshelf!
 
- See [Documentation](https://audiobookshelf.org/docs) for supported directory structure, folder naming conventions, and audio file metadata usage.
+ See [documentation](https://audiobookshelf.org/docs) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
 <br />
 
@@ -175,11 +159,7 @@ Ffmpeg static build: `/usr/lib/audiobookshelf-ffmpeg/`
 
 # Reverse Proxy Set Up
 
-<<<<<<< HEAD
-#### Important! {{ $strings.Title }} requires a websocket connection.
-=======
-#### Important! The Book Shelf requires a websocket connection.
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+#### Important! Audiobookshelf requires a websocket connection.
 
 ### NGINX Proxy Manager
 

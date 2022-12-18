@@ -631,11 +631,7 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-<<<<<<< HEAD
-    {{ $strings.Title }}  Self-hosted audiobook server
-=======
-    The Book Shelf  Self-hosted audiobook server
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+    Audiobookshelf  Self-hosted audiobook server
     Copyright (C) 2021  advplyr
 
     This program is free software: you can redistribute it and/or modify
@@ -656,11 +652,7 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-<<<<<<< HEAD
-    {{ $strings.Title }}  Copyright (C) 2021  advplyr
-=======
-    The Book Shelf  Copyright (C) 2021  advplyr
->>>>>>> 013f27846d304c3da57efe8673039fc634fc2ba8
+    Audiobookshelf  Copyright (C) 2021  advplyr
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.

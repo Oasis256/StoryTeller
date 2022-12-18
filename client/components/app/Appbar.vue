@@ -2,24 +2,23 @@
   <div class="w-full h-16 bg-primary relative">
     <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-50">
       <div class="flex h-full items-center">
-        <img v-if="!showBack" src="/icon48.png" class="w-10 h-10 md:w-12 md:h-12 mr-4" />
-        <a v-if="showBack" @click="back"
-          class="rounded-full h-12 w-12 flex items-center justify-center hover:bg-white hover:bg-opacity-10 mr-4 cursor-pointer">
-          <span class="material-icons text-4xl text-white">arrow_back</span>
-        </a>
-        <h1 class="text-2xl font-book mr-6 hidden lg:block">The Book Shelf</h1>
+        <nuxt-link to="/">
+          <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1 dev">logo_dev
+          </span>
+          <img src="~static/icon.svg" class="w-8 min-w-8 h-8 mr-2 sm:w-12 sm:min-w-12 sm:h-12 sm:mr-4" />
+        </nuxt-link>
+
+        <ui-libraries-dropdown class="mr-2" />
 
         <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
         <h1 class="text-2xl font-book mr-6 hidden lg:block center">
           <nuxt-link to="/">
             <nlp class="above"></nlp>
+            <nlp class="text">
+              {{ $strings.Title }}
+            </nlp>
           </nuxt-link>
-          <nlp class="text">
-            {{ $strings.Title }}
-          </nlp>
         </h1>
-
-        <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1">logo_dev</span>
 
         <div class="flex-grow" />
 
@@ -66,19 +65,11 @@
           </span>
         </nuxt-link>
       </div>
-      <!-- <<<<<<< HEAD -->
-      <div v-show="numLibraryItemsSelected"
-        class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
-        <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numLibraryItemsSelected]) }}</h1>
-        <div class="flex-grow" />
-        <ui-btn v-if="!isPodcastLibrary" color="success" :padding-x="4" small class="flex items-center h-9 mr-2"
-          @click="playSelectedItems">
-          <!-- =======
       <div v-show="numMediaItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numMediaItemsSelected]) }}</h1>
         <div class="flex-grow" />
-        <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small class="flex items-center h-9 mr-2" @click="playSelectedItems">
->>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2 -->
+        <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small
+          class="flex items-center h-9 mr-2" @click="playSelectedItems">
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
@@ -153,7 +144,7 @@ export default {
       return this.$store.state.globals.selectedMediaItems
     },
     selectedMediaItemsArePlayable() {
-      return !this.selectedMediaItems.some(i => !i.hasTracks)
+      return !this.selectedMediaItems.some((i) => !i.hasTracks)
     },
     userMediaProgress() {
       return this.$store.state.user.user.mediaProgress || []
@@ -195,12 +186,15 @@ export default {
       this.$store.commit('setProcessingBatch', true)
 
       const libraryItemIds = this.selectedMediaItems.map((i) => i.id)
-      const libraryItems = await this.$axios.$post(`/api/items/batch/get`, { libraryItemIds }).catch((error) => {
-        const errorMsg = error.response.data || 'Failed to get items'
-        console.error(errorMsg, error)
-        this.$toast.error(errorMsg)
-        return []
-      })
+      const libraryItems = await this.$axios
+        .$post(`/api/items/batch/get`, { libraryItemIds })
+        .then((res) => res.libraryItems)
+        .catch((error) => {
+          const errorMsg = error.response.data || 'Failed to get items'
+          console.error(errorMsg, error)
+          this.$toast.error(errorMsg)
+          return []
+        })
 
       if (!libraryItems.length) {
         this.$store.commit('setProcessingBatch', false)
@@ -259,13 +253,8 @@ export default {
         })
     },
     batchDeleteClick() {
-      // <<<<<<< HEAD
-      var audiobookText = this.numLibraryItemsSelected > 1 ? `these ${this.numLibraryItemsSelected} items` : 'this item'
-      var confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from The Book Shelf`
-      // =======
-      //       const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
-      //       const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
-      // >>>>>>> bf071be2479106bfbfb21b7f7b98d066359174c2
+      const audiobookText = this.numMediaItemsSelected > 1 ? `these ${this.numMediaItemsSelected} items` : 'this item'
+      const confirmMsg = `Are you sure you want to remove ${audiobookText}?\n\n*Does not delete your files, only removes the items from Audiobookshelf`
       if (confirm(confirmMsg)) {
         this.$store.commit('setProcessingBatch', true)
         this.$axios
@@ -307,6 +296,8 @@ export default {
 }
 </script>
 
-<style class="nlp-appbar">
-
+<style>
+#appbar {
+  box-shadow: 0px 5px 5px #11111155;
+}
 </style>

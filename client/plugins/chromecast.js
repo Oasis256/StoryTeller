@@ -14,7 +14,7 @@ export default (ctx) => {
 
     // Custom message to receiver
     var castSession = castContext.getCurrentSession()
-    castSession.sendMessage('urn:x-cast:com.audiobookshelf.cast', {
+    castSession.sendMessage('urn:x-cast:com.shelf.cast', {
       covers
     })
   }
