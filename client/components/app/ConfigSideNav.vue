@@ -87,6 +87,11 @@ export default {
           id: 'config-notifications',
           title: this.$strings.HeaderNotifications,
           path: '/config/notifications'
+        },
+        {
+          id: 'config-item-metadata-utils',
+          title: this.$strings.HeaderItemMetadataUtils,
+          path: '/config/item-metadata-utils'
         }
       ]
 

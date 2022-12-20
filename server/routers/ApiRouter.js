@@ -272,6 +272,11 @@ class ApiRouter {
     this.router.patch('/settings', MiscController.updateServerSettings.bind(this))
     this.router.post('/authorize', MiscController.authorize.bind(this))
     this.router.get('/tags', MiscController.getAllTags.bind(this))
+    this.router.post('/tags/rename', MiscController.renameTag.bind(this))
+    this.router.delete('/tags/:tag', MiscController.deleteTag.bind(this))
+    this.router.get('/genres', MiscController.getAllGenres.bind(this))
+    this.router.post('/genres/rename', MiscController.renameGenre.bind(this))
+    this.router.delete('/genres/:genre', MiscController.deleteGenre.bind(this))
     this.router.post('/validate-cron', MiscController.validateCronExpression.bind(this))
   }
 

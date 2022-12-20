@@ -72,8 +72,9 @@ module.exports = {
             "addressCountry": "Uganda",
             "addressRegion": "East Africa",
             "postalCode": "256",
-            name: 'NuxtJS',
-            id: 'Vone'
+            name: 'codeStudio',
+            id: 'nlpVone',
+            class: 'nlpScript'
           }
         }
       }

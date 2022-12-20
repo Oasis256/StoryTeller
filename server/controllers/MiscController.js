@@ -1,6 +1,8 @@
 const Path = require('path')
 const fs = require('../libs/fsExtra')
 const Logger = require('../Logger')
+const SocketAuthority = require('../SocketAuthority')
+
 const filePerms = require('../utils/filePerms')
 const patternValidation = require('../libs/nodeCron/pattern-validation')
 const { isObject } = require('../utils/index')
@@ -124,12 +126,13 @@ class MiscController {
     res.json(userResponse)
   }
 
+  // GET: api/tags
   getAllTags(req, res) {
     if (!req.user.isAdminOrUp) {
       Logger.error(`[MiscController] Non-admin user attempted to getAllTags`)
       return res.sendStatus(404)
     }
-    var tags = []
+    const tags = []
     this.db.libraryItems.forEach((li) => {
       if (li.media.tags && li.media.tags.length) {
         li.media.tags.forEach((tag) => {
@@ -139,6 +142,159 @@ class MiscController {
     })
     res.json({
       tags: tags
+    })
+  }
+
+  // POST: api/tags/rename
+  async renameTag(req, res) {
+    if (!req.user.isAdminOrUp) {
+      Logger.error(`[MiscController] Non-admin user attempted to renameTag`)
+      return res.sendStatus(404)
+    }
+
+    const tag = req.body.tag
+    const newTag = req.body.newTag
+    if (!tag || !newTag) {
+      Logger.error(`[MiscController] Invalid request body for renameTag`)
+      return res.sendStatus(400)
+    }
+
+    let tagMerged = false
+    let numItemsUpdated = 0
+
+    for (const li of this.db.libraryItems) {
+      if (!li.media.tags || !li.media.tags.length) continue
+
+      if (li.media.tags.includes(newTag)) tagMerged = true // new tag is an existing tag so this is a merge
+
+      if (li.media.tags.includes(tag)) {
+        li.media.tags = li.media.tags.filter(t => t !== tag) // Remove old tag
+        if (!li.media.tags.includes(newTag)) {
+          li.media.tags.push(newTag) // Add new tag
+        }
+        Logger.debug(`[MiscController] Rename tag "${tag}" to "${newTag}" for item "${li.media.metadata.title}"`)
+        await this.db.updateLibraryItem(li)
+        SocketAuthority.emitter('item_updated', li.toJSONExpanded())
+        numItemsUpdated++
+      }
+    }
+
+    res.json({
+      tagMerged,
+      numItemsUpdated
+    })
+  }
+
+  // DELETE: api/tags/:tag
+  async deleteTag(req, res) {
+    if (!req.user.isAdminOrUp) {
+      Logger.error(`[MiscController] Non-admin user attempted to deleteTag`)
+      return res.sendStatus(404)
+    }
+
+    const tag = Buffer.from(decodeURIComponent(req.params.tag), 'base64').toString()
+
+    let numItemsUpdated = 0
+    for (const li of this.db.libraryItems) {
+      if (!li.media.tags || !li.media.tags.length) continue
+
+      if (li.media.tags.includes(tag)) {
+        li.media.tags = li.media.tags.filter(t => t !== tag)
+        Logger.debug(`[MiscController] Remove tag "${tag}" from item "${li.media.metadata.title}"`)
+        await this.db.updateLibraryItem(li)
+        SocketAuthority.emitter('item_updated', li.toJSONExpanded())
+        numItemsUpdated++
+      }
+    }
+
+    res.json({
+      numItemsUpdated
+    })
+  }
+
+  // GET: api/genres
+  getAllGenres(req, res) {
+    if (!req.user.isAdminOrUp) {
+      Logger.error(`[MiscController] Non-admin user attempted to getAllGenres`)
+      return res.sendStatus(404)
+    }
+    const genres = []
+    this.db.libraryItems.forEach((li) => {
+      if (li.media.metadata.genres && li.media.metadata.genres.length) {
+        li.media.metadata.genres.forEach((genre) => {
+          if (!genres.includes(genre)) genres.push(genre)
+        })
+      }
+    })
+    res.json({
+      genres
+    })
+  }
+
+  // POST: api/genres/rename
+  async renameGenre(req, res) {
+    if (!req.user.isAdminOrUp) {
+      Logger.error(`[MiscController] Non-admin user attempted to renameGenre`)
+      return res.sendStatus(404)
+    }
+
+    const genre = req.body.genre
+    const newGenre = req.body.newGenre
+    if (!genre || !newGenre) {
+      Logger.error(`[MiscController] Invalid request body for renameGenre`)
+      return res.sendStatus(400)
+    }
+
+    let genreMerged = false
+    let numItemsUpdated = 0
+
+    for (const li of this.db.libraryItems) {
+      if (!li.media.metadata.genres || !li.media.metadata.genres.length) continue
+
+      if (li.media.metadata.genres.includes(newGenre)) genreMerged = true // new genre is an existing genre so this is a merge
+
+      if (li.media.metadata.genres.includes(genre)) {
+        li.media.metadata.genres = li.media.metadata.genres.filter(g => g !== genre) // Remove old genre
+        if (!li.media.metadata.genres.includes(newGenre)) {
+          li.media.metadata.genres.push(newGenre) // Add new genre
+        }
+        Logger.debug(`[MiscController] Rename genre "${genre}" to "${newGenre}" for item "${li.media.metadata.title}"`)
+        await this.db.updateLibraryItem(li)
+        SocketAuthority.emitter('item_updated', li.toJSONExpanded())
+        numItemsUpdated++
+      }
+    }
+
+    res.json({
+      genreMerged,
+      numItemsUpdated
+    })
+  }
+
+  // DELETE: api/genres/:genre
+  async deleteGenre(req, res) {
+    if (!req.user.isAdminOrUp) {
+      Logger.error(`[MiscController] Non-admin user attempted to deleteGenre`)
+      return res.sendStatus(404)
+    }
+
+    const genre = Buffer.from(decodeURIComponent(req.params.genre), 'base64').toString()
+
+    let numItemsUpdated = 0
+    for (const li of this.db.libraryItems) {
+      if (!li.media.metadata.genres || !li.media.metadata.genres.length) continue
+
+      if (li.media.metadata.genres.includes(genre)) {
+        li.media.metadata.genres = li.media.metadata.genres.filter(t => t !== genre)
+        Logger.debug(`[MiscController] Remove genre "${genre}" from item "${li.media.metadata.title}"`)
+        await this.db.updateLibraryItem(li)
+        SocketAuthority.emitter('item_updated', li.toJSONExpanded())
+        numItemsUpdated++
+      }
+    }
+
+    res.json({
+      numItemsUpdated
     })
   }
 

@@ -1,7 +1,7 @@
 <template>
   <div id="bookshelf" ref="wrapper" class="w-full max-w-full h-full overflow-y-scroll relative">
     <!-- Cover size widget -->
-    <widgets-cover-size-widget class="fixed bottom-4 right-4 z-30" />
+    <widgets-cover-size-widget class="fixed bottom-4 right-4 z-50" />
 
     <div v-if="loaded && !shelves.length && !search" class="w-full flex flex-col items-center justify-center py-12">
       <p class="text-center text-2xl font-book mb-4 py-4">{{ libraryName }} Library is empty!</p>
@@ -405,8 +405,6 @@ export default {
       }
     },
     removeListeners() {
-      this.$store.commit('user/removeSettingsListener', 'bookshelf')
-
       if (this.$root.socket) {
         this.$root.socket.off('user_updated', this.userUpdated)
         this.$root.socket.off('author_updated', this.authorUpdated)
