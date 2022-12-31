@@ -24,7 +24,6 @@
         </div>
 
         <p v-if="isHttp" class="w-full pt-2 text-warning text-xs">{{ $strings.NoteRSSFeedPodcastAppsHttps }}</p>
-        <p v-if="hasEpisodesWithoutPubDate" class="w-full pt-2 text-warning text-xs">{{ $strings.NoteRSSFeedPodcastAppsPubDate }}</p>
       </div>
       <div v-show="userIsAdminOrUp" class="flex items-center pt-6">
         <div class="flex-grow" />
@@ -39,7 +38,7 @@
 export default {
   props: {
     value: Boolean,
-    libraryItem: {
+    collection: {
       type: Object,
       default: () => null
     },
@@ -74,17 +73,11 @@ export default {
         this.$emit('input', val)
       }
     },
-    libraryItemId() {
-      return this.libraryItem.id
-    },
-    media() {
-      return this.libraryItem.media || {}
-    },
-    mediaMetadata() {
-      return this.media.metadata || {}
+    collectionId() {
+      return this.collection.id
     },
     title() {
-      return this.mediaMetadata.title
+      return this.collection.name
     },
     userIsAdminOrUp() {
       return this.$store.getters['user/getIsAdminOrUp']
@@ -94,12 +87,6 @@ export default {
     },
     isHttp() {
       return window.origin.startsWith('http://')
-    },
-    episodes() {
-      return this.media.episodes || []
-    },
-    hasEpisodesWithoutPubDate() {
-      return this.episodes.some((ep) => !ep.pubDate)
     }
   },
   methods: {
@@ -124,7 +111,7 @@ export default {
 
       console.log('Payload', payload)
       this.$axios
-        .$post(`/api/feeds/item/${this.libraryItemId}/open`, payload)
+        .$post(`/api/feeds/collection/${this.collectionId}/open`, payload)
         .then((data) => {
           console.log('Opened RSS Feed', data)
           this.currentFeed = data.feed
@@ -155,8 +142,8 @@ export default {
         })
     },
     init() {
-      if (!this.libraryItem) return
-      this.newFeedSlug = this.libraryItem.id
+      if (!this.collection) return
+      this.newFeedSlug = this.collectionId
       this.currentFeed = this.feed
     }
   },

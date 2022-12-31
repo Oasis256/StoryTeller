@@ -18,22 +18,26 @@ class RssFeedManager {
   }
 
   async init() {
-    var feedObjects = await this.db.getAllEntities('feed')
+    const feedObjects = await this.db.getAllEntities('feed')
     if (feedObjects && feedObjects.length) {
       feedObjects.forEach((feedObj) => {
-        var feed = new Feed(feedObj)
+        const feed = new Feed(feedObj)
         this.feeds[feed.id] = feed
         Logger.info(`[RssFeedManager] Opened rss feed ${feed.feedUrl}`)
       })
     }
   }
 
-  findFeedForItem(libraryItemId) {
-    return Object.values(this.feeds).find(feed => feed.entityId === libraryItemId)
+  findFeedForEntityId(entityId) {
+    return Object.values(this.feeds).find(feed => feed.entityId === entityId)
+  }
+
+  findFeed(feedId) {
+    return this.feeds[feedId] || null
   }
 
   async getFeed(req, res) {
-    var feed = this.feeds[req.params.id]
+    const feed = this.feeds[req.params.id]
     if (!feed) {
       Logger.debug(`[RssFeedManager] Feed not found ${req.params.id}`)
       res.sendStatus(404)
@@ -47,21 +51,41 @@ class RssFeedManager {
         feed.updateFromItem(libraryItem)
         await this.db.updateEntity('feed', feed)
       }
+    } else if (feed.entityType === 'collection') {
+      const collection = this.db.collections.find(c => c.id === feed.entityId)
+      if (collection) {
+        const collectionExpanded = collection.toJSONExpanded(this.db.libraryItems)
+
+        // Find most recently updated item in collection
+        let mostRecentlyUpdatedAt = collectionExpanded.lastUpdate
+        collectionExpanded.books.forEach((libraryItem) => {
+          if (libraryItem.media.tracks.length && libraryItem.updatedAt > mostRecentlyUpdatedAt) {
+            mostRecentlyUpdatedAt = libraryItem.updatedAt
+          }
+        })
+
+        if (!feed.entityUpdatedAt || mostRecentlyUpdatedAt > feed.entityUpdatedAt) {
+          Logger.debug(`[RssFeedManager] Updating RSS feed for collection "${collection.name}"`)
+
+          feed.updateFromCollection(collectionExpanded)
+          await this.db.updateEntity('feed', feed)
+        }
+      }
     }
 
-    var xml = feed.buildXml()
+    const xml = feed.buildXml()
     res.set('Content-Type', 'text/xml')
     res.send(xml)
   }
 
   getFeedItem(req, res) {
-    var feed = this.feeds[req.params.id]
+    const feed = this.feeds[req.params.id]
     if (!feed) {
       Logger.debug(`[RssFeedManager] Feed not found ${req.params.id}`)
       res.sendStatus(404)
       return
     }
-    var episodePath = feed.getEpisodePath(req.params.episodeId)
+    const episodePath = feed.getEpisodePath(req.params.episodeId)
     if (!episodePath) {
       Logger.error(`[RssFeedManager] Feed episode not found ${req.params.episodeId}`)
       res.sendStatus(404)
@@ -71,7 +95,7 @@ class RssFeedManager {
   }
 
   getFeedCover(req, res) {
-    var feed = this.feeds[req.params.id]
+    const feed = this.feeds[req.params.id]
     if (!feed) {
       Logger.debug(`[RssFeedManager] Feed not found ${req.params.id}`)
       res.sendStatus(404)
@@ -85,7 +109,7 @@ class RssFeedManager {
 
     const extname = Path.extname(feed.coverPath).toLowerCase().slice(1)
     res.type(`image/${extname}`)
-    var readStream = fs.createReadStream(feed.coverPath)
+    const readStream = fs.createReadStream(feed.coverPath)
     readStream.pipe(res)
   }
 
@@ -93,32 +117,33 @@ class RssFeedManager {
     const serverAddress = options.serverAddress
     const slug = options.slug
 
-    if (this.feeds[slug]) {
-      Logger.error(`[RssFeedManager] Slug already in use`)
-      return {
-        error: `Slug "${slug}" already in use`
-      }
-    }
-
     const feed = new Feed()
     feed.setFromItem(user.id, slug, libraryItem, serverAddress)
     this.feeds[feed.id] = feed
 
-    Logger.debug(`[RssFeedManager] Opened RSS feed ${feed.feedUrl}`)
+    Logger.debug(`[RssFeedManager] Opened RSS feed "${feed.feedUrl}"`)
     await this.db.insertEntity('feed', feed)
     SocketAuthority.emitter('rss_feed_open', feed.toJSONMinified())
     return feed
   }
 
-  closeFeedForItem(libraryItemId) {
-    var feed = this.findFeedForItem(libraryItemId)
-    if (!feed) return
-    return this.closeRssFeed(feed.id)
+  async openFeedForCollection(user, collectionExpanded, options) {
+    const serverAddress = options.serverAddress
+    const slug = options.slug
+
+    const feed = new Feed()
+    feed.setFromCollection(user.id, slug, collectionExpanded, serverAddress)
+    this.feeds[feed.id] = feed
+
+    Logger.debug(`[RssFeedManager] Opened RSS feed "${feed.feedUrl}"`)
+    await this.db.insertEntity('feed', feed)
+    SocketAuthority.emitter('rss_feed_open', feed.toJSONMinified())
+    return feed
   }
 
   async closeRssFeed(id) {
     if (!this.feeds[id]) return
-    var feed = this.feeds[id]
+    const feed = this.feeds[id]
     await this.db.removeEntity('feed', id)
     SocketAuthority.emitter('rss_feed_closed', feed.toJSONMinified())
     delete this.feeds[id]

@@ -9,7 +9,6 @@ class Author {
     this.name = null
     this.description = null
     this.imagePath = null
-    this.relImagePath = null
     this.addedAt = null
     this.updatedAt = null
 
@@ -24,7 +23,6 @@ class Author {
     this.name = author.name || ''
     this.description = author.description || null
     this.imagePath = author.imagePath
-    this.relImagePath = author.relImagePath
     this.addedAt = author.addedAt
     this.updatedAt = author.updatedAt
   }
@@ -36,14 +34,13 @@ class Author {
       name: this.name,
       description: this.description,
       imagePath: this.imagePath,
-      relImagePath: this.relImagePath,
       addedAt: this.addedAt,
       updatedAt: this.updatedAt
     }
   }
 
   toJSONExpanded(numBooks = 0) {
-    var json = this.toJSON()
+    const json = this.toJSON()
     json.numBooks = numBooks
     return json
   }
@@ -61,17 +58,16 @@ class Author {
     this.description = data.description || null
     this.asin = data.asin || null
     this.imagePath = data.imagePath || null
-    this.relImagePath = data.relImagePath || null
     this.addedAt = Date.now()
     this.updatedAt = Date.now()
   }
 
   update(payload) {
-    var json = this.toJSON()
+    const json = this.toJSON()
     delete json.id
     delete json.addedAt
     delete json.updatedAt
-    var hasUpdates = false
+    let hasUpdates = false
     for (const key in json) {
       if (payload[key] !== undefined && json[key] != payload[key]) {
         this[key] = payload[key]

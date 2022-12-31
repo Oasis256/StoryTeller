@@ -1,6 +1,6 @@
 <template>
   <div v-if="currentLibrary" class="relative h-8 max-w-52 md:min-w-32" v-click-outside="clickOutsideObj">
-    <button type="button" :disabled="disabled" class="w-10 sm:w-full relative h-full border border-white border-opacity-10 hover:border-opacity-20 rounded shadow-sm px-2 text-left text-sm focus:outline-none cursor-pointer bg-black bg-opacity-20 text-gray-400 hover:text-gray-200" aria-haspopup="listbox" :aria-expanded="showMenu" @click.stop.prevent="clickShowMenu">
+    <button type="button" :disabled="disabled" class="w-10 sm:w-full relative h-full border border-white border-opacity-10 hover:border-opacity-20 rounded shadow-sm px-2 text-left text-sm cursor-pointer bg-black bg-opacity-20 text-gray-400 hover:text-gray-200" aria-haspopup="listbox" :aria-expanded="showMenu" :aria-label="$strings.ButtonLibrary + ': ' + currentLibrary.name" @click.stop.prevent="clickShowMenu">
       <div class="flex items-center justify-center sm:justify-start">
         <ui-library-icon :icon="currentLibraryIcon" class="sm:mr-1.5" />
         <span class="hidden sm:block truncate">{{ currentLibrary.name }}</span>
@@ -10,7 +10,7 @@
     <transition name="menu">
       <ul v-show="showMenu" class="absolute z-10 -mt-px min-w-48 w-full bg-primary border border-black-200 shadow-lg max-h-56 rounded-b-md py-1 overflow-auto focus:outline-none sm:text-sm" tabindex="-1" role="listbox">
         <template v-for="library in librariesFiltered">
-          <li :key="library.id" class="text-gray-400 hover:text-white select-none relative py-2 cursor-pointer hover:bg-black-400" role="option" @click="selectLibrary(library)">
+          <li :key="library.id" class="text-gray-400 hover:text-white relative py-2 cursor-pointer hover:bg-black-400" role="option" tabindex="0" @keydown.enter="selectLibrary(library)" @click="selectLibrary(library)">
             <div class="flex items-center px-2">
               <ui-library-icon :icon="library.icon" class="mr-1.5" />
               <span class="font-normal block truncate font-sans text-sm">{{ library.name }}</span>

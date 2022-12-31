@@ -109,7 +109,8 @@ export default {
       this.processing = true
       var result = await this.$axios.$patch(`/api/authors/${this.authorId}`, updatePayload).catch((error) => {
         console.error('Failed', error)
-        this.$toast.error(this.$strings.ToastAuthorUpdateFailed)
+        const errorMsg = error.response ? error.response.data : null
+        this.$toast.error(errorMsg || this.$strings.ToastAuthorUpdateFailed)
         return null
       })
       if (result) {
@@ -125,8 +126,7 @@ export default {
     },
     async removeCover() {
       var updatePayload = {
-        imagePath: null,
-        relImagePath: null
+        imagePath: null
       }
       this.processing = true
       var result = await this.$axios.$patch(`/api/authors/${this.authorId}`, updatePayload).catch((error) => {
@@ -161,8 +161,7 @@ export default {
         if (response.author.imagePath) {
           this.$toast.success(this.$strings.ToastAuthorUpdateSuccess)
           this.$store.commit('globals/showEditAuthorModal', response.author)
-        }
-        else this.$toast.success(this.$strings.ToastAuthorUpdateSuccessNoImageFound)
+        } else this.$toast.success(this.$strings.ToastAuthorUpdateSuccessNoImageFound)
       } else {
         this.$toast.info('No updates were made for Author')
       }

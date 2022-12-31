@@ -80,8 +80,16 @@ class AuthorController {
             await this.cacheManager.purgeImageCache(req.author.id) // Purge cache
           }
           payload.imagePath = imageData.path
-          payload.relImagePath = imageData.relPath
           hasUpdated = true
+        }
+      } else if (payload.imagePath && payload.imagePath !== req.author.imagePath) { // Changing image path locally
+        if (!await fs.pathExists(payload.imagePath)) { // Make sure image path exists
+          Logger.error(`[AuthorController] Image path does not exist: "${payload.imagePath}"`)
+          return res.status(400).send('Author image path does not exist')
+        }
+
+        if (req.author.imagePath) {
+          await this.cacheManager.purgeImageCache(req.author.id) // Purge cache
         }
       }
     }
@@ -120,6 +128,8 @@ class AuthorController {
       }
 
       if (hasUpdated) {
+        req.author.updatedAt = Date.now()
+
         if (authorNameUpdate) { // Update author name on all books
           const itemsWithAuthor = this.db.libraryItems.filter(li => li.mediaType === 'book' && li.media.metadata.hasAuthor(req.author.id))
           itemsWithAuthor.forEach(libraryItem => {
@@ -181,7 +191,6 @@ class AuthorController {
       var imageData = await this.authorFinder.saveAuthorImage(req.author.id, authorData.image)
       if (imageData) {
         req.author.imagePath = imageData.path
-        req.author.relImagePath = imageData.relPath
         hasUpdates = true
       }
     }

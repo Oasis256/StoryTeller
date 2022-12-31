@@ -129,6 +129,7 @@ class Feed {
     const author = isPodcast ? mediaMetadata.author : mediaMetadata.authorName
 
     this.entityUpdatedAt = libraryItem.updatedAt
+    this.coverPath = media.coverPath || null
 
     this.meta.title = mediaMetadata.title
     this.meta.description = mediaMetadata.description
@@ -155,6 +156,76 @@ class Feed {
     this.xml = null
   }
 
+  setFromCollection(userId, slug, collectionExpanded, serverAddress) {
+    const feedUrl = `${serverAddress}/feed/${slug}`
+
+    const itemsWithTracks = collectionExpanded.books.filter(libraryItem => libraryItem.media.tracks.length)
+    const firstItemWithCover = itemsWithTracks.find(item => item.media.coverPath)
+
+    this.id = slug
+    this.slug = slug
+    this.userId = userId
+    this.entityType = 'collection'
+    this.entityId = collectionExpanded.id
+    this.entityUpdatedAt = collectionExpanded.lastUpdate // This will be set to the most recently updated library item
+    this.coverPath = firstItemWithCover?.coverPath || null
+    this.serverAddress = serverAddress
+    this.feedUrl = feedUrl
+
+    this.meta = new FeedMeta()
+    this.meta.title = collectionExpanded.name
+    this.meta.description = collectionExpanded.description || ''
+    this.meta.author = this.getAuthorsStringFromLibraryItems(itemsWithTracks)
+    this.meta.imageUrl = this.coverPath ? `${serverAddress}/feed/${slug}/cover` : `${serverAddress}/Logo.png`
+    this.meta.feedUrl = feedUrl
+    this.meta.link = `${serverAddress}/collection/${collectionExpanded.id}`
+    this.meta.explicit = !!itemsWithTracks.some(li => li.media.metadata.explicit) // explicit if any item is explicit
+
+    this.episodes = []
+
+    itemsWithTracks.forEach((item, index) => {
+      if (item.updatedAt > this.entityUpdatedAt) this.entityUpdatedAt = item.updatedAt
+
+      item.media.tracks.forEach((audioTrack) => {
+        const feedEpisode = new FeedEpisode()
+        feedEpisode.setFromAudiobookTrack(item, serverAddress, slug, audioTrack, this.meta, index)
+        this.episodes.push(feedEpisode)
+      })
+    })
+
+    this.createdAt = Date.now()
+    this.updatedAt = Date.now()
+  }
+
+  updateFromCollection(collectionExpanded) {
+    const itemsWithTracks = collectionExpanded.books.filter(libraryItem => libraryItem.media.tracks.length)
+    const firstItemWithCover = itemsWithTracks.find(item => item.media.coverPath)
+
+    this.entityUpdatedAt = collectionExpanded.lastUpdate
+    this.coverPath = firstItemWithCover?.coverPath || null
+
+    this.meta.title = collectionExpanded.name
+    this.meta.description = collectionExpanded.description || ''
+    this.meta.author = this.getAuthorsStringFromLibraryItems(itemsWithTracks)
+    this.meta.imageUrl = this.coverPath ? `${this.serverAddress}/feed/${this.slug}/cover` : `${this.serverAddress}/Logo.png`
+    this.meta.explicit = !!itemsWithTracks.some(li => li.media.metadata.explicit) // explicit if any item is explicit
+
+    this.episodes = []
+
+    itemsWithTracks.forEach((item, index) => {
+      if (item.updatedAt > this.entityUpdatedAt) this.entityUpdatedAt = item.updatedAt
+
+      item.media.tracks.forEach((audioTrack) => {
+        const feedEpisode = new FeedEpisode()
+        feedEpisode.setFromAudiobookTrack(item, this.serverAddress, this.slug, audioTrack, this.meta, index)
+        this.episodes.push(feedEpisode)
+      })
+    })
+
+    this.updatedAt = Date.now()
+    this.xml = null
+  }
+
   buildXml() {
     if (this.xml) return this.xml
 
@@ -164,6 +235,17 @@ class Feed {
     })
     this.xml = rssfeed.xml()
     return this.xml
+  }
+
+  getAuthorsStringFromLibraryItems(libraryItems) {
+    let itemAuthors = []
+    libraryItems.forEach((item) => itemAuthors.push(...item.media.metadata.authors.map(au => au.name)))
+    itemAuthors = [...new Set(itemAuthors)] // Filter out dupes
+    let author = itemAuthors.slice(0, 3).join(', ')
+    if (itemAuthors.length > 3) {
+      author += ' & more'
+    }
+    return author
   }
 }
 module.exports = Feed

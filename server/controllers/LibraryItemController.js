@@ -21,8 +21,8 @@ class LibraryItemController {
       }
 
       if (includeEntities.includes('rssfeed')) {
-        var feedData = this.rssFeedManager.findFeedForItem(item.id)
-        item.rssFeedUrl = feedData ? feedData.feedUrl : null
+        const feedData = this.rssFeedManager.findFeedForEntityId(item.id)
+        item.rssFeed = feedData ? feedData.toJSONMinified() : null
       }
 
       if (item.mediaType == 'book') {
@@ -52,7 +52,7 @@ class LibraryItemController {
       await this.cacheManager.purgeCoverCache(libraryItem.id)
     }
 
-    var hasUpdates = libraryItem.update(req.body)
+    const hasUpdates = libraryItem.update(req.body)
     if (hasUpdates) {
       Logger.debug(`[LibraryItemController] Updated now saving`)
       await this.db.updateLibraryItem(libraryItem)
@@ -70,8 +70,8 @@ class LibraryItemController {
   // PATCH: will create new authors & series if in payload
   //
   async updateMedia(req, res) {
-    var libraryItem = req.libraryItem
-    var mediaPayload = req.body
+    const libraryItem = req.libraryItem
+    const mediaPayload = req.body
     // Item has cover and update is removing cover so purge it from cache
     if (libraryItem.media.coverPath && (mediaPayload.coverPath === '' || mediaPayload.coverPath === null)) {
       await this.cacheManager.purgeCoverCache(libraryItem.id)
@@ -83,7 +83,7 @@ class LibraryItemController {
     }
 
     // Podcast specific
-    var isPodcastAutoDownloadUpdated = false
+    let isPodcastAutoDownloadUpdated = false
     if (libraryItem.isPodcast) {
       if (mediaPayload.autoDownloadEpisodes !== undefined && libraryItem.media.autoDownloadEpisodes !== mediaPayload.autoDownloadEpisodes) {
         isPodcastAutoDownloadUpdated = true
@@ -92,8 +92,10 @@ class LibraryItemController {
       }
     }
 
-    var hasUpdates = libraryItem.media.update(mediaPayload)
+    const hasUpdates = libraryItem.media.update(mediaPayload)
     if (hasUpdates) {
+      libraryItem.updatedAt = Date.now()
+
       if (isPodcastAutoDownloadUpdated) {
         this.cronManager.checkUpdatePodcastCron(libraryItem)
       }
@@ -432,38 +434,6 @@ class LibraryItemController {
     })
   }
 
-  // POST: api/items/:id/open-feed
-  async openRSSFeed(req, res) {
-    if (!req.user.isAdminOrUp) {
-      Logger.error(`[LibraryItemController] Non-admin user attempted to open RSS feed`, req.user.username)
-      return res.sendStatus(403)
-    }
-
-    const feedData = await this.rssFeedManager.openFeedForItem(req.user, req.libraryItem, req.body)
-    if (feedData.error) {
-      return res.json({
-        success: false,
-        error: feedData.error
-      })
-    }
-
-    res.json({
-      success: true,
-      feedUrl: feedData.feedUrl
-    })
-  }
-
-  async closeRSSFeed(req, res) {
-    if (!req.user.isAdminOrUp) {
-      Logger.error(`[LibraryItemController] Non-admin user attempted to close RSS feed`, req.user.username)
-      return res.sendStatus(403)
-    }
-
-    await this.rssFeedManager.closeFeedForItem(req.params.id)
-
-    res.sendStatus(200)
-  }
-
   async toneScan(req, res) {
     if (!req.libraryItem.media.audioFiles.length) {
       return res.sendStatus(404)
@@ -481,7 +451,7 @@ class LibraryItemController {
   }
 
   middleware(req, res, next) {
-    var item = this.db.libraryItems.find(li => li.id === req.params.id)
+    const item = this.db.libraryItems.find(li => li.id === req.params.id)
     if (!item || !item.media) return res.sendStatus(404)
 
     // Check user can access this library item
