@@ -18,6 +18,7 @@
     <modals-podcast-view-episode />
     <modals-authors-edit-modal />
     <modals-batch-quick-match-model />
+    <modals-rssfeed-open-close-modal />
     <prompt-confirm />
     <readers-reader />
   </div>
@@ -329,12 +330,6 @@ export default {
       }
       this.$store.commit('libraries/removeUserPlaylist', playlist)
     },
-    rssFeedOpen(data) {
-      this.$store.commit('feeds/addFeed', data)
-    },
-    rssFeedClosed(data) {
-      this.$store.commit('feeds/removeFeed', data)
-    },
     backupApplied() {
       // Force refresh
       location.reload()
@@ -423,10 +418,6 @@ export default {
       // Task Listeners
       this.socket.on('task_started', this.taskStarted)
       this.socket.on('task_finished', this.taskFinished)
-
-      // Feed Listeners
-      this.socket.on('rss_feed_open', this.rssFeedOpen)
-      this.socket.on('rss_feed_closed', this.rssFeedClosed)
 
       this.socket.on('backup_applied', this.backupApplied)
 

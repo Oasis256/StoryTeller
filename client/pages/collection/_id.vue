@@ -19,9 +19,9 @@
               {{ streaming ? $strings.ButtonPlaying : $strings.ButtonPlay }}
             </ui-btn>
 
-             <!-- RSS feed -->
+            <!-- RSS feed -->
             <ui-tooltip v-if="rssFeed" :text="$strings.LabelOpenRSSFeed" direction="top">
-              <ui-icon-btn icon="rss_feed" class="mx-0.5" :bg-color="rssFeed ? 'success' : 'primary'" outlined @click="clickRSSFeed" />
+              <ui-icon-btn icon="rss_feed" class="mx-0.5" :bg-color="rssFeed ? 'success' : 'primary'" outlined @click="showRSSFeedModal" />
             </ui-tooltip>
 
             <button type="button" class="h-9 w-9 flex items-center justify-center shadow-sm pl-3 pr-3 text-left focus:outline-none cursor-pointer text-gray-100 hover:text-gray-200 rounded-full hover:bg-white/5 mx-px" @click.stop.prevent="editClick">
@@ -42,8 +42,6 @@
     <div v-show="processing" class="absolute top-0 left-0 w-full h-full z-10 bg-black bg-opacity-40 flex items-center justify-center">
       <ui-loading-indicator />
     </div>
-
-    <modals-rssfeed-collection-modal v-model="showRssFeedModal" :collection="collection" :feed="rssFeed" />
   </div>
 </template>
 
@@ -74,8 +72,7 @@ export default {
   },
   data() {
     return {
-      processing: false,
-      showRssFeedModal: false
+      processing: false
     }
   },
   computed: {
@@ -124,7 +121,7 @@ export default {
           action: 'create-playlist'
         }
       ]
-      if (this.userIsAdminOrUp) {
+      if (this.userIsAdminOrUp || this.rssFeed) {
         items.push({
           text: this.$strings.LabelOpenRSSFeed,
           action: 'open-rss-feed'
@@ -140,8 +137,13 @@ export default {
     }
   },
   methods: {
-    clickRSSFeed() {
-      this.showRssFeedModal = true
+    showRSSFeedModal() {
+      this.$store.commit('globals/setRSSFeedOpenCloseModal', {
+        id: this.collectionId,
+        name: this.collectionName,
+        type: 'collection',
+        feed: this.rssFeed
+      })
     },
     contextMenuAction(action) {
       if (action === 'delete') {
@@ -149,7 +151,7 @@ export default {
       } else if (action === 'create-playlist') {
         this.createPlaylistFromCollection()
       } else if (action === 'open-rss-feed') {
-        this.showRssFeedModal = true
+        this.showRSSFeedModal()
       }
     },
     createPlaylistFromCollection() {

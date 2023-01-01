@@ -50,18 +50,13 @@
         </div>
         <div class="flex-grow" />
         <ui-checkbox v-if="!isBatchSelecting" v-model="settings.collapseBookSeries" :label="$strings.LabelCollapseSeries" checkbox-bg="bg" check-color="white" small class="mr-2" @input="updateCollapseBookSeries" />
-        <ui-btn v-if="!isBatchSelecting" color="primary" small :loading="processingSeries" class="items-center ml-1 sm:ml-4 hidden md:flex" @click="markSeriesFinished">
-          <div class="h-5 w-5">
-            <svg v-if="isSeriesFinished" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="rgb(63, 181, 68)">
-              <path d="M19 1H5c-1.1 0-1.99.9-1.99 2L3 15.93c0 .69.35 1.3.88 1.66L12 23l8.11-5.41c.53-.36.88-.97.88-1.66L21 3c0-1.1-.9-2-2-2zm-9 15l-5-5 1.41-1.41L10 13.17l7.59-7.59L19 7l-9 9z" />
-            </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 1H5c-1.1 0-1.99.9-1.99 2L3 15.93c0 .69.35 1.3.88 1.66L12 23l8.11-5.41c.53-.36.88-.97.88-1.66L21 3c0-1.1-.9-2-2-2zm-7 19.6l-7-4.66V3h14v12.93l-7 4.67zm-2.01-7.42l-2.58-2.59L6 12l4 4 8-8-1.42-1.42z" />
-            </svg>
-          </div>
-          <span class="pl-2"> {{ $strings.LabelMarkSeries }} {{ isSeriesFinished ? $strings.LabelNotFinished : $strings.LabelFinished }}</span>
-        </ui-btn>
-        <ui-btn v-if="isSeriesRemovedFromContinueListening && !isBatchSelecting" small :loading="processingSeries" @click="reAddSeriesToContinueListening" class="hidden md:block ml-2"> Re-Add Series to Continue Listening </ui-btn>
+
+        <!-- RSS feed -->
+        <ui-tooltip v-if="seriesRssFeed" :text="$strings.LabelOpenRSSFeed" direction="top">
+          <ui-icon-btn icon="rss_feed" class="mx-0.5" :size="7" icon-font-size="1.2rem" bg-color="success" outlined @click="showOpenSeriesRSSFeed" />
+        </ui-tooltip>
+
+        <ui-context-menu-dropdown v-if="!isBatchSelecting && seriesContextMenuItems.length" :items="seriesContextMenuItems" class="mx-px" @action="seriesContextMenuAction" />
       </template>
       <!-- library & collections page -->
       <template v-else-if="page !== 'search' && page !== 'podcast-search' && page !== 'recent-episodes' && !isHome">
@@ -114,10 +109,42 @@ export default {
       totalEntities: 0,
       processingSeries: false,
       processingIssues: false,
-      processingAuthors: false
+      processingAuthors: false,
+      contextMenuItems: [
+        {
+          text: 'cat',
+          action: 'dog'
+        }
+      ]
     }
   },
   computed: {
+    seriesContextMenuItems() {
+      if (!this.selectedSeries) return []
+
+      const items = [
+        {
+          text: this.isSeriesFinished ? this.$strings.MessageMarkAsNotFinished : this.$strings.MessageMarkAsFinished,
+          action: 'mark-series-finished'
+        }
+      ]
+
+      if (this.userIsAdminOrUp || this.selectedSeries.rssFeed) {
+        items.push({
+          text: this.$strings.LabelOpenRSSFeed,
+          action: 'open-rss-feed'
+        })
+      }
+
+      if (this.isSeriesRemovedFromContinueListening) {
+        items.push({
+          text: 'Re-Add Series to Continue Listening',
+          action: 're-add-to-continue-listening'
+        })
+      }
+
+      return items
+    },
     seriesSortItems() {
       return [
         {
@@ -207,6 +234,9 @@ export default {
     seriesProgress() {
       return this.selectedSeries ? this.selectedSeries.progress : null
     },
+    seriesRssFeed() {
+      return this.selectedSeries ? this.selectedSeries.rssFeed : null
+    },
     seriesLibraryItemIds() {
       if (!this.seriesProgress) return []
       return this.seriesProgress.libraryItemIds || []
@@ -229,6 +259,31 @@ export default {
     }
   },
   methods: {
+    seriesContextMenuAction(action) {
+      if (action === 'open-rss-feed') {
+        this.showOpenSeriesRSSFeed()
+      } else if (action === 're-add-to-continue-listening') {
+        if (this.processingSeries) {
+          console.warn('Already processing series')
+          return
+        }
+        this.reAddSeriesToContinueListening()
+      } else if (action === 'mark-series-finished') {
+        if (this.processingSeries) {
+          console.warn('Already processing series')
+          return
+        }
+        this.markSeriesFinished()
+      }
+    },
+    showOpenSeriesRSSFeed() {
+      this.$store.commit('globals/setRSSFeedOpenCloseModal', {
+        id: this.selectedSeries.id,
+        name: this.selectedSeries.name,
+        type: 'series',
+        feed: this.selectedSeries.rssFeed
+      })
+    },
     reAddSeriesToContinueListening() {
       this.processingSeries = true
       this.$axios
@@ -293,27 +348,38 @@ export default {
       }
     },
     markSeriesFinished() {
-      var newIsFinished = !this.isSeriesFinished
-      this.processingSeries = true
-      var updateProgressPayloads = this.seriesLibraryItemIds.map((lid) => {
-        return {
-          libraryItemId: lid,
-          isFinished: newIsFinished
-        }
-      })
-      console.log('Progress payloads', updateProgressPayloads)
-      this.$axios
-        .patch(`/api/me/progress/batch/update`, updateProgressPayloads)
-        .then(() => {
-          this.$toast.success('Series update success')
-          this.selectedSeries.progress.isFinished = newIsFinished
-          this.processingSeries = false
-        })
-        .catch((error) => {
-          this.$toast.error('Series update failed')
-          console.error('Failed to batch update read/not read', error)
-          this.processingSeries = false
-        })
+      const newIsFinished = !this.isSeriesFinished
+
+      const payload = {
+        message: newIsFinished ? this.$strings.MessageConfirmMarkSeriesFinished : this.$strings.MessageConfirmMarkSeriesNotFinished,
+        callback: (confirmed) => {
+          if (confirmed) {
+            this.processingSeries = true
+            const updateProgressPayloads = this.seriesLibraryItemIds.map((lid) => {
+              return {
+                libraryItemId: lid,
+                isFinished: newIsFinished
+              }
+            })
+            console.log('Progress payloads', updateProgressPayloads)
+            this.$axios
+              .patch(`/api/me/progress/batch/update`, updateProgressPayloads)
+              .then(() => {
+                this.$toast.success(this.$strings.ToastSeriesUpdateSuccess)
+                this.selectedSeries.progress.isFinished = newIsFinished
+              })
+              .catch((error) => {
+                this.$toast.error(this.$strings.ToastSeriesUpdateFailed)
+                console.error('Failed to batch update read/not read', error)
+              })
+              .finally(() => {
+                this.processingSeries = false
+              })
+          }
+        },
+        type: 'yesNo'
+      }
+      this.$store.commit('globals/setConfirmPrompt', payload)
     },
     updateOrder() {
       this.saveSettings()
@@ -346,16 +412,32 @@ export default {
     },
     setBookshelfTotalEntities(totalEntities) {
       this.totalEntities = totalEntities
+    },
+    rssFeedOpen(data) {
+      if (data.entityId === this.seriesId) {
+        console.log('RSS Feed Opened', data)
+        this.selectedSeries.rssFeed = data
+      }
+    },
+    rssFeedClosed(data) {
+      if (data.entityId === this.seriesId) {
+        console.log('RSS Feed Closed', data)
+        this.selectedSeries.rssFeed = null
+      }
     }
   },
   mounted() {
     this.init()
     this.$eventBus.$on('user-settings', this.settingsUpdated)
     this.$eventBus.$on('bookshelf-total-entities', this.setBookshelfTotalEntities)
+    this.$root.socket.on('rss_feed_open', this.rssFeedOpen)
+    this.$root.socket.on('rss_feed_closed', this.rssFeedClosed)
   },
   beforeDestroy() {
     this.$eventBus.$off('user-settings', this.settingsUpdated)
     this.$eventBus.$off('bookshelf-total-entities', this.setBookshelfTotalEntities)
+    this.$root.socket.off('rss_feed_open', this.rssFeedOpen)
+    this.$root.socket.off('rss_feed_closed', this.rssFeedClosed)
   }
 }
 </script>

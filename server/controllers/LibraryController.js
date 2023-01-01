@@ -170,8 +170,11 @@ class LibraryController {
   // api/libraries/:id/items
   // TODO: Optimize this method, items are iterated through several times but can be combined
   getLibraryItems(req, res) {
-    var libraryItems = req.libraryItems
-    var payload = {
+    let libraryItems = req.libraryItems
+
+    const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
+
+    const payload = {
       results: [],
       total: libraryItems.length,
       limit: req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 0,
@@ -181,7 +184,8 @@ class LibraryController {
       filterBy: req.query.filter,
       mediaType: req.library.mediaType,
       minified: req.query.minified === '1',
-      collapseseries: req.query.collapseseries === '1'
+      collapseseries: req.query.collapseseries === '1',
+      include: include.join(',')
     }
     const mediaIsBook = payload.mediaType === 'book'
 
@@ -219,7 +223,7 @@ class LibraryController {
     }
 
     // Step 3 - Sort the retrieved library items.
-    var sortArray = []
+    const sortArray = []
 
     // When on the series page, sort by sequence only
     if (payload.sortBy === 'book.volumeNumber') payload.sortBy = null // TODO: Remove temp fix after mobile release 0.9.60
@@ -294,13 +298,13 @@ class LibraryController {
 
     // Step 3.5: Limit items
     if (payload.limit) {
-      var startIndex = payload.page * payload.limit
+      const startIndex = payload.page * payload.limit
       libraryItems = libraryItems.slice(startIndex, startIndex + payload.limit)
     }
 
     // Step 4 - Transform the items to pass to the client side
     payload.results = libraryItems.map(li => {
-      let json = payload.minified ? li.toJSONMinified() : li.toJSON()
+      const json = payload.minified ? li.toJSONMinified() : li.toJSON()
 
       if (li.collapsedSeries) {
         json.collapsedSeries = {
@@ -333,9 +337,17 @@ class LibraryController {
               .map(r => r.start == r.end ? r.start : `${r.start}-${r.end}`)
               .join(', ')
         }
-      } else if (filterSeries) {
-        // If filtering by series, make sure to include the series metadata
-        json.media.metadata.series = li.media.metadata.getSeries(filterSeries)
+      } else {
+        // add rssFeed object if "include=rssfeed" was put in query string (only for non-collapsed series)
+        if (include.includes('rssfeed')) {
+          const feedData = this.rssFeedManager.findFeedForEntityId(json.id)
+          json.rssFeed = feedData ? feedData.toJSONMinified() : null
+        }
+
+        if (filterSeries) {
+          // If filtering by series, make sure to include the series metadata
+          json.media.metadata.series = li.media.metadata.getSeries(filterSeries)
+        }
       }
 
       return json
@@ -363,6 +375,9 @@ class LibraryController {
   // api/libraries/:id/series
   async getAllSeriesForLibrary(req, res) {
     const libraryItems = req.libraryItems
+
+    const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
+
     const payload = {
       results: [],
       total: 0,
@@ -371,7 +386,8 @@ class LibraryController {
       sortBy: req.query.sort,
       sortDesc: req.query.desc === '1',
       filterBy: req.query.filter,
-      minified: req.query.minified === '1'
+      minified: req.query.minified === '1',
+      include: include.join(',')
     }
 
     let series = libraryHelpers.getSeriesFromBooks(libraryItems, this.db.series, null, payload.filterBy, req.user, payload.minified)
@@ -396,8 +412,17 @@ class LibraryController {
     payload.total = series.length
 
     if (payload.limit) {
-      var startIndex = payload.page * payload.limit
+      const startIndex = payload.page * payload.limit
       series = series.slice(startIndex, startIndex + payload.limit)
+    }
+
+    // add rssFeed when "include=rssfeed" is in query string
+    if (include.includes('rssfeed')) {
+      series = series.map((se) => {
+        const feedData = this.rssFeedManager.findFeedForEntityId(se.id)
+        se.rssFeed = feedData?.toJSONMinified() || null
+        return se
+      })
     }
 
     payload.results = series
@@ -406,9 +431,11 @@ class LibraryController {
 
   // api/libraries/:id/collections
   async getCollectionsForLibrary(req, res) {
-    var libraryItems = req.libraryItems
+    const libraryItems = req.libraryItems
 
-    var payload = {
+    const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
+
+    const payload = {
       results: [],
       total: 0,
       limit: req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 0,
@@ -416,20 +443,28 @@ class LibraryController {
       sortBy: req.query.sort,
       sortDesc: req.query.desc === '1',
       filterBy: req.query.filter,
-      minified: req.query.minified === '1'
+      minified: req.query.minified === '1',
+      include: include.join(',')
     }
 
-    var collections = this.db.collections.filter(c => c.libraryId === req.library.id).map(c => {
-      var expanded = c.toJSONExpanded(libraryItems, payload.minified)
+    let collections = this.db.collections.filter(c => c.libraryId === req.library.id).map(c => {
+      const expanded = c.toJSONExpanded(libraryItems, payload.minified)
+
       // If all books restricted to user in this collection then hide this collection
       if (!expanded.books.length && c.books.length) return null
+
+      if (include.includes('rssfeed')) {
+        const feedData = this.rssFeedManager.findFeedForEntityId(c.id)
+        expanded.rssFeed = feedData?.toJSONMinified() || null
+      }
+
       return expanded
     }).filter(c => !!c)
 
     payload.total = collections.length
 
     if (payload.limit) {
-      var startIndex = payload.page * payload.limit
+      const startIndex = payload.page * payload.limit
       collections = collections.slice(startIndex, startIndex + payload.limit)
     }
 
@@ -466,9 +501,10 @@ class LibraryController {
   async getLibraryUserPersonalizedOptimal(req, res) {
     const mediaType = req.library.mediaType
     const libraryItems = req.libraryItems
-    const limitPerShelf = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) : 10
+    const limitPerShelf = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) || 10 : 10
+    const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
 
-    const categories = libraryHelpers.buildPersonalizedShelves(req.user, libraryItems, mediaType, this.db.series, this.db.authors, limitPerShelf)
+    const categories = libraryHelpers.buildPersonalizedShelves(this, req.user, libraryItems, mediaType, limitPerShelf, include)
     res.json(categories)
   }
 
