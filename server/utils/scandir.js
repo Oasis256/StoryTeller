@@ -95,11 +95,7 @@ function groupFileItemsIntoLibraryItemDirs(mediaType, fileItems) {
   if (mediaType === 'music') {
     const audioFileGroup = {}
     fileItems.filter(i => isMediaFile(mediaType, i.extension)).forEach((item) => {
-      if (!item.reldirpath) {
-        audioFileGroup[item.name] = item.name
-      } else {
-        audioFileGroup[item.reldirpath] = [item.name]
-      }
+      audioFileGroup[item.path] = item.path
     })
     return audioFileGroup
   }
@@ -201,7 +197,14 @@ async function scanFolder(libraryMediaType, folder, serverSettings = {}) {
     let isFile = false // item is not in a folder
     let libraryItemData = null
     let fileObjs = []
-    if (libraryItemPath === libraryItemGrouping[libraryItemPath]) {
+    if (libraryMediaType === 'music') {
+      libraryItemData = {
+        path: Path.posix.join(folderPath, libraryItemPath),
+        relPath: libraryItemPath
+      }
+      fileObjs = await cleanFileObjects(folderPath, [libraryItemPath])
+      isFile = true
+    } else if (libraryItemPath === libraryItemGrouping[libraryItemPath]) {
       // Media file in root only get title
       libraryItemData = {
         mediaMetadata: {
@@ -344,23 +347,8 @@ function getPodcastDataFromDir(folderPath, relPath) {
   }
 }
 
-function getMusicDataFromDir(folderPath, relPath, fileNames) {
-  relPath = relPath.replace(/\\/g, '/')
-
-  const firstFileName = fileNames.length ? fileNames[0] : ''
-  return {
-    mediaMetadata: {
-      title: Path.basename(firstFileName, Path.extname(firstFileName))
-    },
-    relPath: relPath, // relative music audio file path i.e. /Some Folder/..
-    path: Path.posix.join(folderPath, relPath) // i.e. /music/Some Folder/..
-  }
-}
-
 function getDataFromMediaDir(libraryMediaType, folderPath, relPath, serverSettings, fileNames) {
-  if (libraryMediaType === 'music') {
-    return getMusicDataFromDir(folderPath, relPath, fileNames)
-  } else if (libraryMediaType === 'podcast') {
+  if (libraryMediaType === 'podcast') {
     return getPodcastDataFromDir(folderPath, relPath)
   } else if (libraryMediaType === 'book') {
     var parseSubtitle = !!serverSettings.scannerParseSubtitle
@@ -373,12 +361,12 @@ function getDataFromMediaDir(libraryMediaType, folderPath, relPath, serverSettin
 // Called from Scanner.js
 async function getLibraryItemFileData(libraryMediaType, folder, libraryItemPath, isSingleMediaItem, serverSettings = {}) {
   libraryItemPath = libraryItemPath.replace(/\\/g, '/')
-  var folderFullPath = folder.fullPath.replace(/\\/g, '/')
+  const folderFullPath = folder.fullPath.replace(/\\/g, '/')
 
-  var libraryItemDir = libraryItemPath.replace(folderFullPath, '').slice(1)
-  var libraryItemData = {}
+  const libraryItemDir = libraryItemPath.replace(folderFullPath, '').slice(1)
+  let libraryItemData = {}
 
-  var fileItems = []
+  let fileItems = []
 
   if (isSingleMediaItem) { // Single media item in root of folder
     fileItems = [
@@ -400,8 +388,8 @@ async function getLibraryItemFileData(libraryMediaType, folder, libraryItemPath,
     libraryItemData = getDataFromMediaDir(libraryMediaType, folderFullPath, libraryItemDir, serverSettings, fileNames)
   }
 
-  var libraryItemDirStats = await getFileTimestampsWithIno(libraryItemData.path)
-  var libraryItem = {
+  const libraryItemDirStats = await getFileTimestampsWithIno(libraryItemData.path)
+  const libraryItem = {
     ino: libraryItemDirStats.ino,
     mtimeMs: libraryItemDirStats.mtimeMs || 0,
     ctimeMs: libraryItemDirStats.ctimeMs || 0,

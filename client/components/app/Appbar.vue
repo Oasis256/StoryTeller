@@ -3,7 +3,8 @@
     <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-60">
       <div class="flex h-full items-center">
         <nuxt-link to="/">
-          <img src="~static/icon.svg" :alt="$strings.ButtonHome" class="w-8 min-w-8 h-8 mr-2 sm:w-12 sm:min-w-12 sm:h-12 sm:mr-4" />
+          <img src="~static/icon.svg" :alt="$strings.ButtonHome"
+            class="w-8 min-w-8 h-8 mr-2 sm:w-12 sm:min-w-12 sm:h-12 sm:mr-4" />
         </nuxt-link>
 
         <ui-libraries-dropdown class="mr-2" />
@@ -30,25 +31,30 @@
           <google-cast-launcher></google-cast-launcher>
         </div>
 
-        <nuxt-link v-if="currentLibrary" to="/config/stats" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
+        <nuxt-link v-if="currentLibrary" to="/config/stats"
+          class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderYourStats" direction="bottom" class="flex items-center">
             <span class="material-icons text-2xl" aria-label="User Stats" role="button">equalizer</span>
           </ui-tooltip>
         </nuxt-link>
 
-        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload"
+          class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.ButtonUpload" direction="bottom" class="flex items-center">
             <span class="material-icons text-2xl" aria-label="Upload Media" role="button">upload</span>
           </ui-tooltip>
         </nuxt-link>
 
-        <nuxt-link v-if="userIsAdminOrUp" to="/config" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userIsAdminOrUp" to="/config"
+          class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderSettings" direction="bottom" class="flex items-center">
             <span class="material-icons text-2xl" aria-label="System Settings" role="button">settings</span>
           </ui-tooltip>
         </nuxt-link>
 
-        <nuxt-link to="/account" class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40" aria-haspopup="listbox" aria-expanded="true">
+        <nuxt-link to="/account"
+          class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40"
+          aria-haspopup="listbox" aria-expanded="true">
           <span class="items-center hidden md:flex">
             <span class="block truncate">{{ username }}</span>
           </span>
@@ -66,16 +72,16 @@
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
-        <ui-tooltip v-if="userIsAdminOrUp && !isPodcastLibrary" :text="$strings.ButtonQuickMatch" direction="bottom">
+        <ui-tooltip v-if="userIsAdminOrUp && isBookLibrary" :text="$strings.ButtonQuickMatch" direction="bottom">
           <ui-icon-btn :disabled="processingBatch" icon="auto_awesome" @click="batchAutoMatchClick" class="mx-1.5" />
         </ui-tooltip>
-        <ui-tooltip v-if="!isPodcastLibrary"
+        <ui-tooltip v-if="isBookLibrary"
           :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished"
           direction="bottom">
           <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead"
             class="mx-1.5" />
         </ui-tooltip>
-        <ui-tooltip v-if="userCanUpdate && !isPodcastLibrary" :text="$strings.LabelAddToCollection" direction="bottom">
+        <ui-tooltip v-if="userCanUpdate && isBookLibrary" :text="$strings.LabelAddToCollection" direction="bottom">
           <ui-icon-btn :disabled="processingBatch" icon="collections_bookmark" @click="batchAddToCollectionClick"
             class="mx-1.5" />
         </ui-tooltip>
@@ -117,6 +123,9 @@ export default {
     },
     isPodcastLibrary() {
       return this.libraryMediaType === 'podcast'
+    },
+    isBookLibrary() {
+      return this.libraryMediaType === 'book'
     },
     isHome() {
       return this.$route.name === 'library-library'
@@ -196,12 +205,15 @@ export default {
 
       const queueItems = []
       libraryItems.forEach((item) => {
+        let subtitle = ''
+        if (item.mediaType === 'book') subtitle = item.media.metadata.authors.map((au) => au.name).join(', ')
+        else if (item.mediaType === 'music') subtitle = item.media.metadata.artists.join(', ')
         queueItems.push({
           libraryItemId: item.id,
           libraryId: item.libraryId,
           episodeId: null,
           title: item.media.metadata.title,
-          subtitle: item.media.metadata.authors.map((au) => au.name).join(', '),
+          subtitle,
           caption: '',
           duration: item.media.duration || null,
           coverPath: item.media.coverPath || null

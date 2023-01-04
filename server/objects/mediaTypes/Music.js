@@ -41,6 +41,7 @@ class Music {
       coverPath: this.coverPath,
       tags: [...this.tags],
       audioFile: this.audioFile.toJSON(),
+      duration: this.duration,
       size: this.size
     }
   }
@@ -52,6 +53,7 @@ class Music {
       coverPath: this.coverPath,
       tags: [...this.tags],
       audioFile: this.audioFile.toJSON(),
+      duration: this.duration,
       size: this.size
     }
   }
@@ -129,6 +131,12 @@ class Music {
 
   setAudioFile(audioFile) {
     this.audioFile = audioFile
+  }
+
+  setMetadataFromAudioFile(overrideExistingDetails = false) {
+    if (!this.audioFile) return false
+    if (!this.audioFile.metaTags) return false
+    return this.metadata.setDataFromAudioMetaTags(this.audioFile.metaTags, overrideExistingDetails)
   }
 
   syncMetadataFiles(textMetadataFiles, opfMetadataOverrideDetails) {
