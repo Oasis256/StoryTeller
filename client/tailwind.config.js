@@ -20,7 +20,8 @@ module.exports = {
       'w-3.5',
       'h-3.5',
       'border-warning',
-      'mb-px'
+      'mb-px',
+      'text-1.5xl'
     ],
   },
   theme: {
@@ -61,6 +62,7 @@ module.exports = {
         '80': '20rem'
       },
       spacing: {
+        '18': '4.5rem',
         '-54': '-13.5rem'
       },
       rotate: {
@@ -94,6 +96,7 @@ module.exports = {
       },
       fontSize: {
         xxs: '0.625rem',
+        '1.5xl': '1.375rem',
         '2.5xl': '1.6875rem'
       },
       zIndex: {

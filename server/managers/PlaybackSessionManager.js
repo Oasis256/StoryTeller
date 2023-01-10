@@ -54,9 +54,10 @@ class PlaybackSessionManager {
   }
 
   async syncSessionRequest(user, session, payload, res) {
-    const result = await this.syncSession(user, session, payload)
-    if (result) {
-      res.json(session.toJSONForClient(result.libraryItem))
+    if (await this.syncSession(user, session, payload)) {
+      res.sendStatus(200)
+    } else {
+      res.sendStatus(500)
     }
   }
 
@@ -271,7 +272,7 @@ class PlaybackSessionManager {
   // Remove playback sessions with listening time too high
   async removeInvalidSessions() {
     const selectFunc = (session) => isNaN(session.timeListening) || Number(session.timeListening) > 3600000000
-    const numSessionsRemoved = await this.db.removeEntities('session', selectFunc)
+    const numSessionsRemoved = await this.db.removeEntities('session', selectFunc, true)
     if (numSessionsRemoved) {
       Logger.info(`[PlaybackSessionManager] Removed ${numSessionsRemoved} invalid playback sessions`)
     }
