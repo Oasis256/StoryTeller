@@ -633,9 +633,13 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "WeekdayFriday": "Freitag",
   "WeekdayMon": "Mon",
   "WeekdayMonday": "Montag",
+  "WeekdaySat": "Sat",
   "WeekdaySaturday": "Samstag",
+  "WeekdaySun": "Sun",
   "WeekdaySunday": "Sonntag",
+  "WeekdayThu": "Thu",
   "WeekdayThursday": "Donnerstag",
+  "WeekdayTue": "Tue",
   "WeekdayTuesday": "Dienstag",
   "WeekdayWed": "Wed",
   "WeekdayWednesday": "Mittwoch"
