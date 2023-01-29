@@ -311,6 +311,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "LabelPublishYear": "Jahr",
   "LabelRecentlyAdded": "Kürzlich hinzugefügt",
   "LabelRecentSeries": "Aktuelle Serien",
+  "LabelRecommended": "Recommended",
   "LabelRegion": "Region",
   "LabelReleaseDate": "Veröffentlichungsdatum",
   "LabelRemoveCover": "Lösche Titelbild",
