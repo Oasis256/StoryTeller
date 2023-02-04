@@ -12,6 +12,7 @@ const languageCodeMap = {
   'hr': { label: 'Hrvatski', dateFnsLocale: 'hr' },
   'it': { label: 'Italiano', dateFnsLocale: 'it' },
   'pl': { label: 'Polski', dateFnsLocale: 'pl' },
+  'ru': { label: 'Русский', dateFnsLocale: 'ru' },
   'zh-cn': { label: '简体中文 (Simplified Chinese)', dateFnsLocale: 'zhCN' },
 }
 Vue.prototype.$languageCodeOptions = Object.keys(languageCodeMap).map(code => {
@@ -77,7 +78,7 @@ async function loadi18n(code) {
   Vue.prototype.$setDateFnsLocale(languageCodeMap[code].dateFnsLocale)
 
   console.log('i18n strings=', Vue.prototype.$strings)
-  Vue.prototype.$eventBus.$emit('change-lang', code)
+  this.$eventBus.$emit('change-lang', code)
   return true
 }
 
