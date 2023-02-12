@@ -273,3 +273,7 @@ Bookshelf Label
   display: flex;
   justify-content: flex-end;
 }
+
+.nuxt-progress {
+  background-color: #0de448;
+}
