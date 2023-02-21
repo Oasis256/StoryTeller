@@ -141,6 +141,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "HeaderSettingsGeneral": "Allgemein",
   "HeaderSettingsScanner": "Scanner",
   "HeaderSleepTimer": "Einschlaf-Timer",
+  "HeaderStatsLargestItems": "Largest Items",
   "HeaderStatsLongestItems": "Längste Einträge (h)",
   "HeaderStatsMinutesListeningChart": "Hörminuten (letzte 7 Tage)",
   "HeaderStatsRecentSessions": "Neueste Ereignisse",
