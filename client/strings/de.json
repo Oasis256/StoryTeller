@@ -166,6 +166,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "LabelAddToPlaylistBatch": "Füge {0} Hörbüch(er)/Podcast(s) der Wiedergabeliste hinzu",
   "LabelAll": "Alle",
   "LabelAllUsers": "Alle Benutzer",
+  "LabelAlreadyInYourLibrary": "Already in your library",
   "LabelAppend": "Anhängen",
   "LabelAuthor": "Autor",
   "LabelAuthorFirstLast": "Autor (Vorname Nachname)",
