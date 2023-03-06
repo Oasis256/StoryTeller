@@ -143,6 +143,12 @@ export default {
         var itemProgress = this.$store.getters['user/getUserMediaProgress'](this.libraryItem.id, episode.id)
         return !itemProgress || !itemProgress.isFinished
       })
+    },
+    dateFormat() {
+      return this.$store.state.serverSettings.dateFormat
+    },
+    timeFormat() {
+      return this.$store.state.serverSettings.timeFormat
     }
   },
   methods: {
@@ -195,7 +201,7 @@ export default {
         episodeId: episode.id,
         title: episode.title,
         subtitle: this.mediaMetadata.title,
-        caption: episode.publishedAt ? `Published ${this.$formatDate(episode.publishedAt, 'MMM do, yyyy')}` : 'Unknown publish date',
+        caption: episode.publishedAt ? `Published ${this.$formatDate(episode.publishedAt, this.dateFormat)}` : 'Unknown publish date',
         duration: episode.audioFile.duration || null,
         coverPath: this.media.coverPath || null
       }
@@ -263,7 +269,7 @@ export default {
             episodeId: episode.id,
             title: episode.title,
             subtitle: this.mediaMetadata.title,
-            caption: episode.publishedAt ? `Published ${this.$formatDate(episode.publishedAt, 'MMM do, yyyy')}` : 'Unknown publish date',
+            caption: episode.publishedAt ? `Published ${this.$formatDate(episode.publishedAt, this.dateFormat)}` : 'Unknown publish date',
             duration: episode.audioFile.duration || null,
             coverPath: this.media.coverPath || null
           })
@@ -281,6 +287,8 @@ export default {
       this.showPodcastRemoveModal = true
     },
     editEpisode(episode) {
+      const episodeIds = this.episodesSorted.map((e) => e.id)
+      this.$store.commit('setEpisodeTableEpisodeIds', episodeIds)
       this.$store.commit('setSelectedLibraryItem', this.libraryItem)
       this.$store.commit('globals/setSelectedEpisode', episode)
       this.$store.commit('globals/setShowEditPodcastEpisodeModal', true)
