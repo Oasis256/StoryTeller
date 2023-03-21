@@ -569,6 +569,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "PlaceholderNewFolderPath": "Neuer Ordnerpfad",
   "PlaceholderNewPlaylist": "Neuer Wiedergabelistenname",
   "PlaceholderSearch": "Suche...",
+  "PlaceholderSearchEpisode": "Search episode...",
   "ToastAccountUpdateFailed": "Aktualisierung des Kontos fehlgeschlagen",
   "ToastAccountUpdateSuccess": "Konto aktualisiert",
   "ToastAuthorImageRemoveFailed": "Bild konnte nicht entfernt werden",
