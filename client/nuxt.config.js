@@ -43,52 +43,41 @@ module.exports = {
       { NAME: 'country', CONTENT: 'Uganda' },
       { NAME: 'Geography', CONTENT: 'Kansanga, Kampala, Uganda' }
     ],
-
-
-
-    // metaInfo: {
-      script: [{
-        type: 'application/ld+json',
-        json: {
-          "@context": "http://schema.org",
-          "@type": "Organization",
-          "@id": "webshule.com",
-          "name": "WebShule Educational Services",
-          "logo": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
-          "telephone": "+256 750 994 545",
-          "email": "support@webshule.com",
-          "sameAs": [
-            "https://webshule.com",
-            "http://www.webshule.com",
-            "http://webshule.com",
-          ],
-          "url": "https://shule.webshule.com",
-          "image": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
-          "description": "Shule, You don't need to go to school, School will come to you.",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Kansanga",
-            "addressLocality": "Kampala",
-            "addressCountry": "Uganda",
-            "addressRegion": "East Africa",
-            "postalCode": "256",
-            name: 'codeStudio',
-            id: 'nlpVone',
-            class: 'nlpScript'
-          }
+    script: [],
+  // metaInfo: {
+    script: [{
+      type: 'application/ld+json',
+      json: {
+        "@context": "http://schema.org",
+        "@type": "Organization",
+        "@id": "webshule.com",
+        "name": "WebShule Educational Services",
+        "logo": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+        "telephone": "+256 750 994 545",
+        "email": "support@webshule.com",
+        "sameAs": [
+          "https://webshule.com",
+          "http://www.webshule.com",
+          "http://webshule.com",
+        ],
+        "url": "https://shule.webshule.com",
+        "image": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+        "description": "Shule, You don't need to go to school, School will come to you.",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Kansanga",
+          "addressLocality": "Kampala",
+          "addressCountry": "Uganda",
+          "addressRegion": "East Africa",
+          "postalCode": "256",
+          name: 'codeStudio',
+          id: 'nlpVone',
+          class: 'nlpScript'
         }
       }
-      ],
-    // },
-  
-
-
-
-    script: [
-      {
-        src: (process.env.ROUTER_BASE_PATH || '') + '/libs/sortable.js'
-      }
+    }
     ],
+  // },
     link: [
       { rel: 'icon', type: 'image/x-icon', href: (process.env.ROUTER_BASE_PATH || '') + '/favicon.ico' }
     ]
