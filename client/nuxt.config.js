@@ -28,13 +28,13 @@ module.exports = {
       { hid: 'description', name: 'description', content: '' },
       { property: 'fb:app_id', content: '1607117262915201' },
       { name: 'description', content: 'The Book Shelf' },
-      { name: 'author', content: 'Oasis Innocent &hearts; oasis.sybill@shule.live &hearts;' },
+      { name: 'author', content: 'Oasis Innocent &hearts; oasis.sybill@shule.life &hearts;' },
       { name: 'web_author', content: 'The N-line Project codeStudio' },
       { NAME: 'Copyright', CONTENT: 'The N-line Project' },
       { NAME: 'Designer', CONTENT: 'Oasis Innocent' },
       { NAME: 'Publisher', CONTENT: 'Oasis Innocent, codeStudio, The N-line Project' },
       { NAME: 'distribution', CONTENT: 'Global' },
-      { name: 'contact', content: 'oasis.sybill@webshule.com' },
+      { name: 'contact', content: 'oasis.sybill@gmail.com' },
       { name: 'robots', content: 'index, follow' },
       { name: 'revisit-after', content: '3 month' },
       // { NAME: 'ROBOTS', CONTENT: 'NOYDIR,NOODP' },
@@ -45,37 +45,38 @@ module.exports = {
     ],
     script: [],
   // metaInfo: {
-    script: [{
-      type: 'application/ld+json',
-      json: {
-        "@context": "http://schema.org",
-        "@type": "Organization",
-        "@id": "webshule.com",
-        "name": "WebShule Educational Services",
-        "logo": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
-        "telephone": "+256 750 994 545",
-        "email": "support@webshule.com",
-        "sameAs": [
-          "https://webshule.com",
-          "http://www.webshule.com",
-          "http://webshule.com",
-        ],
-        "url": "https://shule.webshule.com",
-        "image": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
-        "description": "Shule, You don't need to go to school, School will come to you.",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Kansanga",
-          "addressLocality": "Kampala",
-          "addressCountry": "Uganda",
-          "addressRegion": "East Africa",
-          "postalCode": "256",
-          name: 'codeStudio',
-          id: 'nlpVone',
-          class: 'nlpScript'
+    script: [
+      {
+        type: 'application/ld+json',
+        json: {
+          "@context": "http://schema.org",
+          "@type": "Organization",
+          "@id": "reads.shule.life",
+          "name": "Self Hosted AudioBook Server and Reader",
+          "logo": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          "telephone": "+256 750 994 545",
+          "email": "support@shule.life",
+          "sameAs": [
+            "https://reads.shule.life",
+            "http://www.reads.shule.life",
+            "http://reads.shule.life",
+          ],
+          "url": "https://reads.shule.life",
+          "image": (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          "description": "Shule, You don't need to go to school, School will come to you.",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Kansanga",
+            "addressLocality": "Kampala",
+            "addressCountry": "Uganda",
+            "addressRegion": "East Africa",
+            "postalCode": "256",
+            name: 'codeStudio',
+            id: 'nlpVone',
+            class: 'nlpScript'
+          }
         }
       }
-    }
     ],
   // },
     link: [
