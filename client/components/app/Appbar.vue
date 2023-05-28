@@ -27,8 +27,6 @@
 
         <div class="flex-grow" />
 
-        <widgets-notification-widget class="hidden md:block" />
-
         <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom"
           text="Casting requires a secure connection" class="flex items-center">
           <span class="material-icons-outlined text-2xl text-warning text-opacity-50"> cast </span>
@@ -36,6 +34,8 @@
         <div v-if="isChromecastInitialized" class="w-6 min-w-6 h-6 ml-2 mr-1 sm:mx-2 cursor-pointer">
           <google-cast-launcher></google-cast-launcher>
         </div>
+
+        <widgets-notification-widget class="hidden md:block" />
 
         <nuxt-link v-if="currentLibrary" to="/config/stats"
           class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
@@ -78,7 +78,8 @@
           <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
-        <ui-tooltip v-if="isBookLibrary" :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished"
+        <ui-tooltip v-if="isBookLibrary"
+          :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished"
           direction="bottom">
           <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead"
             class="mx-1.5" />
@@ -205,6 +206,11 @@ export default {
         })
       }
 
+      options.push({
+        text: 'Re-Scan',
+        action: 'rescan'
+      })
+
       return options
     }
   },
@@ -238,7 +244,33 @@ export default {
         this.requestBatchQuickEmbed()
       } else if (action === 'quick-match') {
         this.batchAutoMatchClick()
+      } else if (action === 'rescan') {
+        this.batchRescan()
       }
+    },
+    async batchRescan() {
+      const payload = {
+        message: `Are you sure you want to re-scan ${this.selectedMediaItems.length} items?`,
+        callback: (confirmed) => {
+          if (confirmed) {
+            this.$axios
+              .$post(`/api/items/batch/scan`, {
+                libraryItemIds: this.selectedMediaItems.map((i) => i.id)
+              })
+              .then(() => {
+                console.log('Batch Re-Scan started')
+                this.cancelSelectionMode()
+              })
+              .catch((error) => {
+                console.error('Batch Re-Scan failed', error)
+                const errorMsg = error.response.data || 'Failed to batch re-scan'
+                this.$toast.error(errorMsg)
+              })
+          }
+        },
+        type: 'yesNo'
+      }
+      this.$store.commit('globals/setConfirmPrompt', payload)
     },
     async playSelectedItems() {
       this.$store.commit('setProcessingBatch', true)
