@@ -174,12 +174,6 @@ export default {
     dateFormat() {
       return this.store.state.serverSettings.dateFormat
     },
-    showExperimentalFeatures() {
-      return this.store.state.showExperimentalFeatures
-    },
-    enableEReader() {
-      return this.store.getters['getServerSetting']('enableEReader')
-    },
     _libraryItem() {
       return this.libraryItem || {}
     },
@@ -367,13 +361,13 @@ export default {
       return this.store.getters['getIsStreamingFromDifferentLibrary']
     },
     showReadButton() {
-      return !this.isSelectionMode && !this.showPlayButton && this.ebookFormat && (this.showExperimentalFeatures || this.enableEReader)
+      return !this.isSelectionMode && !this.showPlayButton && this.ebookFormat
     },
     showPlayButton() {
       return !this.isSelectionMode && !this.isMissing && !this.isInvalid && !this.isStreaming && (this.numTracks || this.recentEpisode || this.isMusic)
     },
     showSmallEBookIcon() {
-      return !this.isSelectionMode && this.ebookFormat && (this.showExperimentalFeatures || this.enableEReader)
+      return !this.isSelectionMode && this.ebookFormat
     },
     isMissing() {
       return this._libraryItem.isMissing
@@ -888,7 +882,7 @@ export default {
       var wrapperBox = this.$refs.moreIcon.getBoundingClientRect()
       var el = instance.$el
 
-      var elHeight = this.moreMenuItems.length * 28 + 2
+      var elHeight = this.moreMenuItems.length * 28 + 10
       var elWidth = 130
 
       var bottomOfIcon = wrapperBox.top + wrapperBox.height
@@ -921,7 +915,7 @@ export default {
         return null
       })
       if (!libraryItem) return
-      this.store.commit('showEReader', libraryItem)
+      this.store.commit('showEReader', { libraryItem, keepProgress: true })
     },
     selectBtnClick(evt) {
       if (this.processingBatch) return

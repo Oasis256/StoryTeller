@@ -7,11 +7,12 @@
             class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
         </nuxt-link>
 
-        <!-- 
+        <!--         
         <nuxt-link to="/">
-          <h1 class="text-xl mr-6 hidden lg:block hover:underline">audiobookshelf <span v-if="showExperimentalFeatures" class="material-icons text-lg text-warning pr-1">logo_dev</span></h1>
+          <h1 class="text-xl mr-6 hidden lg:block hover:underline">audiobookshelf</h1>
         </nuxt-link> 
-      -->
+        -->
+
 
         <ui-libraries-dropdown class="mr-2" />
 
@@ -176,9 +177,6 @@ export default {
     },
     processingBatch() {
       return this.$store.state.processingBatch
-    },
-    showExperimentalFeatures() {
-      return this.$store.state.showExperimentalFeatures
     },
     isChromecastEnabled() {
       return this.$store.getters['getServerSetting']('chromecastEnabled')

@@ -491,9 +491,9 @@ export default {
       }
     },
     checkActiveElementIsInput() {
-      var activeElement = document.activeElement
-      var inputs = ['input', 'select', 'button', 'textarea']
-      return activeElement && inputs.indexOf(activeElement.tagName.toLowerCase()) !== -1
+      const activeElement = document.activeElement
+      const inputs = ['input', 'select', 'button', 'textarea', 'trix-editor']
+      return activeElement && inputs.some((i) => i === activeElement.tagName.toLowerCase())
     },
     getHotkeyName(e) {
       var keyCode = e.keyCode || e.which
@@ -560,12 +560,6 @@ export default {
         .catch((err) => console.error(err))
     },
     initLocalStorage() {
-      // If experimental features set in local storage
-      var experimentalFeaturesSaved = localStorage.getItem('experimental')
-      if (experimentalFeaturesSaved === '1') {
-        this.$store.commit('setExperimentalFeatures', true)
-      }
-
       // Queue auto play
       var playerQueueAutoPlay = localStorage.getItem('playerQueueAutoPlay')
       this.$store.commit('setPlayerQueueAutoPlay', playerQueueAutoPlay !== '0')

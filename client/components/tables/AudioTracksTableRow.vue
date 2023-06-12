@@ -17,7 +17,7 @@
       {{ $secondsToTimestamp(track.duration) }}
     </td>
     <td v-if="contextMenuItems.length" class="text-center">
-      <ui-context-menu-dropdown :items="contextMenuItems" menu-width="110px" @action="contextMenuAction" />
+      <ui-context-menu-dropdown :items="contextMenuItems" :menu-width="110" @action="contextMenuAction" />
     </td>
   </tr>
 </template>
@@ -88,7 +88,7 @@ export default {
     },
     deleteLibraryFile() {
       const payload = {
-        message: 'This will delete the file from your file system. Are you sure?',
+        message: this.$strings.MessageConfirmDeleteFile,
         callback: (confirmed) => {
           if (confirmed) {
             this.$axios
