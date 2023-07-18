@@ -116,8 +116,13 @@
     </div>
 
     <!-- Podcast Num Episodes -->
-    <div v-else-if="numEpisodes && !isHovering && !isSelectionMode" class="absolute rounded-full bg-black bg-opacity-90 box-shadow-md z-10 flex items-center justify-center" :style="{ top: 0.375 * sizeMultiplier + 'rem', right: 0.375 * sizeMultiplier + 'rem', width: 1.25 * sizeMultiplier + 'rem', height: 1.25 * sizeMultiplier + 'rem' }">
+    <div v-else-if="!numEpisodesIncomplete && numEpisodes && !isHovering && !isSelectionMode" class="absolute rounded-full bg-black bg-opacity-90 box-shadow-md z-10 flex items-center justify-center" :style="{ top: 0.375 * sizeMultiplier + 'rem', right: 0.375 * sizeMultiplier + 'rem', width: 1.25 * sizeMultiplier + 'rem', height: 1.25 * sizeMultiplier + 'rem' }">
       <p :style="{ fontSize: sizeMultiplier * 0.8 + 'rem' }">{{ numEpisodes }}</p>
+    </div>
+
+    <!-- Podcast Num Episodes -->
+    <div v-else-if="numEpisodesIncomplete && !isHovering && !isSelectionMode" class="absolute rounded-full bg-yellow-400 text-black font-semibold box-shadow-md z-10 flex items-center justify-center" :style="{ top: 0.375 * sizeMultiplier + 'rem', right: 0.375 * sizeMultiplier + 'rem', width: 1.25 * sizeMultiplier + 'rem', height: 1.25 * sizeMultiplier + 'rem' }">
+      <p :style="{ fontSize: sizeMultiplier * 0.8 + 'rem' }">{{ numEpisodesIncomplete }}</p>
     </div>
   </div>
 </template>
@@ -227,8 +232,10 @@ export default {
       return this.media.numTracks || 0 // toJSONMinified
     },
     numEpisodes() {
-      if (!this.isPodcast) return 0
       return this.media.numEpisodes || 0
+    },
+    numEpisodesIncomplete() {
+      return this._libraryItem.numEpisodesIncomplete || 0
     },
     processingBatch() {
       return this.store.state.processingBatch
@@ -680,7 +687,6 @@ export default {
         .$patch(apiEndpoint, updatePayload)
         .then(() => {
           this.processing = false
-          toast.success(updatePayload.isFinished ? this.$strings.ToastItemMarkedAsFinishedSuccess : this.$strings.ToastItemMarkedAsNotFinishedSuccess)
         })
         .catch((error) => {
           console.error('Failed', error)
@@ -757,6 +763,8 @@ export default {
       this.store.commit('globals/setConfirmPrompt', payload)
     },
     removeSeriesFromContinueListening() {
+      if (!this.series) return
+
       const axios = this.$axios || this.$nuxt.$axios
       this.processing = true
       axios

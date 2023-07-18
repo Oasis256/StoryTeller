@@ -1,3 +1,4 @@
+const uuidv4 = require("uuid").v4
 const fs = require('../libs/fsExtra')
 const Path = require('path')
 const { version } = require('../../package.json')
@@ -8,13 +9,14 @@ const Book = require('./mediaTypes/Book')
 const Podcast = require('./mediaTypes/Podcast')
 const Video = require('./mediaTypes/Video')
 const Music = require('./mediaTypes/Music')
-const { areEquivalent, copyValue, getId, cleanStringForSearch } = require('../utils/index')
+const { areEquivalent, copyValue, cleanStringForSearch } = require('../utils/index')
 const { filePathToPOSIX } = require('../utils/fileUtils')
 
 class LibraryItem {
   constructor(libraryItem = null) {
     this.id = null
     this.ino = null // Inode
+    this.oldLibraryItemId = null
 
     this.libraryId = null
     this.folderId = null
@@ -51,6 +53,7 @@ class LibraryItem {
   construct(libraryItem) {
     this.id = libraryItem.id
     this.ino = libraryItem.ino || null
+    this.oldLibraryItemId = libraryItem.oldLibraryItemId
     this.libraryId = libraryItem.libraryId
     this.folderId = libraryItem.folderId
     this.path = libraryItem.path
@@ -96,6 +99,7 @@ class LibraryItem {
     return {
       id: this.id,
       ino: this.ino,
+      oldLibraryItemId: this.oldLibraryItemId,
       libraryId: this.libraryId,
       folderId: this.folderId,
       path: this.path,
@@ -120,6 +124,7 @@ class LibraryItem {
     return {
       id: this.id,
       ino: this.ino,
+      oldLibraryItemId: this.oldLibraryItemId,
       libraryId: this.libraryId,
       folderId: this.folderId,
       path: this.path,
@@ -144,6 +149,7 @@ class LibraryItem {
     return {
       id: this.id,
       ino: this.ino,
+      oldLibraryItemId: this.oldLibraryItemId,
       libraryId: this.libraryId,
       folderId: this.folderId,
       path: this.path,
@@ -191,7 +197,7 @@ class LibraryItem {
 
   // Data comes from scandir library item data
   setData(libraryMediaType, payload) {
-    this.id = getId('li')
+    this.id = uuidv4()
     this.mediaType = libraryMediaType
     if (libraryMediaType === 'video') {
       this.media = new Video()
@@ -202,6 +208,7 @@ class LibraryItem {
     } else if (libraryMediaType === 'music') {
       this.media = new Music()
     }
+    this.media.id = uuidv4()
     this.media.libraryItemId = this.id
 
     for (const key in payload) {

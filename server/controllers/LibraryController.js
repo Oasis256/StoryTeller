@@ -9,6 +9,9 @@ const { sort, createNewSortInstance } = require('../libs/fastSort')
 const naturalSort = createNewSortInstance({
   comparer: new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare
 })
+
+const Database = require('../Database')
+
 class LibraryController {
   constructor() { }
 
@@ -40,13 +43,14 @@ class LibraryController {
     }
 
     const library = new Library()
-    newLibraryPayload.displayOrder = this.db.libraries.length + 1
+
+    newLibraryPayload.displayOrder = Database.libraries.map(li => li.displayOrder).sort((a, b) => a - b).pop() + 1
     library.setData(newLibraryPayload)
-    await this.db.insertEntity('library', library)
+    await Database.createLibrary(library)
 
     // Only emit to users with access to library
     const userFilter = (user) => {
-      return user.checkCanAccessLibrary && user.checkCanAccessLibrary(library.id)
+      return user.checkCanAccessLibrary?.(library.id)
     }
     SocketAuthority.emitter('library_added', library.toJSON(), userFilter)
 
@@ -58,14 +62,15 @@ class LibraryController {
 
   findAll(req, res) {
     const librariesAccessible = req.user.librariesAccessible || []
-    if (librariesAccessible && librariesAccessible.length) {
+    if (librariesAccessible.length) {
       return res.json({
-        libraries: this.db.libraries.filter(lib => librariesAccessible.includes(lib.id)).map(lib => lib.toJSON())
+        libraries: Database.libraries.filter(lib => librariesAccessible.includes(lib.id)).map(lib => lib.toJSON())
       })
     }
 
     res.json({
-      libraries: this.db.libraries.map(lib => lib.toJSON())
+      libraries: Database.libraries.map(lib => lib.toJSON())
+      // libraries: Database.libraries.map(lib => lib.toJSON())
     })
   }
 
@@ -75,7 +80,7 @@ class LibraryController {
       return res.json({
         filterdata: libraryHelpers.getDistinctFilterDataNew(req.libraryItems),
         issues: req.libraryItems.filter(li => li.hasIssues).length,
-        numUserPlaylists: this.db.playlists.filter(p => p.userId === req.user.id && p.libraryId === req.library.id).length,
+        numUserPlaylists: Database.playlists.filter(p => p.userId === req.user.id && p.libraryId === req.library.id).length,
         library: req.library
       })
     }
@@ -128,14 +133,14 @@ class LibraryController {
       this.cronManager.updateLibraryScanCron(library)
 
       // Remove libraryItems no longer in library
-      const itemsToRemove = this.db.libraryItems.filter(li => li.libraryId === library.id && !library.checkFullPathInLibrary(li.path))
+      const itemsToRemove = Database.libraryItems.filter(li => li.libraryId === library.id && !library.checkFullPathInLibrary(li.path))
       if (itemsToRemove.length) {
         Logger.info(`[Scanner] Updating library, removing ${itemsToRemove.length} items`)
         for (let i = 0; i < itemsToRemove.length; i++) {
           await this.handleDeleteLibraryItem(itemsToRemove[i])
         }
       }
-      await this.db.updateEntity('library', library)
+      await Database.updateLibrary(library)
 
       // Only emit to users with access to library
       const userFilter = (user) => {
@@ -153,28 +158,28 @@ class LibraryController {
     this.watcher.removeLibrary(library)
 
     // Remove collections for library
-    const collections = this.db.collections.filter(c => c.libraryId === library.id)
+    const collections = Database.collections.filter(c => c.libraryId === library.id)
     for (const collection of collections) {
       Logger.info(`[Server] deleting collection "${collection.name}" for library "${library.name}"`)
-      await this.db.removeEntity('collection', collection.id)
+      await Database.removeCollection(collection.id)
     }
 
     // Remove items in this library
-    const libraryItems = this.db.libraryItems.filter(li => li.libraryId === library.id)
+    const libraryItems = Database.libraryItems.filter(li => li.libraryId === library.id)
     Logger.info(`[Server] deleting library "${library.name}" with ${libraryItems.length} items"`)
     for (let i = 0; i < libraryItems.length; i++) {
       await this.handleDeleteLibraryItem(libraryItems[i])
     }
 
     const libraryJson = library.toJSON()
-    await this.db.removeEntity('library', library.id)
+    await Database.removeLibrary(library.id)
     SocketAuthority.emitter('library_removed', libraryJson)
     return res.json(libraryJson)
   }
 
   // api/libraries/:id/items
   // TODO: Optimize this method, items are iterated through several times but can be combined
-  getLibraryItems(req, res) {
+  async getLibraryItems(req, res) {
     let libraryItems = req.libraryItems
 
     const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
@@ -193,11 +198,12 @@ class LibraryController {
       include: include.join(',')
     }
     const mediaIsBook = payload.mediaType === 'book'
+    const mediaIsPodcast = payload.mediaType === 'podcast'
 
     // Step 1 - Filter the retrieved library items
     let filterSeries = null
     if (payload.filterBy) {
-      libraryItems = libraryHelpers.getFilteredLibraryItems(libraryItems, payload.filterBy, req.user, this.rssFeedManager.feedsArray)
+      libraryItems = await libraryHelpers.getFilteredLibraryItems(libraryItems, payload.filterBy, req.user)
       payload.total = libraryItems.length
 
       // Determining if we are filtering titles by a series, and if so, which series
@@ -209,7 +215,7 @@ class LibraryController {
     // If also filtering by series, will not collapse the filtered series as this would lead
     // to series having a collapsed series that is just that series.
     if (payload.collapseseries) {
-      let collapsedItems = libraryHelpers.collapseBookSeries(libraryItems, this.db.series, filterSeries)
+      let collapsedItems = libraryHelpers.collapseBookSeries(libraryItems, Database.series, filterSeries, req.library.settings.hideSingleBookSeries)
 
       if (!(collapsedItems.length == 1 && collapsedItems[0].collapsedSeries)) {
         libraryItems = collapsedItems
@@ -231,13 +237,12 @@ class LibraryController {
     const sortArray = []
 
     // When on the series page, sort by sequence only
-    if (payload.sortBy === 'book.volumeNumber') payload.sortBy = null // TODO: Remove temp fix after mobile release 0.9.60
     if (filterSeries && !payload.sortBy) {
       sortArray.push({ asc: (li) => li.media.metadata.getSeries(filterSeries).sequence })
       // If no series sequence then fallback to sorting by title (or collapsed series name for sub-series)
       sortArray.push({
         asc: (li) => {
-          if (this.db.serverSettings.sortingIgnorePrefix) {
+          if (Database.serverSettings.sortingIgnorePrefix) {
             return li.collapsedSeries?.nameIgnorePrefix || li.media.metadata.titleIgnorePrefix
           } else {
             return li.collapsedSeries?.name || li.media.metadata.title
@@ -247,15 +252,11 @@ class LibraryController {
     }
 
     if (payload.sortBy) {
-      // old sort key TODO: should be mutated in dbMigration
       let sortKey = payload.sortBy
-      if (sortKey.startsWith('book.')) {
-        sortKey = sortKey.replace('book.', 'media.metadata.')
-      }
 
       // Handle server setting sortingIgnorePrefix
       const sortByTitle = sortKey === 'media.metadata.title'
-      if (sortByTitle && this.db.serverSettings.sortingIgnorePrefix) {
+      if (sortByTitle && Database.serverSettings.sortingIgnorePrefix) {
         // BookMetadata.js has titleIgnorePrefix getter
         sortKey += 'IgnorePrefix'
       }
@@ -267,7 +268,7 @@ class LibraryController {
         sortArray.push({
           asc: (li) => {
             if (li.collapsedSeries) {
-              return this.db.serverSettings.sortingIgnorePrefix ?
+              return Database.serverSettings.sortingIgnorePrefix ?
                 li.collapsedSeries.nameIgnorePrefix :
                 li.collapsedSeries.name
             } else {
@@ -284,7 +285,7 @@ class LibraryController {
           if (mediaIsBook && sortBySequence) {
             return li.media.metadata.getSeries(filterSeries).sequence
           } else if (mediaIsBook && sortByTitle && li.collapsedSeries) {
-            return this.db.serverSettings.sortingIgnorePrefix ?
+            return Database.serverSettings.sortingIgnorePrefix ?
               li.collapsedSeries.nameIgnorePrefix :
               li.collapsedSeries.name
           } else {
@@ -318,7 +319,7 @@ class LibraryController {
     }
 
     // Step 4 - Transform the items to pass to the client side
-    payload.results = libraryItems.map(li => {
+    payload.results = await Promise.all(libraryItems.map(async li => {
       const json = payload.minified ? li.toJSONMinified() : li.toJSON()
 
       if (li.collapsedSeries) {
@@ -355,8 +356,13 @@ class LibraryController {
       } else {
         // add rssFeed object if "include=rssfeed" was put in query string (only for non-collapsed series)
         if (include.includes('rssfeed')) {
-          const feedData = this.rssFeedManager.findFeedForEntityId(json.id)
+          const feedData = await this.rssFeedManager.findFeedForEntityId(json.id)
           json.rssFeed = feedData ? feedData.toJSONMinified() : null
+        }
+
+        // add numEpisodesIncomplete if "include=numEpisodesIncomplete" was put in query string (only for podcasts)
+        if (mediaIsPodcast && include.includes('numepisodesincomplete')) {
+          json.numEpisodesIncomplete = req.user.getNumEpisodesIncompleteForPodcast(li)
         }
 
         if (filterSeries) {
@@ -366,7 +372,7 @@ class LibraryController {
       }
 
       return json
-    })
+    }))
 
     res.json(payload)
   }
@@ -387,7 +393,13 @@ class LibraryController {
     res.sendStatus(200)
   }
 
-  // api/libraries/:id/series
+  /**
+   * api/libraries/:id/series
+   * Optional query string: `?include=rssfeed` that adds `rssFeed` to series if a feed is open
+   * 
+   * @param {*} req 
+   * @param {*} res 
+   */
   async getAllSeriesForLibrary(req, res) {
     const libraryItems = req.libraryItems
 
@@ -405,7 +417,7 @@ class LibraryController {
       include: include.join(',')
     }
 
-    let series = libraryHelpers.getSeriesFromBooks(libraryItems, this.db.series, null, payload.filterBy, req.user, payload.minified)
+    let series = libraryHelpers.getSeriesFromBooks(libraryItems, Database.series, null, payload.filterBy, req.user, payload.minified, req.library.settings.hideSingleBookSeries)
 
     const direction = payload.sortDesc ? 'desc' : 'asc'
     series = naturalSort(series).by([
@@ -422,7 +434,7 @@ class LibraryController {
           } else if (payload.sortBy === 'lastBookAdded') {
             return Math.max(...(se.books).map(x => x.addedAt), 0)
           } else { // sort by name
-            return this.db.serverSettings.sortingIgnorePrefix ? se.nameIgnorePrefixSort : se.name
+            return Database.serverSettings.sortingIgnorePrefix ? se.nameIgnorePrefixSort : se.name
           }
         }
       }
@@ -437,15 +449,51 @@ class LibraryController {
 
     // add rssFeed when "include=rssfeed" is in query string
     if (include.includes('rssfeed')) {
-      series = series.map((se) => {
-        const feedData = this.rssFeedManager.findFeedForEntityId(se.id)
+      series = await Promise.all(series.map(async (se) => {
+        const feedData = await this.rssFeedManager.findFeedForEntityId(se.id)
         se.rssFeed = feedData?.toJSONMinified() || null
         return se
-      })
+      }))
     }
 
     payload.results = series
     res.json(payload)
+  }
+
+  /**
+   * api/libraries/:id/series/:seriesId
+   *
+   * Optional includes (e.g. `?include=rssfeed,progress`)
+   * rssfeed: adds `rssFeed` to series object if a feed is open
+   * progress: adds `progress` to series object with { libraryItemIds:Array<llid>, libraryItemIdsFinished:Array<llid>, isFinished:boolean }
+   * 
+   * @param {*} req 
+   * @param {*} res - Series
+   */
+  async getSeriesForLibrary(req, res) {
+    const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
+
+    const series = Database.series.find(se => se.id === req.params.seriesId)
+    if (!series) return res.sendStatus(404)
+
+    const libraryItemsInSeries = req.libraryItems.filter(li => li.media.metadata.hasSeries?.(series.id))
+
+    const seriesJson = series.toJSON()
+    if (include.includes('progress')) {
+      const libraryItemsFinished = libraryItemsInSeries.filter(li => !!req.user.getMediaProgress(li.id)?.isFinished)
+      seriesJson.progress = {
+        libraryItemIds: libraryItemsInSeries.map(li => li.id),
+        libraryItemIdsFinished: libraryItemsFinished.map(li => li.id),
+        isFinished: libraryItemsFinished.length >= libraryItemsInSeries.length
+      }
+    }
+
+    if (include.includes('rssfeed')) {
+      const feedObj = await this.rssFeedManager.findFeedForEntityId(seriesJson.id)
+      seriesJson.rssFeed = feedObj?.toJSONMinified() || null
+    }
+
+    res.json(seriesJson)
   }
 
   // api/libraries/:id/collections
@@ -466,19 +514,21 @@ class LibraryController {
       include: include.join(',')
     }
 
-    let collections = this.db.collections.filter(c => c.libraryId === req.library.id).map(c => {
+    let collections = await Promise.all(Database.collections.filter(c => c.libraryId === req.library.id).map(async c => {
       const expanded = c.toJSONExpanded(libraryItems, payload.minified)
 
       // If all books restricted to user in this collection then hide this collection
       if (!expanded.books.length && c.books.length) return null
 
       if (include.includes('rssfeed')) {
-        const feedData = this.rssFeedManager.findFeedForEntityId(c.id)
+        const feedData = await this.rssFeedManager.findFeedForEntityId(c.id)
         expanded.rssFeed = feedData?.toJSONMinified() || null
       }
 
       return expanded
-    }).filter(c => !!c)
+    }))
+
+    collections = collections.filter(c => !!c)
 
     payload.total = collections.length
 
@@ -493,7 +543,7 @@ class LibraryController {
 
   // api/libraries/:id/playlists
   async getUserPlaylistsForLibrary(req, res) {
-    let playlistsForUser = this.db.playlists.filter(p => p.userId === req.user.id && p.libraryId === req.library.id).map(p => p.toJSONExpanded(this.db.libraryItems))
+    let playlistsForUser = Database.playlists.filter(p => p.userId === req.user.id && p.libraryId === req.library.id).map(p => p.toJSONExpanded(Database.libraryItems))
 
     const payload = {
       results: [],
@@ -517,7 +567,7 @@ class LibraryController {
       return res.status(400).send('Invalid library media type')
     }
 
-    let libraryItems = this.db.libraryItems.filter(li => li.libraryId === req.library.id)
+    let libraryItems = Database.libraryItems.filter(li => li.libraryId === req.library.id)
     let albums = libraryHelpers.groupMusicLibraryItemsIntoAlbums(libraryItems)
     albums = naturalSort(albums).asc(a => a.title) // Alphabetical by album title
 
@@ -544,12 +594,10 @@ class LibraryController {
   // api/libraries/:id/personalized
   // New and improved personalized call only loops through library items once
   async getLibraryUserPersonalizedOptimal(req, res) {
-    const mediaType = req.library.mediaType
-    const libraryItems = req.libraryItems
     const limitPerShelf = req.query.limit && !isNaN(req.query.limit) ? Number(req.query.limit) || 10 : 10
     const include = (req.query.include || '').split(',').map(v => v.trim().toLowerCase()).filter(v => !!v)
 
-    const categories = libraryHelpers.buildPersonalizedShelves(this, req.user, libraryItems, mediaType, limitPerShelf, include)
+    const categories = await libraryHelpers.buildPersonalizedShelves(this, req.user, req.libraryItems, req.library, limitPerShelf, include)
     res.json(categories)
   }
 
@@ -563,26 +611,26 @@ class LibraryController {
     var orderdata = req.body
     var hasUpdates = false
     for (let i = 0; i < orderdata.length; i++) {
-      var library = this.db.libraries.find(lib => lib.id === orderdata[i].id)
+      var library = Database.libraries.find(lib => lib.id === orderdata[i].id)
       if (!library) {
         Logger.error(`[LibraryController] Invalid library not found in reorder ${orderdata[i].id}`)
         return res.sendStatus(500)
       }
       if (library.update({ displayOrder: orderdata[i].newOrder })) {
         hasUpdates = true
-        await this.db.updateEntity('library', library)
+        await Database.updateLibrary(library)
       }
     }
 
     if (hasUpdates) {
-      this.db.libraries.sort((a, b) => a.displayOrder - b.displayOrder)
+      Database.libraries.sort((a, b) => a.displayOrder - b.displayOrder)
       Logger.debug(`[LibraryController] Updated library display orders`)
     } else {
       Logger.debug(`[LibraryController] Library orders were up to date`)
     }
 
     res.json({
-      libraries: this.db.libraries.map(lib => lib.toJSON())
+      libraries: Database.libraries.map(lib => lib.toJSON())
     })
   }
 
@@ -612,7 +660,7 @@ class LibraryController {
       if (queryResult.series?.length) {
         queryResult.series.forEach((se) => {
           if (!seriesMatches[se.id]) {
-            const _series = this.db.series.find(_se => _se.id === se.id)
+            const _series = Database.series.find(_se => _se.id === se.id)
             if (_series) seriesMatches[se.id] = { series: _series.toJSON(), books: [li.toJSON()] }
           } else {
             seriesMatches[se.id].books.push(li.toJSON())
@@ -622,7 +670,7 @@ class LibraryController {
       if (queryResult.authors?.length) {
         queryResult.authors.forEach((au) => {
           if (!authorMatches[au.id]) {
-            const _author = this.db.authors.find(_au => _au.id === au.id)
+            const _author = Database.authors.find(_au => _au.id === au.id)
             if (_author) {
               authorMatches[au.id] = _author.toJSON()
               authorMatches[au.id].numBooks = 1
@@ -689,7 +737,7 @@ class LibraryController {
       if (li.media.metadata.authors && li.media.metadata.authors.length) {
         li.media.metadata.authors.forEach((au) => {
           if (!authors[au.id]) {
-            const _author = this.db.authors.find(_au => _au.id === au.id)
+            const _author = Database.authors.find(_au => _au.id === au.id)
             if (_author) {
               authors[au.id] = _author.toJSON()
               authors[au.id].numBooks = 1
@@ -751,7 +799,7 @@ class LibraryController {
     }
 
     if (itemsUpdated.length) {
-      await this.db.updateLibraryItems(itemsUpdated)
+      await Database.updateBulkBooks(itemsUpdated.map(i => i.media))
       SocketAuthority.emitter('items_updated', itemsUpdated.map(li => li.toJSONExpanded()))
     }
 
@@ -776,7 +824,7 @@ class LibraryController {
     }
 
     if (itemsUpdated.length) {
-      await this.db.updateLibraryItems(itemsUpdated)
+      await Database.updateBulkBooks(itemsUpdated.map(i => i.media))
       SocketAuthority.emitter('items_updated', itemsUpdated.map(li => li.toJSONExpanded()))
     }
 
@@ -857,15 +905,15 @@ class LibraryController {
   middleware(req, res, next) {
     if (!req.user.checkCanAccessLibrary(req.params.id)) {
       Logger.warn(`[LibraryController] Library ${req.params.id} not accessible to user ${req.user.username}`)
-      return res.sendStatus(404)
+      return res.sendStatus(403)
     }
 
-    const library = this.db.libraries.find(lib => lib.id === req.params.id)
+    const library = Database.libraries.find(lib => lib.id === req.params.id)
     if (!library) {
       return res.status(404).send('Library not found')
     }
     req.library = library
-    req.libraryItems = this.db.libraryItems.filter(li => {
+    req.libraryItems = Database.libraryItems.filter(li => {
       return li.libraryId === library.id && req.user.checkCanAccessLibraryItem(li)
     })
     next()

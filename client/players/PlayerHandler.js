@@ -191,6 +191,7 @@ export default class PlayerHandler {
 
     const payload = {
       deviceInfo: {
+        clientName: 'Abs Web',
         deviceId: this.getDeviceId()
       },
       supportedMimeTypes: this.player.playableMimeTypes,
@@ -281,6 +282,10 @@ export default class PlayerHandler {
     }
   }
 
+  /**
+   * First sync happens after 20 seconds
+   * subsequent syncs happen every 10 seconds
+   */
   startPlayInterval() {
     clearInterval(this.playInterval)
     let lastTick = Date.now()
@@ -293,7 +298,7 @@ export default class PlayerHandler {
       const exactTimeElapsed = ((Date.now() - lastTick) / 1000)
       lastTick = Date.now()
       this.listeningTimeSinceSync += exactTimeElapsed
-      const TimeToWaitBeforeSync = this.lastSyncTime > 0 ? 5 : 20
+      const TimeToWaitBeforeSync = this.lastSyncTime > 0 ? 10 : 20
       if (this.listeningTimeSinceSync >= TimeToWaitBeforeSync) {
         this.sendProgressSync(currentTime)
       }
@@ -315,7 +320,7 @@ export default class PlayerHandler {
     }
     this.listeningTimeSinceSync = 0
     this.lastSyncTime = 0
-    return this.ctx.$axios.$post(`/api/session/${this.currentSessionId}/close`, syncData, { timeout: 1000 }).catch((error) => {
+    return this.ctx.$axios.$post(`/api/session/${this.currentSessionId}/close`, syncData, { timeout: 6000 }).catch((error) => {
       console.error('Failed to close session', error)
     })
   }
@@ -335,12 +340,13 @@ export default class PlayerHandler {
     }
 
     this.listeningTimeSinceSync = 0
-    this.ctx.$axios.$post(`/api/session/${this.currentSessionId}/sync`, syncData, { timeout: 3000 }).then(() => {
+    this.ctx.$axios.$post(`/api/session/${this.currentSessionId}/sync`, syncData, { timeout: 9000 }).then(() => {
       this.failedProgressSyncs = 0
     }).catch((error) => {
       console.error('Failed to update session progress', error)
+      // After 4 failed sync attempts show an alert toast
       this.failedProgressSyncs++
-      if (this.failedProgressSyncs >= 2) {
+      if (this.failedProgressSyncs >= 4) {
         this.ctx.showFailedProgressSyncs()
         this.failedProgressSyncs = 0
       }

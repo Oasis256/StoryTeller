@@ -2,9 +2,10 @@ const Path = require('path')
 const fs = require('../libs/fsExtra')
 const Logger = require('../Logger')
 const SocketAuthority = require('../SocketAuthority')
+const Database = require('../Database')
 
 const zipHelpers = require('../utils/zipHelpers')
-const { reqSupportsWebp, isNullOrNaN } = require('../utils/index')
+const { reqSupportsWebp } = require('../utils/index')
 const { ScanResult } = require('../utils/constants')
 const { getAudioMimeTypeFromExtname } = require('../utils/fileUtils')
 
@@ -12,7 +13,7 @@ class LibraryItemController {
   constructor() { }
 
   // Example expand with authors: api/items/:id?expanded=1&include=authors
-  findOne(req, res) {
+  async findOne(req, res) {
     const includeEntities = (req.query.include || '').split(',')
     if (req.query.expanded == 1) {
       var item = req.libraryItem.toJSONExpanded()
@@ -24,14 +25,14 @@ class LibraryItemController {
       }
 
       if (includeEntities.includes('rssfeed')) {
-        const feedData = this.rssFeedManager.findFeedForEntityId(item.id)
-        item.rssFeed = feedData ? feedData.toJSONMinified() : null
+        const feedData = await this.rssFeedManager.findFeedForEntityId(item.id)
+        item.rssFeed = feedData?.toJSONMinified() || null
       }
 
       if (item.mediaType == 'book') {
         if (includeEntities.includes('authors')) {
           item.media.metadata.authors = item.media.metadata.authors.map(au => {
-            var author = this.db.authors.find(_au => _au.id === au.id)
+            var author = Database.authors.find(_au => _au.id === au.id)
             if (!author) return null
             return {
               ...author
@@ -61,7 +62,7 @@ class LibraryItemController {
     const hasUpdates = libraryItem.update(req.body)
     if (hasUpdates) {
       Logger.debug(`[LibraryItemController] Updated now saving`)
-      await this.db.updateLibraryItem(libraryItem)
+      await Database.updateLibraryItem(libraryItem)
       SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     }
     res.json(libraryItem.toJSON())
@@ -87,7 +88,9 @@ class LibraryItemController {
     }
 
     const libraryItemPath = req.libraryItem.path
-    const filename = `${req.libraryItem.media.metadata.title}.zip`
+    const itemTitle = req.libraryItem.media.metadata.title
+    Logger.info(`[LibraryItemController] User "${req.user.username}" requested download for item "${itemTitle}" at "${libraryItemPath}"`)
+    const filename = `${itemTitle}.zip`
     zipHelpers.zipDirectoryPipe(libraryItemPath, filename, res)
   }
 
@@ -97,6 +100,7 @@ class LibraryItemController {
   async updateMedia(req, res) {
     const libraryItem = req.libraryItem
     const mediaPayload = req.body
+
     // Item has cover and update is removing cover so purge it from cache
     if (libraryItem.media.coverPath && (mediaPayload.coverPath === '' || mediaPayload.coverPath === null)) {
       await this.cacheManager.purgeCoverCache(libraryItem.id)
@@ -104,7 +108,7 @@ class LibraryItemController {
 
     // Book specific
     if (libraryItem.isBook) {
-      await this.createAuthorsAndSeriesForItemUpdate(mediaPayload)
+      await this.createAuthorsAndSeriesForItemUpdate(mediaPayload, libraryItem.libraryId)
     }
 
     // Podcast specific
@@ -139,7 +143,7 @@ class LibraryItemController {
       }
 
       Logger.debug(`[LibraryItemController] Updated library item media ${libraryItem.media.metadata.title}`)
-      await this.db.updateLibraryItem(libraryItem)
+      await Database.updateLibraryItem(libraryItem)
       SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     }
     res.json({
@@ -174,7 +178,7 @@ class LibraryItemController {
       return res.status(500).send('Unknown error occurred')
     }
 
-    await this.db.updateLibraryItem(libraryItem)
+    await Database.updateLibraryItem(libraryItem)
     SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     res.json({
       success: true,
@@ -194,7 +198,7 @@ class LibraryItemController {
       return res.status(500).send(validationResult.error)
     }
     if (validationResult.updated) {
-      await this.db.updateLibraryItem(libraryItem)
+      await Database.updateLibraryItem(libraryItem)
       SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     }
     res.json({
@@ -210,7 +214,7 @@ class LibraryItemController {
     if (libraryItem.media.coverPath) {
       libraryItem.updateMediaCover('')
       await this.cacheManager.purgeCoverCache(libraryItem.id)
-      await this.db.updateLibraryItem(libraryItem)
+      await Database.updateLibraryItem(libraryItem)
       SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     }
 
@@ -282,7 +286,7 @@ class LibraryItemController {
       return res.sendStatus(500)
     }
     libraryItem.media.updateAudioTracks(orderedFileData)
-    await this.db.updateLibraryItem(libraryItem)
+    await Database.updateLibraryItem(libraryItem)
     SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
     res.json(libraryItem.toJSON())
   }
@@ -309,7 +313,7 @@ class LibraryItemController {
       return res.sendStatus(500)
     }
 
-    const itemsToDelete = this.db.libraryItems.filter(li => libraryItemIds.includes(li.id))
+    const itemsToDelete = Database.libraryItems.filter(li => libraryItemIds.includes(li.id))
     if (!itemsToDelete.length) {
       return res.sendStatus(404)
     }
@@ -338,15 +342,15 @@ class LibraryItemController {
 
     for (let i = 0; i < updatePayloads.length; i++) {
       var mediaPayload = updatePayloads[i].mediaPayload
-      var libraryItem = this.db.libraryItems.find(_li => _li.id === updatePayloads[i].id)
+      var libraryItem = Database.libraryItems.find(_li => _li.id === updatePayloads[i].id)
       if (!libraryItem) return null
 
-      await this.createAuthorsAndSeriesForItemUpdate(mediaPayload)
+      await this.createAuthorsAndSeriesForItemUpdate(mediaPayload, libraryItem.libraryId)
 
       var hasUpdates = libraryItem.media.update(mediaPayload)
       if (hasUpdates) {
         Logger.debug(`[LibraryItemController] Updated library item media ${libraryItem.media.metadata.title}`)
-        await this.db.updateLibraryItem(libraryItem)
+        await Database.updateLibraryItem(libraryItem)
         SocketAuthority.emitter('item_updated', libraryItem.toJSONExpanded())
         itemsUpdated++
       }
@@ -366,7 +370,7 @@ class LibraryItemController {
     }
     const libraryItems = []
     libraryItemIds.forEach((lid) => {
-      const li = this.db.libraryItems.find(_li => _li.id === lid)
+      const li = Database.libraryItems.find(_li => _li.id === lid)
       if (li) libraryItems.push(li.toJSONExpanded())
     })
     res.json({
@@ -389,7 +393,7 @@ class LibraryItemController {
       return res.sendStatus(400)
     }
 
-    const libraryItems = req.body.libraryItemIds.map(lid => this.db.getLibraryItem(lid)).filter(li => li)
+    const libraryItems = req.body.libraryItemIds.map(lid => Database.getLibraryItem(lid)).filter(li => li)
     if (!libraryItems?.length) {
       return res.sendStatus(400)
     }
@@ -424,7 +428,7 @@ class LibraryItemController {
       return res.sendStatus(400)
     }
 
-    const libraryItems = req.body.libraryItemIds.map(lid => this.db.getLibraryItem(lid)).filter(li => li)
+    const libraryItems = req.body.libraryItemIds.map(lid => Database.getLibraryItem(lid)).filter(li => li)
     if (!libraryItems?.length) {
       return res.sendStatus(400)
     }
@@ -438,18 +442,6 @@ class LibraryItemController {
         await this.scanner.scanLibraryItemByRequest(libraryItem)
       }
     }
-  }
-
-  // DELETE: api/items/all
-  async deleteAll(req, res) {
-    if (!req.user.isAdminOrUp) {
-      Logger.warn('User other than admin attempted to delete all library items', req.user)
-      return res.sendStatus(403)
-    }
-    Logger.info('Removing all Library Items')
-    var success = await this.db.recreateLibraryItemsDb()
-    if (success) res.sendStatus(200)
-    else res.sendStatus(500)
   }
 
   // POST: api/items/:id/scan (admin)
@@ -504,7 +496,7 @@ class LibraryItemController {
     const chapters = req.body.chapters || []
     const wasUpdated = req.libraryItem.media.updateChapters(chapters)
     if (wasUpdated) {
-      await this.db.updateLibraryItem(req.libraryItem)
+      await Database.updateLibraryItem(req.libraryItem)
       SocketAuthority.emitter('item_updated', req.libraryItem.toJSONExpanded())
     }
 
@@ -586,7 +578,7 @@ class LibraryItemController {
       }
     }
     req.libraryItem.updatedAt = Date.now()
-    await this.db.updateLibraryItem(req.libraryItem)
+    await Database.updateLibraryItem(req.libraryItem)
     SocketAuthority.emitter('item_updated', req.libraryItem.toJSONExpanded())
     res.sendStatus(200)
   }
@@ -682,13 +674,13 @@ class LibraryItemController {
     }
 
     req.libraryItem.updatedAt = Date.now()
-    await this.db.updateLibraryItem(req.libraryItem)
+    await Database.updateLibraryItem(req.libraryItem)
     SocketAuthority.emitter('item_updated', req.libraryItem.toJSONExpanded())
     res.sendStatus(200)
   }
 
   middleware(req, res, next) {
-    req.libraryItem = this.db.libraryItems.find(li => li.id === req.params.id)
+    req.libraryItem = Database.libraryItems.find(li => li.id === req.params.id)
     if (!req.libraryItem?.media) return res.sendStatus(404)
 
     // Check user can access this library item

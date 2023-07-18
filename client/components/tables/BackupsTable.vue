@@ -25,6 +25,7 @@
           <td class="hidden sm:table-cell font-mono md:text-sm text-xs">{{ $bytesPretty(backup.fileSize) }}</td>
           <td>
             <div class="w-full flex flex-row items-center justify-center">
+<<<<<<< HEAD
               <ui-btn v-if="backup.serverVersion" small color="primary" @click="applyBackup(backup)">{{
                   $strings.ButtonRestore
               }}</ui-btn>
@@ -41,6 +42,16 @@
               <span
                 class="material-icons text-xl hover:text-error hover:text-opacity-100 text-opacity-70 text-white cursor-pointer mx-1"
                 @click="deleteBackupClick(backup)">delete</span>
+=======
+              <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{ $strings.ButtonRestore }}</ui-btn>
+              <ui-tooltip v-else text="This backup was created with an old version of audiobookshelf no longer supported" direction="bottom" class="mx-2 flex items-center">
+                <span class="material-icons-outlined text-2xl text-error">error_outline</span>
+              </ui-tooltip>
+
+              <button aria-label="Download Backup" class="inline-flex material-icons text-xl mx-1 mt-1 text-white/70 hover:text-white/100" @click.stop="downloadBackup(backup)">download</button>
+
+              <button aria-label="Delete Backup" class="inline-flex material-icons text-xl mx-1 text-white/70 hover:text-error" @click="deleteBackupClick(backup)">delete</button>
+>>>>>>> c2af96e7cd5f41eed91cddbceea8b128cdd59400
             </div>
           </td>
         </tr>
@@ -95,6 +106,9 @@ export default {
     }
   },
   methods: {
+    downloadBackup(backup) {
+      this.$downloadFile(`${process.env.serverUrl}/api/backups/${backup.id}/download?token=${this.userToken}`)
+    },
     confirm() {
       this.showConfirmApply = false
 
@@ -106,8 +120,9 @@ export default {
         })
         .catch((error) => {
           this.isBackingUp = false
-          console.error('Failed', error)
-          this.$toast.error(this.$strings.ToastBackupRestoreFailed)
+          console.error('Failed to apply backup', error)
+          const errorMsg = error.response.data || this.$strings.ToastBackupRestoreFailed
+          this.$toast.error(errorMsg)
         })
     },
     deleteBackupClick(backup) {

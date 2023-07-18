@@ -1,5 +1,6 @@
 const { sort, createNewSortInstance } = require('../libs/fastSort')
 const Logger = require('../Logger')
+const Database = require('../Database')
 const { getTitlePrefixAtEnd, isNullOrNaN, getTitleIgnorePrefix } = require('../utils/index')
 const naturalSort = createNewSortInstance({
   comparer: new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare
@@ -10,10 +11,10 @@ module.exports = {
     return Buffer.from(decodeURIComponent(text), 'base64').toString()
   },
 
-  getFilteredLibraryItems(libraryItems, filterBy, user, feedsArray) {
+  async getFilteredLibraryItems(libraryItems, filterBy, user) {
     let filtered = libraryItems
 
-    const searchGroups = ['genres', 'tags', 'series', 'authors', 'progress', 'narrators', 'missing', 'languages', 'tracks', 'ebooks']
+    const searchGroups = ['genres', 'tags', 'series', 'authors', 'progress', 'narrators', 'publishers', 'missing', 'languages', 'tracks', 'ebooks']
     const group = searchGroups.find(_group => filterBy.startsWith(_group + '.'))
     if (group) {
       const filterVal = filterBy.replace(`${group}.`, '')
@@ -28,6 +29,7 @@ module.exports = {
       }
       else if (group === 'authors') filtered = filtered.filter(li => li.isBook && li.media.metadata.hasAuthor(filter))
       else if (group === 'narrators') filtered = filtered.filter(li => li.isBook && li.media.metadata.hasNarrator(filter))
+      else if (group === 'publishers') filtered = filtered.filter(li => li.isBook && li.media.metadata.publisher === filter)
       else if (group === 'progress') {
         filtered = filtered.filter(li => {
           const itemProgress = user.getMediaProgress(li.id)
@@ -69,7 +71,9 @@ module.exports = {
     } else if (filterBy === 'issues') {
       filtered = filtered.filter(li => li.hasIssues)
     } else if (filterBy === 'feed-open') {
-      filtered = filtered.filter(li => feedsArray.some(feed => feed.entityId === li.id))
+      const libraryItemIdsWithFeed = await Database.models.feed.findAllLibraryItemIds()
+      filtered = filtered.filter(li => libraryItemIdsWithFeed.includes(li.id))
+      // filtered = filtered.filter(li => feedsArray.some(feed => feed.entityId === li.id))
     } else if (filterBy === 'abridged') {
       filtered = filtered.filter(li => !!li.media.metadata?.abridged)
     } else if (filterBy === 'ebook') {
@@ -81,16 +85,17 @@ module.exports = {
 
   // Returns false if should be filtered out
   checkFilterForSeriesLibraryItem(libraryItem, filterBy) {
-    var searchGroups = ['genres', 'tags', 'authors', 'progress', 'narrators', 'languages']
-    var group = searchGroups.find(_group => filterBy.startsWith(_group + '.'))
+    const searchGroups = ['genres', 'tags', 'authors', 'progress', 'narrators', 'publishers', 'languages']
+    const group = searchGroups.find(_group => filterBy.startsWith(_group + '.'))
     if (group) {
-      var filterVal = filterBy.replace(`${group}.`, '')
-      var filter = this.decode(filterVal)
+      const filterVal = filterBy.replace(`${group}.`, '')
+      const filter = this.decode(filterVal)
 
       if (group === 'genres') return libraryItem.media.metadata.genres.includes(filter)
       else if (group === 'tags') return libraryItem.media.tags.includes(filter)
       else if (group === 'authors') return libraryItem.isBook && libraryItem.media.metadata.hasAuthor(filter)
       else if (group === 'narrators') return libraryItem.isBook && libraryItem.media.metadata.hasNarrator(filter)
+      else if (group === 'publishers') return libraryItem.isBook && libraryItem.media.metadata.publisher === filter
       else if (group === 'languages') {
         return libraryItem.media.metadata.language === filter
       }
@@ -122,27 +127,28 @@ module.exports = {
   },
 
   getDistinctFilterDataNew(libraryItems) {
-    var data = {
+    const data = {
       authors: [],
       genres: [],
       tags: [],
       series: [],
       narrators: [],
-      languages: []
+      languages: [],
+      publishers: []
     }
     libraryItems.forEach((li) => {
-      var mediaMetadata = li.media.metadata
-      if (mediaMetadata.authors && mediaMetadata.authors.length) {
+      const mediaMetadata = li.media.metadata
+      if (mediaMetadata.authors?.length) {
         mediaMetadata.authors.forEach((author) => {
-          if (author && !data.authors.find(au => au.id === author.id)) data.authors.push({ id: author.id, name: author.name })
+          if (author && !data.authors.some(au => au.id === author.id)) data.authors.push({ id: author.id, name: author.name })
         })
       }
-      if (mediaMetadata.series && mediaMetadata.series.length) {
+      if (mediaMetadata.series?.length) {
         mediaMetadata.series.forEach((series) => {
-          if (series && !data.series.find(se => se.id === series.id)) data.series.push({ id: series.id, name: series.name })
+          if (series && !data.series.some(se => se.id === series.id)) data.series.push({ id: series.id, name: series.name })
         })
       }
-      if (mediaMetadata.genres && mediaMetadata.genres.length) {
+      if (mediaMetadata.genres?.length) {
         mediaMetadata.genres.forEach((genre) => {
           if (genre && !data.genres.includes(genre)) data.genres.push(genre)
         })
@@ -152,23 +158,29 @@ module.exports = {
           if (tag && !data.tags.includes(tag)) data.tags.push(tag)
         })
       }
-      if (mediaMetadata.narrators && mediaMetadata.narrators.length) {
+      if (mediaMetadata.narrators?.length) {
         mediaMetadata.narrators.forEach((narrator) => {
           if (narrator && !data.narrators.includes(narrator)) data.narrators.push(narrator)
         })
       }
-      if (mediaMetadata.language && !data.languages.includes(mediaMetadata.language)) data.languages.push(mediaMetadata.language)
+      if (mediaMetadata.publisher && !data.publishers.includes(mediaMetadata.publisher)) {
+        data.publishers.push(mediaMetadata.publisher)
+      }
+      if (mediaMetadata.language && !data.languages.includes(mediaMetadata.language)) {
+        data.languages.push(mediaMetadata.language)
+      }
     })
     data.authors = naturalSort(data.authors).asc(au => au.name)
     data.genres = naturalSort(data.genres).asc()
     data.tags = naturalSort(data.tags).asc()
     data.series = naturalSort(data.series).asc(se => se.name)
     data.narrators = naturalSort(data.narrators).asc()
+    data.publishers = naturalSort(data.publishers).asc()
     data.languages = naturalSort(data.languages).asc()
     return data
   },
 
-  getSeriesFromBooks(books, allSeries, filterSeries, filterBy, user, minified = false) {
+  getSeriesFromBooks(books, allSeries, filterSeries, filterBy, user, minified, hideSingleBookSeries) {
     const _series = {}
     const seriesToFilterOut = {}
     books.forEach((libraryItem) => {
@@ -217,6 +229,11 @@ module.exports = {
     })
 
     let seriesItems = Object.values(_series)
+
+    // Library setting to hide series with only 1 book
+    if (hideSingleBookSeries) {
+      seriesItems = seriesItems.filter(se => se.books.length > 1)
+    }
 
     // check progress filter
     if (filterBy && filterBy.startsWith('progress.') && user) {
@@ -312,11 +329,11 @@ module.exports = {
   },
 
 
-  collapseBookSeries(libraryItems, series, filterSeries) {
+  collapseBookSeries(libraryItems, series, filterSeries, hideSingleBookSeries) {
     // Get series from the library items. If this list is being collapsed after filtering for a series,
     // don't collapse that series, only books that are in other series.
     const seriesObjects = this
-      .getSeriesFromBooks(libraryItems, series, filterSeries, null, null, true)
+      .getSeriesFromBooks(libraryItems, series, filterSeries, null, null, true, hideSingleBookSeries)
       .filter(s => s.id != filterSeries)
 
     const filteredLibraryItems = []
@@ -341,9 +358,12 @@ module.exports = {
     return filteredLibraryItems
   },
 
-  buildPersonalizedShelves(ctx, user, libraryItems, mediaType, maxEntitiesPerShelf, include) {
+  async buildPersonalizedShelves(ctx, user, libraryItems, library, maxEntitiesPerShelf, include) {
+    const mediaType = library.mediaType
     const isPodcastLibrary = mediaType === 'podcast'
     const includeRssFeed = include.includes('rssfeed')
+    const includeNumEpisodesIncomplete = include.includes('numepisodesincomplete') // Podcasts only
+    const hideSingleBookSeries = library.settings.hideSingleBookSeries
 
     const shelves = [
       {
@@ -439,12 +459,18 @@ module.exports = {
 
     for (const libraryItem of libraryItems) {
       if (libraryItem.addedAt > categoryMap['recently-added'].smallest) {
+        const libraryItemObj = libraryItem.toJSONMinified()
+
+        // add numEpisodesIncomplete if "include=numEpisodesIncomplete" was put in query string (only for podcasts)
+        if (includeNumEpisodesIncomplete && libraryItem.isPodcast) {
+          libraryItemObj.numEpisodesIncomplete = user.getNumEpisodesIncompleteForPodcast(libraryItem)
+        }
 
         const indexToPut = categoryMap['recently-added'].items.findIndex(i => libraryItem.addedAt > i.addedAt)
         if (indexToPut >= 0) {
-          categoryMap['recently-added'].items.splice(indexToPut, 0, libraryItem.toJSONMinified())
+          categoryMap['recently-added'].items.splice(indexToPut, 0, libraryItemObj)
         } else {
-          categoryMap['recently-added'].items.push(libraryItem.toJSONMinified())
+          categoryMap['recently-added'].items.push(libraryItemObj)
         }
 
         if (categoryMap['recently-added'].items.length > maxEntitiesPerShelf) {
@@ -460,8 +486,10 @@ module.exports = {
         // Podcast categories
         const podcastEpisodes = libraryItem.media.episodes || []
         for (const episode of podcastEpisodes) {
+          const mediaProgress = allItemProgress.find(mp => mp.episodeId === episode.id)
+
           // Newest episodes
-          if (episode.addedAt > categoryMap['episodes-recently-added'].smallest) {
+          if (!mediaProgress?.isFinished && episode.addedAt > categoryMap['episodes-recently-added'].smallest) {
             const libraryItemWithEpisode = {
               ...libraryItem.toJSONMinified(),
               recentEpisode: episode.toJSON()
@@ -483,7 +511,6 @@ module.exports = {
           }
 
           // Episode recently listened and finished
-          const mediaProgress = allItemProgress.find(mp => mp.episodeId === episode.id)
           if (mediaProgress) {
             if (mediaProgress.isFinished) {
               if (mediaProgress.finishedAt > categoryMap['listen-again'].smallest) { // Item belongs on shelf
@@ -566,7 +593,7 @@ module.exports = {
             const hideFromContinueListening = user.checkShouldHideSeriesFromContinueListening(librarySeries.id)
 
             if (!seriesMap[librarySeries.id]) {
-              const seriesObj = ctx.db.series.find(se => se.id === librarySeries.id)
+              const seriesObj = Database.series.find(se => se.id === librarySeries.id)
               if (seriesObj) {
                 const series = {
                   ...seriesObj.toJSON(),
@@ -579,21 +606,11 @@ module.exports = {
                 }
                 seriesMap[librarySeries.id] = series
 
-                if (series.addedAt > categoryMap['recent-series'].smallest) {
-                  const indexToPut = categoryMap['recent-series'].items.findIndex(i => series.addedAt > i.addedAt)
-                  if (indexToPut >= 0) {
-                    categoryMap['recent-series'].items.splice(indexToPut, 0, series)
-                  } else {
-                    categoryMap['recent-series'].items.push(series)
-                  }
-
-                  // Max series is 5
-                  if (categoryMap['recent-series'].items.length > 5) {
-                    categoryMap['recent-series'].items.pop()
-                    categoryMap['recent-series'].smallest = categoryMap['recent-series'].items[categoryMap['recent-series'].items.length - 1].addedAt
-                  }
-
-                  categoryMap['recent-series'].biggest = categoryMap['recent-series'].items[0].addedAt
+                const indexToPut = categoryMap['recent-series'].items.findIndex(i => series.addedAt > i.addedAt)
+                if (indexToPut >= 0) {
+                  categoryMap['recent-series'].items.splice(indexToPut, 0, series)
+                } else {
+                  categoryMap['recent-series'].items.push(series)
                 }
               }
             } else {
@@ -628,7 +645,7 @@ module.exports = {
         if (libraryItem.media.metadata.authors.length) {
           for (const libraryAuthor of libraryItem.media.metadata.authors) {
             if (!authorMap[libraryAuthor.id]) {
-              const authorObj = ctx.db.authors.find(au => au.id === libraryAuthor.id)
+              const authorObj = Database.authors.find(au => au.id === libraryAuthor.id)
               if (authorObj) {
                 const author = {
                   ...authorObj.toJSON(),
@@ -818,6 +835,12 @@ module.exports = {
 
     // Sort series books by sequence
     if (categoryMap['recent-series'].items.length) {
+      if (hideSingleBookSeries) {
+        categoryMap['recent-series'].items = categoryMap['recent-series'].items.filter(seriesItem => seriesItem.books.length > 1)
+      }
+      // Limit series shown to 5
+      categoryMap['recent-series'].items = categoryMap['recent-series'].items.slice(0, 5)
+
       for (const seriesItem of categoryMap['recent-series'].items) {
         seriesItem.books = naturalSort(seriesItem.books).asc(li => li.seriesSequence)
       }
@@ -825,27 +848,30 @@ module.exports = {
 
     const categoriesWithItems = Object.values(categoryMap).filter(cat => cat.items.length)
 
-    return categoriesWithItems.map(cat => {
-      const shelf = shelves.find(s => s.id === cat.id)
-      shelf.entities = cat.items
+    const finalShelves = []
+    for (const categoryWithItems of categoriesWithItems) {
+      const shelf = shelves.find(s => s.id === categoryWithItems.id)
+      shelf.entities = categoryWithItems.items
 
       // Add rssFeed to entities if query string "include=rssfeed" was on request
       if (includeRssFeed) {
         if (shelf.type === 'book' || shelf.type === 'podcast') {
-          shelf.entities = shelf.entities.map((item) => {
-            item.rssFeed = ctx.rssFeedManager.findFeedForEntityId(item.id)?.toJSONMinified() || null
+          shelf.entities = await Promise.all(shelf.entities.map(async (item) => {
+            const feed = await ctx.rssFeedManager.findFeedForEntityId(item.id)
+            item.rssFeed = feed?.toJSONMinified() || null
             return item
-          })
+          }))
         } else if (shelf.type === 'series') {
-          shelf.entities = shelf.entities.map((series) => {
-            series.rssFeed = ctx.rssFeedManager.findFeedForEntityId(series.id)?.toJSONMinified() || null
+          shelf.entities = await Promise.all(shelf.entities.map(async (series) => {
+            const feed = await ctx.rssFeedManager.findFeedForEntityId(series.id)
+            series.rssFeed = feed?.toJSONMinified() || null
             return series
-          })
+          }))
         }
       }
-
-      return shelf
-    })
+      finalShelves.push(shelf)
+    }
+    return finalShelves
   },
 
   groupMusicLibraryItemsIntoAlbums(libraryItems) {
