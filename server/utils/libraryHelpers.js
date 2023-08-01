@@ -34,7 +34,7 @@ module.exports = {
         filtered = filtered.filter(li => {
           const itemProgress = user.getMediaProgress(li.id)
           if (filter === 'finished' && (itemProgress && itemProgress.isFinished)) return true
-          if (filter === 'not-started' && !itemProgress) return true
+          if (filter === 'not-started' && (!itemProgress || itemProgress.notStarted)) return true
           if (filter === 'not-finished' && (!itemProgress || !itemProgress.isFinished)) return true
           if (filter === 'in-progress' && (itemProgress && itemProgress.inProgress)) return true
           return false
@@ -73,7 +73,6 @@ module.exports = {
     } else if (filterBy === 'feed-open') {
       const libraryItemIdsWithFeed = await Database.models.feed.findAllLibraryItemIds()
       filtered = filtered.filter(li => libraryItemIdsWithFeed.includes(li.id))
-      // filtered = filtered.filter(li => feedsArray.some(feed => feed.entityId === li.id))
     } else if (filterBy === 'abridged') {
       filtered = filtered.filter(li => !!li.media.metadata?.abridged)
     } else if (filterBy === 'ebook') {

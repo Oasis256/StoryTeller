@@ -1,10 +1,106 @@
-const { DataTypes, Model } = require('sequelize')
+const { DataTypes, Model, literal } = require('sequelize')
 const Logger = require('../Logger')
 const oldLibraryItem = require('../objects/LibraryItem')
+const libraryFilters = require('../utils/queries/libraryFilters')
 const { areEquivalent } = require('../utils/index')
 
 module.exports = (sequelize) => {
   class LibraryItem extends Model {
+    /**
+     * Loads all podcast episodes, all library items in chunks of 500, then maps them to old library items
+     * @todo this is a temporary solution until we can use the sqlite without loading all the library items on init
+     * 
+     * @returns {Promise<objects.LibraryItem[]>} old library items
+     */
+    static async loadAllLibraryItems() {
+      let start = Date.now()
+      Logger.info(`[LibraryItem] Loading podcast episodes...`)
+      const podcastEpisodes = await sequelize.models.podcastEpisode.findAll()
+      Logger.info(`[LibraryItem] Finished loading ${podcastEpisodes.length} podcast episodes in ${((Date.now() - start) / 1000).toFixed(2)}s`)
+
+      start = Date.now()
+      Logger.info(`[LibraryItem] Loading library items...`)
+      let libraryItems = await this.getAllOldLibraryItemsIncremental()
+      Logger.info(`[LibraryItem] Finished loading ${libraryItems.length} library items in ${((Date.now() - start) / 1000).toFixed(2)}s`)
+
+      // Map LibraryItem to old library item
+      libraryItems = libraryItems.map(li => {
+        if (li.mediaType === 'podcast') {
+          li.media.podcastEpisodes = podcastEpisodes.filter(pe => pe.podcastId === li.media.id)
+        }
+        return this.getOldLibraryItem(li)
+      })
+
+      return libraryItems
+    }
+
+    /**
+     * Loads all LibraryItem in batches of 500
+     * @todo temporary solution
+     * 
+     * @param {Model<LibraryItem>[]} libraryItems 
+     * @param {number} offset 
+     * @returns {Promise<Model<LibraryItem>[]>}
+     */
+    static async getAllOldLibraryItemsIncremental(libraryItems = [], offset = 0) {
+      const limit = 500
+      const rows = await this.getLibraryItemsIncrement(offset, limit)
+      libraryItems.push(...rows)
+      if (!rows.length || rows.length < limit) {
+        return libraryItems
+      }
+      Logger.info(`[LibraryItem] Loaded ${rows.length} library items. ${libraryItems.length} loaded so far.`)
+      return this.getAllOldLibraryItemsIncremental(libraryItems, offset + rows.length)
+    }
+
+    /**
+     * Gets library items partially expanded, not including podcast episodes
+     * @todo temporary solution
+     * 
+     * @param {number} offset
+     * @param {number} limit
+     * @returns {Promise<Model<LibraryItem>[]>} LibraryItem
+     */
+    static getLibraryItemsIncrement(offset, limit) {
+      return this.findAll({
+        include: [
+          {
+            model: sequelize.models.book,
+            include: [
+              {
+                model: sequelize.models.author,
+                through: {
+                  attributes: ['createdAt']
+                }
+              },
+              {
+                model: sequelize.models.series,
+                through: {
+                  attributes: ['sequence', 'createdAt']
+                }
+              }
+            ]
+          },
+          {
+            model: sequelize.models.podcast
+          }
+        ],
+        order: [
+          ['createdAt', 'ASC'],
+          // Ensure author & series stay in the same order
+          [sequelize.models.book, sequelize.models.author, sequelize.models.bookAuthor, 'createdAt', 'ASC'],
+          [sequelize.models.book, sequelize.models.series, 'bookSeries', 'createdAt', 'ASC'],
+        ],
+        offset,
+        limit
+      })
+    }
+
+    /**
+     * Currently unused because this is too slow and uses too much mem
+     * 
+     * @returns {Array<objects.LibraryItem>} old library items
+     */
     static async getAllOldLibraryItems() {
       let libraryItems = await this.findAll({
         include: [
@@ -38,6 +134,12 @@ module.exports = (sequelize) => {
       return libraryItems.map(ti => this.getOldLibraryItem(ti))
     }
 
+    /**
+     * Convert an expanded LibraryItem into an old library item
+     * 
+     * @param {Model<LibraryItem>} libraryItemExpanded 
+     * @returns {oldLibraryItem}
+     */
     static getOldLibraryItem(libraryItemExpanded) {
       let media = null
       if (libraryItemExpanded.mediaType === 'book') {
@@ -279,6 +381,7 @@ module.exports = (sequelize) => {
         mtime: oldLibraryItem.mtimeMs,
         ctime: oldLibraryItem.ctimeMs,
         birthtime: oldLibraryItem.birthtimeMs,
+        size: oldLibraryItem.size,
         lastScan: oldLibraryItem.lastScan,
         lastScanVersion: oldLibraryItem.scanVersion,
         libraryId: oldLibraryItem.libraryId,
@@ -295,6 +398,43 @@ module.exports = (sequelize) => {
         },
         individualHooks: true
       })
+    }
+
+    /**
+     * Get library items using filter and sort
+     * @param {oldLibrary} library 
+     * @param {string} userId 
+     * @param {object} options 
+     * @returns {object} { libraryItems:oldLibraryItem[], count:number }
+     */
+    static async getByFilterAndSort(library, userId, options) {
+      const { libraryItems, count } = await libraryFilters.getFilteredLibraryItems(library, userId, options)
+      return {
+        libraryItems: libraryItems.map(li => {
+          const oldLibraryItem = this.getOldLibraryItem(li).toJSONMinified()
+          if (li.collapsedSeries) {
+            oldLibraryItem.collapsedSeries = li.collapsedSeries
+          }
+          if (li.series) {
+            oldLibraryItem.media.metadata.series = li.series
+          }
+          if (li.rssFeed) {
+            oldLibraryItem.rssFeed = sequelize.models.feed.getOldFeed(li.rssFeed).toJSONMinified()
+          }
+          if (li.media.numEpisodes) {
+            oldLibraryItem.media.numEpisodes = li.media.numEpisodes
+          }
+          if (li.size && !oldLibraryItem.media.size) {
+            oldLibraryItem.media.size = li.size
+          }
+          if (li.numEpisodesIncomplete) {
+            oldLibraryItem.numEpisodesIncomplete = li.numEpisodesIncomplete
+          }
+
+          return oldLibraryItem
+        }),
+        count
+      }
     }
 
     getMedia(options) {
@@ -321,6 +461,7 @@ module.exports = (sequelize) => {
     mtime: DataTypes.DATE(6),
     ctime: DataTypes.DATE(6),
     birthtime: DataTypes.DATE(6),
+    size: DataTypes.BIGINT,
     lastScan: DataTypes.DATE,
     lastScanVersion: DataTypes.STRING,
     libraryFiles: DataTypes.JSON,

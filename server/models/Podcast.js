@@ -4,7 +4,7 @@ module.exports = (sequelize) => {
   class Podcast extends Model {
     static getOldPodcast(libraryItemExpanded) {
       const podcastExpanded = libraryItemExpanded.media
-      const podcastEpisodes = podcastExpanded.podcastEpisodes.map(ep => ep.getOldPodcastEpisode(libraryItemExpanded.id)).sort((a, b) => a.index - b.index)
+      const podcastEpisodes = podcastExpanded.podcastEpisodes?.map(ep => ep.getOldPodcastEpisode(libraryItemExpanded.id)).sort((a, b) => a.index - b.index)
       return {
         id: podcastExpanded.id,
         libraryItemId: libraryItemExpanded.id,
@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
         },
         coverPath: podcastExpanded.coverPath,
         tags: podcastExpanded.tags,
-        episodes: podcastEpisodes,
+        episodes: podcastEpisodes || [],
         autoDownloadEpisodes: podcastExpanded.autoDownloadEpisodes,
         autoDownloadSchedule: podcastExpanded.autoDownloadSchedule,
         lastEpisodeCheck: podcastExpanded.lastEpisodeCheck?.valueOf() || null,
@@ -39,6 +39,7 @@ module.exports = (sequelize) => {
       return {
         id: oldPodcast.id,
         title: oldPodcastMetadata.title,
+        titleIgnorePrefix: oldPodcastMetadata.titleIgnorePrefix,
         author: oldPodcastMetadata.author,
         releaseDate: oldPodcastMetadata.releaseDate,
         feedURL: oldPodcastMetadata.feedUrl,
@@ -69,6 +70,7 @@ module.exports = (sequelize) => {
       primaryKey: true
     },
     title: DataTypes.STRING,
+    titleIgnorePrefix: DataTypes.STRING,
     author: DataTypes.STRING,
     releaseDate: DataTypes.STRING,
     feedURL: DataTypes.STRING,

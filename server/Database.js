@@ -6,21 +6,19 @@ const fs = require('./libs/fsExtra')
 const Logger = require('./Logger')
 
 const dbMigration = require('./utils/migrations/dbMigration')
+const Auth = require('./Auth')
 
 class Database {
   constructor() {
     this.sequelize = null
     this.dbPath = null
     this.isNew = false // New absdatabase.sqlite created
+    this.hasRootUser = false // Used to show initialization page in web ui
 
     // Temporarily using format of old DB
     // TODO: below data should be loaded from the DB as needed
     this.libraryItems = []
-    this.users = []
-    this.libraries = []
     this.settings = []
-    this.collections = []
-    this.playlists = []
     this.authors = []
     this.series = []
 
@@ -31,10 +29,6 @@ class Database {
 
   get models() {
     return this.sequelize?.models || {}
-  }
-
-  get hasRootUser() {
-    return this.users.some(u => u.type === 'root')
   }
 
   async checkHasDb() {
@@ -66,7 +60,8 @@ class Database {
     this.sequelize = new Sequelize({
       dialect: 'sqlite',
       storage: this.dbPath,
-      logging: false
+      logging: false,
+      transactionType: 'IMMEDIATE'
     })
 
     // Helper function
@@ -119,6 +114,24 @@ class Database {
     return this.sequelize.sync({ force, alter: false })
   }
 
+  /**
+   * Compare two server versions
+   * @param {string} v1 
+   * @param {string} v2 
+   * @returns {-1|0|1} 1 if v1 > v2
+   */
+  compareVersions(v1, v2) {
+    if (!v1 || !v2) return 0
+    return v1.localeCompare(v2, undefined, { numeric: true, sensitivity: "case", caseFirst: "upper" })
+  }
+
+  /**
+   * Checks if migration to sqlite db is necessary & runs migration.
+   * 
+   * Check if version was upgraded and run any version specific migrations.
+   * 
+   * Loads most of the data from the database. This is a temporary solution.
+   */
   async loadData() {
     if (this.isNew && await dbMigration.checkShouldMigrate()) {
       Logger.info(`[Database] New database was created and old database was detected - migrating old to new`)
@@ -135,19 +148,28 @@ class Database {
     global.ServerSettings = this.serverSettings.toJSON()
 
     // Version specific migrations
-    if (this.serverSettings.version === '2.3.0' && packageJson.version !== '2.3.0') {
+    if (this.serverSettings.version === '2.3.0' && this.compareVersions(packageJson.version, '2.3.0') == 1) {
       await dbMigration.migrationPatch(this)
     }
+    if (['2.3.0', '2.3.1', '2.3.2', '2.3.3'].includes(this.serverSettings.version) && this.compareVersions(packageJson.version, '2.3.3') >= 0) {
+      await dbMigration.migrationPatch2(this)
+    }
 
-    this.libraryItems = await this.models.libraryItem.getAllOldLibraryItems()
-    this.users = await this.models.user.getOldUsers()
-    this.libraries = await this.models.library.getAllOldLibraries()
-    this.collections = await this.models.collection.getOldCollections()
-    this.playlists = await this.models.playlist.getOldPlaylists()
+    Logger.info(`[Database] Loading db data...`)
+
+    this.libraryItems = await this.models.libraryItem.loadAllLibraryItems()
+    Logger.info(`[Database] Loaded ${this.libraryItems.length} library items`)
+
     this.authors = await this.models.author.getOldAuthors()
-    this.series = await this.models.series.getAllOldSeries()
+    Logger.info(`[Database] Loaded ${this.authors.length} authors`)
 
-    Logger.info(`[Database] Db data loaded in ${Date.now() - startTime}ms`)
+    this.series = await this.models.series.getAllOldSeries()
+    Logger.info(`[Database] Loaded ${this.series.length} series`)
+
+    // Set if root user has been created
+    this.hasRootUser = await this.models.user.getHasRootUser()
+
+    Logger.info(`[Database] Db data loaded in ${((Date.now() - startTime) / 1000).toFixed(2)}s`)
 
     if (packageJson.version !== this.serverSettings.version) {
       Logger.info(`[Database] Server upgrade detected from ${this.serverSettings.version} to ${packageJson.version}`)
@@ -156,14 +178,18 @@ class Database {
     }
   }
 
-  async createRootUser(username, pash, token) {
+  /**
+   * Create root user
+   * @param {string} username 
+   * @param {string} pash 
+   * @param {Auth} auth 
+   * @returns {boolean} true if created
+   */
+  async createRootUser(username, pash, auth) {
     if (!this.sequelize) return false
-    const newUser = await this.models.user.createRootUser(username, pash, token)
-    if (newUser) {
-      this.users.push(newUser)
-      return true
-    }
-    return false
+    await this.models.user.createRootUser(username, pash, auth)
+    this.hasRootUser = true
+    return true
   }
 
   updateServerSettings() {
@@ -180,7 +206,6 @@ class Database {
   async createUser(oldUser) {
     if (!this.sequelize) return false
     await this.models.user.createFromOld(oldUser)
-    this.users.push(oldUser)
     return true
   }
 
@@ -197,7 +222,6 @@ class Database {
   async removeUser(userId) {
     if (!this.sequelize) return false
     await this.models.user.removeById(userId)
-    this.users = this.users.filter(u => u.id !== userId)
   }
 
   upsertMediaProgress(oldMediaProgress) {
@@ -218,7 +242,6 @@ class Database {
   async createLibrary(oldLibrary) {
     if (!this.sequelize) return false
     await this.models.library.createFromOld(oldLibrary)
-    this.libraries.push(oldLibrary)
   }
 
   updateLibrary(oldLibrary) {
@@ -229,7 +252,6 @@ class Database {
   async removeLibrary(libraryId) {
     if (!this.sequelize) return false
     await this.models.library.removeById(libraryId)
-    this.libraries = this.libraries.filter(lib => lib.id !== libraryId)
   }
 
   async createCollection(oldCollection) {
@@ -251,7 +273,6 @@ class Database {
         await this.createBulkCollectionBooks(collectionBooks)
       }
     }
-    this.collections.push(oldCollection)
   }
 
   updateCollection(oldCollection) {
@@ -273,7 +294,6 @@ class Database {
   async removeCollection(collectionId) {
     if (!this.sequelize) return false
     await this.models.collection.removeById(collectionId)
-    this.collections = this.collections.filter(c => c.id !== collectionId)
   }
 
   createCollectionBook(collectionBook) {
@@ -318,7 +338,6 @@ class Database {
         await this.createBulkPlaylistMediaItems(playlistMediaItems)
       }
     }
-    this.playlists.push(oldPlaylist)
   }
 
   updatePlaylist(oldPlaylist) {
@@ -341,7 +360,6 @@ class Database {
   async removePlaylist(playlistId) {
     if (!this.sequelize) return false
     await this.models.playlist.removeById(playlistId)
-    this.playlists = this.playlists.filter(p => p.id !== playlistId)
   }
 
   createPlaylistMediaItem(playlistMediaItem) {
@@ -370,12 +388,14 @@ class Database {
 
   async createLibraryItem(oldLibraryItem) {
     if (!this.sequelize) return false
+    await oldLibraryItem.saveMetadata()
     await this.models.libraryItem.fullCreateFromOld(oldLibraryItem)
     this.libraryItems.push(oldLibraryItem)
   }
 
-  updateLibraryItem(oldLibraryItem) {
+  async updateLibraryItem(oldLibraryItem) {
     if (!this.sequelize) return false
+    await oldLibraryItem.saveMetadata()
     return this.models.libraryItem.fullUpdateFromOld(oldLibraryItem)
   }
 
@@ -383,8 +403,11 @@ class Database {
     if (!this.sequelize) return false
     let updatesMade = 0
     for (const oldLibraryItem of oldLibraryItems) {
+      await oldLibraryItem.saveMetadata()
       const hasUpdates = await this.models.libraryItem.fullUpdateFromOld(oldLibraryItem)
-      if (hasUpdates) updatesMade++
+      if (hasUpdates) {
+        updatesMade++
+      }
     }
     return updatesMade
   }
@@ -392,6 +415,7 @@ class Database {
   async createBulkLibraryItems(oldLibraryItems) {
     if (!this.sequelize) return false
     for (const oldLibraryItem of oldLibraryItems) {
+      await oldLibraryItem.saveMetadata()
       await this.models.libraryItem.fullCreateFromOld(oldLibraryItem)
       this.libraryItems.push(oldLibraryItem)
     }
