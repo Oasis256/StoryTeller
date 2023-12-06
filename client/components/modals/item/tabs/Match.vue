@@ -22,7 +22,7 @@
     </div>
     <div v-show="!processing" class="w-full max-h-full overflow-y-auto overflow-x-hidden matchListWrapper mt-4">
       <template v-for="(res, index) in searchResults">
-        <cards-book-match-card :key="index" :book="res" :is-podcast="isPodcast" :book-cover-aspect-ratio="bookCoverAspectRatio" @select="selectMatch" />
+        <cards-book-match-card :key="index" :book="res" :current-book-duration="currentBookDuration" :is-podcast="isPodcast" :book-cover-aspect-ratio="bookCoverAspectRatio" @select="selectMatch" />
       </template>
     </div>
     <div v-if="selectedMatchOrig" class="absolute top-0 left-0 w-full bg-bg h-full px-2 py-6 md:p-8 max-h-full overflow-y-auto overflow-x-hidden">
@@ -290,13 +290,17 @@ export default {
       return this.$strings.LabelSearchTitle
     },
     media() {
-      return this.libraryItem ? this.libraryItem.media || {} : {}
+      return this.libraryItem?.media || {}
     },
     mediaMetadata() {
       return this.media.metadata || {}
     },
+    currentBookDuration() {
+      if (this.isPodcast) return 0
+      return this.media.duration || 0
+    },
     mediaType() {
-      return this.libraryItem ? this.libraryItem.mediaType : null
+      return this.libraryItem?.mediaType || null
     },
     isPodcast() {
       return this.mediaType == 'podcast'
@@ -305,7 +309,7 @@ export default {
       const filterData = this.$store.state.libraries.filterData || {}
       const currentGenres = filterData.genres || []
       const selectedMatchGenres = this.selectedMatch.genres || []
-      return [...new Set([...currentGenres ,...selectedMatchGenres])]
+      return [...new Set([...currentGenres, ...selectedMatchGenres])]
     }
   },
   methods: {
@@ -325,9 +329,9 @@ export default {
       }
     },
     getSearchQuery() {
-      if (this.isPodcast) return `term=${this.searchTitle}`
-      var searchQuery = `provider=${this.provider}&fallbackTitleOnly=1&title=${this.searchTitle}`
-      if (this.searchAuthor) searchQuery += `&author=${this.searchAuthor}`
+      if (this.isPodcast) return `term=${encodeURIComponent(this.searchTitle)}`
+      var searchQuery = `provider=${this.provider}&fallbackTitleOnly=1&title=${encodeURIComponent(this.searchTitle)}`
+      if (this.searchAuthor) searchQuery += `&author=${encodeURIComponent(this.searchAuthor)}`
       return searchQuery
     },
     submitSearch() {
@@ -580,6 +584,7 @@ export default {
 .matchListWrapper {
   height: calc(100% - 124px);
 }
+
 @media (min-width: 768px) {
   .matchListWrapper {
     height: calc(100% - 80px);

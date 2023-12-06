@@ -15,6 +15,9 @@ class Library {
     this.provider = 'google'
 
     this.lastScan = 0
+    this.lastScanVersion = null
+    this.lastScanMetadataPrecedence = null
+
     this.settings = null
 
     this.createdAt = null
@@ -53,6 +56,10 @@ class Library {
       this.settings.disableWatcher = !!library.disableWatcher
     }
 
+    this.lastScan = library.lastScan
+    this.lastScanVersion = library.lastScanVersion
+    this.lastScanMetadataPrecedence = library.lastScanMetadataPrecedence
+
     this.createdAt = library.createdAt
     this.lastUpdate = library.lastUpdate
     this.cleanOldValues() // mediaType changed for v2 and icon change for v2.2.2
@@ -84,6 +91,8 @@ class Library {
       mediaType: this.mediaType,
       provider: this.provider,
       settings: this.settings.toJSON(),
+      lastScan: this.lastScan,
+      lastScanVersion: this.lastScanVersion,
       createdAt: this.createdAt,
       lastUpdate: this.lastUpdate
     }
@@ -116,9 +125,9 @@ class Library {
   }
 
   update(payload) {
-    var hasUpdates = false
+    let hasUpdates = false
 
-    var keysToCheck = ['name', 'provider', 'mediaType', 'icon']
+    const keysToCheck = ['name', 'provider', 'mediaType', 'icon']
     keysToCheck.forEach((key) => {
       if (payload[key] && payload[key] !== this[key]) {
         this[key] = payload[key]
@@ -135,18 +144,18 @@ class Library {
       hasUpdates = true
     }
     if (payload.folders) {
-      var newFolders = payload.folders.filter(f => !f.id)
-      var removedFolders = this.folders.filter(f => !payload.folders.find(_f => _f.id === f.id))
+      const newFolders = payload.folders.filter(f => !f.id)
+      const removedFolders = this.folders.filter(f => !payload.folders.some(_f => _f.id === f.id))
 
       if (removedFolders.length) {
-        var removedFolderIds = removedFolders.map(f => f.id)
+        const removedFolderIds = removedFolders.map(f => f.id)
         this.folders = this.folders.filter(f => !removedFolderIds.includes(f.id))
       }
 
       if (newFolders.length) {
         newFolders.forEach((folderData) => {
           folderData.libraryId = this.id
-          var newFolder = new Folder()
+          const newFolder = new Folder()
           newFolder.setData(folderData)
           this.folders.push(newFolder)
         })

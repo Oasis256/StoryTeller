@@ -1,59 +1,59 @@
 const Path = require('path')
 const fs = require('../libs/fsExtra')
 const stream = require('stream')
-const filePerms = require('../utils/filePerms')
 const Logger = require('../Logger')
 const { resizeImage } = require('../utils/ffmpegHelpers')
+const { encodeUriPath } = require('../utils/fileUtils')
 
 class CacheManager {
   constructor() {
+    this.CachePath = null
+    this.CoverCachePath = null
+    this.ImageCachePath = null
+    this.ItemCachePath = null
+  }
+
+  /**
+   * Create cache directory paths if they dont exist
+   */
+  async ensureCachePaths() { // Creates cache paths if necessary and sets owner and permissions
     this.CachePath = Path.join(global.MetadataPath, 'cache')
     this.CoverCachePath = Path.join(this.CachePath, 'covers')
     this.ImageCachePath = Path.join(this.CachePath, 'images')
     this.ItemCachePath = Path.join(this.CachePath, 'items')
-  }
 
-  async ensureCachePaths() { // Creates cache paths if necessary and sets owner and permissions
-    var pathsCreated = false
     if (!(await fs.pathExists(this.CachePath))) {
       await fs.mkdir(this.CachePath)
-      pathsCreated = true
     }
 
     if (!(await fs.pathExists(this.CoverCachePath))) {
       await fs.mkdir(this.CoverCachePath)
-      pathsCreated = true
     }
 
     if (!(await fs.pathExists(this.ImageCachePath))) {
       await fs.mkdir(this.ImageCachePath)
-      pathsCreated = true
     }
 
     if (!(await fs.pathExists(this.ItemCachePath))) {
       await fs.mkdir(this.ItemCachePath)
-      pathsCreated = true
-    }
-
-    if (pathsCreated) {
-      await filePerms.setDefault(this.CachePath)
     }
   }
 
-  async handleCoverCache(res, libraryItem, options = {}) {
+  async handleCoverCache(res, libraryItemId, coverPath, options = {}) {
     const format = options.format || 'webp'
     const width = options.width || 400
     const height = options.height || null
 
     res.type(`image/${format}`)
 
-    const path = Path.join(this.CoverCachePath, `${libraryItem.id}_${width}${height ? `x${height}` : ''}`) + '.' + format
+    const path = Path.join(this.CoverCachePath, `${libraryItemId}_${width}${height ? `x${height}` : ''}`) + '.' + format
 
     // Cache exists
     if (await fs.pathExists(path)) {
       if (global.XAccel) {
-        Logger.debug(`Use X-Accel to serve static file ${path}`)
-        return res.status(204).header({ 'X-Accel-Redirect': global.XAccel + path }).send()
+        const encodedURI = encodeUriPath(global.XAccel + path)
+        Logger.debug(`Use X-Accel to serve static file ${encodedURI}`)
+        return res.status(204).header({ 'X-Accel-Redirect': encodedURI }).send()
       }
 
       const r = fs.createReadStream(path)
@@ -67,19 +67,13 @@ class CacheManager {
       return ps.pipe(res)
     }
 
-    if (!libraryItem.media.coverPath || !await fs.pathExists(libraryItem.media.coverPath)) {
-      return res.sendStatus(500)
-    }
-
-    const writtenFile = await resizeImage(libraryItem.media.coverPath, path, width, height)
+    const writtenFile = await resizeImage(coverPath, path, width, height)
     if (!writtenFile) return res.sendStatus(500)
 
-    // Set owner and permissions of cache image
-    await filePerms.setDefault(path)
-
     if (global.XAccel) {
-      Logger.debug(`Use X-Accel to serve static file ${writtenFile}`)
-      return res.status(204).header({ 'X-Accel-Redirect': global.XAccel + writtenFile }).send()
+      const encodedURI = encodeUriPath(global.XAccel + writtenFile)
+      Logger.debug(`Use X-Accel to serve static file ${encodedURI}`)
+      return res.status(204).header({ 'X-Accel-Redirect': encodedURI }).send()
     }
 
     var readStream = fs.createReadStream(writtenFile)
@@ -160,11 +154,8 @@ class CacheManager {
     let writtenFile = await resizeImage(author.imagePath, path, width, height)
     if (!writtenFile) return res.sendStatus(500)
 
-    // Set owner and permissions of cache image
-    await filePerms.setDefault(path)
-
     var readStream = fs.createReadStream(writtenFile)
     readStream.pipe(res)
   }
 }
-module.exports = CacheManager
+module.exports = new CacheManager()

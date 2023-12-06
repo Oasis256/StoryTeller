@@ -55,7 +55,9 @@ export default {
         else if (pageName === 'library-stats') return this.$strings.HeaderLibraryStats
         else if (pageName === 'users') return this.$strings.HeaderUsers
         else if (pageName === 'item-metadata-utils') return this.$strings.HeaderItemMetadataUtils
+        else if (pageName === 'rss-feeds') return this.$strings.HeaderRSSFeeds
         else if (pageName === 'email') return this.$strings.HeaderEmail
+        else if (pageName === 'authentication') return this.$strings.HeaderAuthentication
       }
       return this.$strings.HeaderSettings
     }

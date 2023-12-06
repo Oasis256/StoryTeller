@@ -93,7 +93,7 @@ class PlaybackSessionManager {
   }
 
   async syncLocalSession(user, sessionJson, deviceInfo) {
-    const libraryItem = Database.getLibraryItem(sessionJson.libraryItemId)
+    const libraryItem = await Database.libraryItemModel.getOldById(sessionJson.libraryItemId)
     const episode = (sessionJson.episodeId && libraryItem && libraryItem.isPodcast) ? libraryItem.media.getEpisode(sessionJson.episodeId) : null
     if (!libraryItem || (libraryItem.isPodcast && !episode)) {
       Logger.error(`[PlaybackSessionManager] syncLocalSession: Media item not found for session "${sessionJson.displayTitle}" (${sessionJson.id})`)
@@ -259,13 +259,13 @@ class PlaybackSessionManager {
     }
 
     this.sessions.push(newPlaybackSession)
-    SocketAuthority.adminEmitter('user_stream_update', user.toJSONForPublic(this.sessions, Database.libraryItems))
+    SocketAuthority.adminEmitter('user_stream_update', user.toJSONForPublic(this.sessions))
 
     return newPlaybackSession
   }
 
   async syncSession(user, session, syncData) {
-    const libraryItem = Database.libraryItems.find(li => li.id === session.libraryItemId)
+    const libraryItem = await Database.libraryItemModel.getOldById(session.libraryItemId)
     if (!libraryItem) {
       Logger.error(`[PlaybackSessionManager] syncSession Library Item not found "${session.libraryItemId}"`)
       return null
@@ -304,7 +304,7 @@ class PlaybackSessionManager {
       await this.saveSession(session)
     }
     Logger.debug(`[PlaybackSessionManager] closeSession "${session.id}"`)
-    SocketAuthority.adminEmitter('user_stream_update', user.toJSONForPublic(this.sessions, Database.libraryItems))
+    SocketAuthority.adminEmitter('user_stream_update', user.toJSONForPublic(this.sessions))
     SocketAuthority.clientEmitter(session.userId, 'user_session_closed', session.id)
     return this.removeSession(session.id)
   }
@@ -330,14 +330,15 @@ class PlaybackSessionManager {
     Logger.debug(`[PlaybackSessionManager] Removed session "${sessionId}"`)
   }
 
-  // Check for streams that are not in memory and remove
+  /**
+   * Remove all stream folders in `/metadata/streams`
+   */
   async removeOrphanStreams() {
     await fs.ensureDir(this.StreamsPath)
     try {
       const streamsInPath = await fs.readdir(this.StreamsPath)
-      for (let i = 0; i < streamsInPath.length; i++) {
-        const streamId = streamsInPath[i]
-        if (streamId.startsWith('play_')) { // Make sure to only remove folders that are a stream
+      for (const streamId of streamsInPath) {
+        if (/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/.test(streamId)) { // Ensure is uuidv4
           const session = this.sessions.find(se => se.id === streamId)
           if (!session) {
             const streamPath = Path.join(this.StreamsPath, streamId)

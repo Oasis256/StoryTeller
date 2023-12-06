@@ -68,7 +68,8 @@
         <span class="material-icons" :style="{ fontSize: sizeMultiplier + 'rem' }">edit</span>
       </div>
 
-      <div class="absolute cursor-pointer hover:text-yellow-300 hover:scale-125 transform duration-100" :style="{ top: 0.375 * sizeMultiplier + 'rem', left: 0.375 * sizeMultiplier + 'rem' }" @click.stop.prevent="selectBtnClick">
+      <!-- Radio button -->
+      <div v-if="!isAuthorBookshelfView" class="absolute cursor-pointer hover:text-yellow-300 hover:scale-125 transform duration-100" :style="{ top: 0.375 * sizeMultiplier + 'rem', left: 0.375 * sizeMultiplier + 'rem' }" @click.stop.prevent="selectBtnClick">
         <span class="material-icons" :class="selected ? 'text-yellow-400' : ''" :style="{ fontSize: 1.25 * sizeMultiplier + 'rem' }">{{ selected ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>
       </div>
 
@@ -89,7 +90,7 @@
 
     <!-- Series name overlay -->
     <div v-if="booksInSeries && libraryItem && isHovering" class="w-full h-full absolute top-0 left-0 z-10 bg-black bg-opacity-60 rounded flex items-center justify-center" :style="{ padding: sizeMultiplier + 'rem' }">
-      <p class="text-gray-200 text-center" :style="{ fontSize: 1.1 * sizeMultiplier + 'rem' }">{{ series }}</p>
+      <p v-if="seriesName" class="text-gray-200 text-center" :style="{ fontSize: 1.1 * sizeMultiplier + 'rem' }">{{ seriesName }}</p>
     </div>
 
     <!-- Error widget -->
@@ -218,8 +219,11 @@ export default {
       // Only included when filtering by series or collapse series or Continue Series shelf on home page
       return this.mediaMetadata.series
     },
+    seriesName() {
+      return this.series?.name || null
+    },
     seriesSequence() {
-      return this.series ? this.series.sequence : null
+      return this.series?.sequence || null
     },
     libraryId() {
       return this._libraryItem.libraryId
@@ -318,6 +322,7 @@ export default {
       if (this.orderBy === 'media.duration') return 'Duration: ' + this.$elapsedPrettyExtended(this.media.duration, false)
       if (this.orderBy === 'size') return 'Size: ' + this.$bytesPretty(this._libraryItem.size)
       if (this.orderBy === 'media.numTracks') return `${this.numEpisodes} Episodes`
+      if (this.orderBy === 'media.metadata.publishedYear' && this.mediaMetadata.publishedYear) return 'Published ' + this.mediaMetadata.publishedYear
       return null
     },
     episodeProgress() {
@@ -839,13 +844,15 @@ export default {
     },
     deleteLibraryItem() {
       const payload = {
-        message: 'This will delete the library item from the database and your file system. Are you sure?',
-        checkboxLabel: 'Delete from file system. Uncheck to only remove from database.',
+        message: this.$strings.MessageConfirmDeleteLibraryItem,
+        checkboxLabel: this.$strings.LabelDeleteFromFileSystemCheckbox,
         yesButtonText: this.$strings.ButtonDelete,
         yesButtonColor: 'error',
-        checkboxDefaultValue: true,
+        checkboxDefaultValue: !Number(localStorage.getItem('softDeleteDefault') || 0),
         callback: (confirmed, hardDelete) => {
           if (confirmed) {
+            localStorage.setItem('softDeleteDefault', hardDelete ? 0 : 1)
+
             this.processing = true
             const axios = this.$axios || this.$nuxt.$axios
             axios

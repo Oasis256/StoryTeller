@@ -1632,14 +1632,17 @@ module.exports.migrationPatch2 = async (ctx) => {
 
   try {
     await queryInterface.sequelize.transaction(t => {
-      const queries = [
-        queryInterface.addColumn('bookAuthors', 'createdAt', {
-          type: DataTypes.DATE
-        }, { transaction: t }),
-        queryInterface.addColumn('bookSeries', 'createdAt', {
-          type: DataTypes.DATE
-        }, { transaction: t }),
-      ]
+      const queries = []
+      if (!bookAuthorsTableDescription?.createdAt) {
+        queries.push(...[
+          queryInterface.addColumn('bookAuthors', 'createdAt', {
+            type: DataTypes.DATE
+          }, { transaction: t }),
+          queryInterface.addColumn('bookSeries', 'createdAt', {
+            type: DataTypes.DATE
+          }, { transaction: t }),
+        ])
+      }
       if (!authorsTableDescription?.lastFirst) {
         queries.push(...[
           queryInterface.addColumn('authors', 'lastFirst', {
@@ -1691,11 +1694,13 @@ module.exports.migrationPatch2 = async (ctx) => {
       await migrationPatch2Series(ctx, 0)
     }
 
-    // Patch bookAuthors createdAt column
-    await migrationPatch2BookAuthors(ctx, 0)
+    if (!bookAuthorsTableDescription?.createdAt) {
+      // Patch bookAuthors createdAt column
+      await migrationPatch2BookAuthors(ctx, 0)
 
-    // Patch bookSeries createdAt column
-    await migrationPatch2BookSeries(ctx, 0)
+      // Patch bookSeries createdAt column
+      await migrationPatch2BookSeries(ctx, 0)
+    }
 
     Logger.info(`[dbMigration] Migration patch 2.3.3+ finished`)
     return true

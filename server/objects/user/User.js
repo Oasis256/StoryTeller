@@ -7,6 +7,7 @@ class User {
     this.id = null
     this.oldUserId = null // TODO: Temp for keeping old access tokens
     this.username = null
+    this.email = null
     this.pash = null
     this.type = null
     this.token = null
@@ -23,6 +24,8 @@ class User {
     this.librariesAccessible = [] // Library IDs (Empty if ALL libraries)
     this.itemTagsSelected = [] // Empty if ALL item tags accessible
 
+    this.authOpenIDSub = null
+
     if (user) {
       this.construct(user)
     }
@@ -33,6 +36,9 @@ class User {
   }
   get isAdmin() {
     return this.type === 'admin'
+  }
+  get isUser() {
+    return this.type === 'user'
   }
   get isGuest() {
     return this.type === 'guest'
@@ -62,7 +68,7 @@ class User {
   getDefaultUserPermissions() {
     return {
       download: true,
-      update: true,
+      update: this.type === 'root' || this.type === 'admin',
       delete: this.type === 'root',
       upload: this.type === 'root' || this.type === 'admin',
       accessAllLibraries: true,
@@ -76,6 +82,7 @@ class User {
       id: this.id,
       oldUserId: this.oldUserId,
       username: this.username,
+      email: this.email,
       pash: this.pash,
       type: this.type,
       token: this.token,
@@ -88,7 +95,8 @@ class User {
       createdAt: this.createdAt,
       permissions: this.permissions,
       librariesAccessible: [...this.librariesAccessible],
-      itemTagsSelected: [...this.itemTagsSelected]
+      itemTagsSelected: [...this.itemTagsSelected],
+      authOpenIDSub: this.authOpenIDSub
     }
   }
 
@@ -97,6 +105,7 @@ class User {
       id: this.id,
       oldUserId: this.oldUserId,
       username: this.username,
+      email: this.email,
       type: this.type,
       token: (this.type === 'root' && hideRootToken) ? '' : this.token,
       mediaProgress: this.mediaProgress ? this.mediaProgress.map(li => li.toJSON()) : [],
@@ -117,23 +126,20 @@ class User {
     return json
   }
 
-  // Data broadcasted
-  toJSONForPublic(sessions, libraryItems) {
-    var userSession = sessions ? sessions.find(s => s.userId === this.id) : null
-    var session = null
-    if (userSession) {
-      var libraryItem = libraryItems.find(li => li.id === userSession.libraryItemId)
-      if (libraryItem) {
-        session = userSession.toJSONForClient(libraryItem)
-      }
-    }
+  /**
+   * User data for clients
+   * @param {[oldPlaybackSession[]]} sessions optional array of open playback sessions
+   * @returns {object}
+   */
+  toJSONForPublic(sessions) {
+    const userSession = sessions?.find(s => s.userId === this.id) || null
+    const session = userSession?.toJSONForClient() || null
     return {
       id: this.id,
       oldUserId: this.oldUserId,
       username: this.username,
       type: this.type,
       session,
-      mostRecent: this.getMostRecentItemProgress(libraryItems),
       lastSeen: this.lastSeen,
       createdAt: this.createdAt
     }
@@ -143,6 +149,7 @@ class User {
     this.id = user.id
     this.oldUserId = user.oldUserId
     this.username = user.username
+    this.email = user.email || null
     this.pash = user.pash
     this.type = user.type
     this.token = user.token
@@ -182,12 +189,14 @@ class User {
 
     this.librariesAccessible = [...(user.librariesAccessible || [])]
     this.itemTagsSelected = [...(user.itemTagsSelected || [])]
+
+    this.authOpenIDSub = user.authOpenIDSub || null
   }
 
   update(payload) {
     var hasUpdates = false
     // Update the following keys:
-    const keysToCheck = ['pash', 'type', 'username', 'isActive']
+    const keysToCheck = ['pash', 'type', 'username', 'email', 'isActive']
     keysToCheck.forEach((key) => {
       if (payload[key] !== undefined) {
         if (key === 'isActive' || payload[key]) { // pash, type, username must evaluate to true (cannot be null or empty)
@@ -269,45 +278,6 @@ class User {
     return libraryIds.find(lid => this.checkCanAccessLibrary(lid)) || null
   }
 
-  // Returns most recent media progress w/ `media` object and optionally an `episode` object
-  getMostRecentItemProgress(libraryItems) {
-    if (!this.mediaProgress.length) return null
-    var mediaProgressObjects = this.mediaProgress.map(lip => lip.toJSON())
-    mediaProgressObjects.sort((a, b) => b.lastUpdate - a.lastUpdate)
-
-    var libraryItemMedia = null
-    var progressEpisode = null
-    // Find the most recent progress that still has a libraryItem and episode
-    var mostRecentProgress = mediaProgressObjects.find((progress) => {
-      const libraryItem = libraryItems.find(li => li.id === progress.libraryItemId)
-      if (!libraryItem) {
-        Logger.warn('[User] Library item not found for users progress ' + progress.libraryItemId)
-        return false
-      } else if (progress.episodeId) {
-        const episode = libraryItem.mediaType === 'podcast' ? libraryItem.media.getEpisode(progress.episodeId) : null
-        if (!episode) {
-          Logger.warn(`[User] Episode ${progress.episodeId} not found for user media progress, podcast: ${libraryItem.media.metadata.title}`)
-          return false
-        } else {
-          libraryItemMedia = libraryItem.media.toJSONExpanded()
-          progressEpisode = episode.toJSON()
-          return true
-        }
-      } else {
-        libraryItemMedia = libraryItem.media.toJSONExpanded()
-        return true
-      }
-    })
-
-    if (!mostRecentProgress) return null
-
-    return {
-      ...mostRecentProgress,
-      media: libraryItemMedia,
-      episode: progressEpisode
-    }
-  }
-
   getMediaProgress(libraryItemId, episodeId = null) {
     if (!this.mediaProgress) return null
     return this.mediaProgress.find(lip => {
@@ -366,6 +336,18 @@ class User {
 
     if (libraryItem.media.metadata.explicit && !this.canAccessExplicitContent) return false
     return this.checkCanAccessLibraryItemWithTags(libraryItem.media.tags)
+  }
+
+  /**
+   * Checks if a user can access a library item
+   * @param {string} libraryId 
+   * @param {boolean} explicit 
+   * @param {string[]} tags 
+   */
+  checkCanAccessLibraryItemWithData(libraryId, explicit, tags) {
+    if (!this.checkCanAccessLibrary(libraryId)) return false
+    if (explicit && !this.canAccessExplicitContent) return false
+    return this.checkCanAccessLibraryItemWithTags(tags)
   }
 
   findBookmark(libraryItemId, time) {

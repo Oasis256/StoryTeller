@@ -1,9 +1,20 @@
 const Path = require('path')
-const fs = require('../libs/fsExtra')
-const Logger = require('../Logger')
-const { recurseFiles, getFileTimestampsWithIno, filePathToPOSIX } = require('./fileUtils')
+const { filePathToPOSIX } = require('./fileUtils')
 const globals = require('./globals')
 const LibraryFile = require('../objects/files/LibraryFile')
+const parseNameString = require('./parsers/parseNameString')
+
+/**
+ * @typedef LibraryItemFilenameMetadata
+ * @property {string} title
+ * @property {string} subtitle Book mediaType only
+ * @property {string} asin Book mediaType only
+ * @property {string[]} authors Book mediaType only
+ * @property {string[]} narrators Book mediaType only
+ * @property {string} seriesName Book mediaType only
+ * @property {string} seriesSequence Book mediaType only
+ * @property {string} publishedYear Book mediaType only
+ */
 
 function isMediaFile(mediaType, ext, audiobooksOnly = false) {
   if (!ext) return false
@@ -22,9 +33,12 @@ function checkFilepathIsAudioFile(filepath) {
 }
 module.exports.checkFilepathIsAudioFile = checkFilepathIsAudioFile
 
-// TODO: Function needs to be re-done
-// Input: array of relative file paths
-// Output: map of files grouped into potential item dirs
+/**
+ * TODO: Function needs to be re-done
+ * @param {string} mediaType 
+ * @param {string[]} paths array of relative file paths
+ * @returns {Record<string,string[]>} map of files grouped into potential libarary item dirs
+ */
 function groupFilesIntoLibraryItemPaths(mediaType, paths) {
   // Step 1: Clean path, Remove leading "/", Filter out non-media files in root dir
   var nonMediaFilePaths = []
@@ -85,10 +99,24 @@ function groupFilesIntoLibraryItemPaths(mediaType, paths) {
 
   // Step 4: Add in non-media files if they fit into item group
   if (nonMediaFilePaths.length) {
+
     for (const nonMediaFilePath of nonMediaFilePaths) {
       const pathDir = Path.dirname(nonMediaFilePath)
-      if (itemGroup[pathDir]) {
-        itemGroup[pathDir].push(nonMediaFilePath)
+      const filename = Path.basename(nonMediaFilePath)
+      const dirparts = pathDir.split('/')
+      const numparts = dirparts.length
+      let _path = ''
+
+      // Iterate over directories in path
+      for (let i = 0; i < numparts; i++) {
+        const dirpart = dirparts.shift()
+        _path = Path.posix.join(_path, dirpart)
+        if (itemGroup[_path]) { // Directory is a group
+          const relpath = Path.posix.join(dirparts.join('/'), filename)
+          itemGroup[_path].push(relpath)
+        } else if (!dirparts.length) {
+          itemGroup[_path] = [filename]
+        }
       }
     }
   }
@@ -97,8 +125,12 @@ function groupFilesIntoLibraryItemPaths(mediaType, paths) {
 }
 module.exports.groupFilesIntoLibraryItemPaths = groupFilesIntoLibraryItemPaths
 
-// Input: array of relative file items (see recurseFiles)
-// Output: map of files grouped into potential libarary item dirs
+/**
+ * @param {string} mediaType 
+ * @param {{name:string, path:string, dirpath:string, reldirpath:string, fullpath:string, extension:string, deep:number}[]} fileItems (see recurseFiles)
+ * @param {boolean} [audiobooksOnly=false] 
+ * @returns {Record<string,string[]>} map of files grouped into potential libarary item dirs
+ */
 function groupFileItemsIntoLibraryItemDirs(mediaType, fileItems, audiobooksOnly = false) {
   // Handle music where every audio file is a library item
   if (mediaType === 'music') {
@@ -173,8 +205,15 @@ function groupFileItemsIntoLibraryItemDirs(mediaType, fileItems, audiobooksOnly 
   })
   return libraryItemGroup
 }
+module.exports.groupFileItemsIntoLibraryItemDirs = groupFileItemsIntoLibraryItemDirs
 
-function cleanFileObjects(libraryItemPath, files) {
+/**
+ * Get LibraryFile from filepath
+ * @param {string} libraryItemPath 
+ * @param {string[]} files 
+ * @returns {import('../objects/files/LibraryFile')}
+ */
+function buildLibraryFile(libraryItemPath, files) {
   return Promise.all(files.map(async (file) => {
     const filePath = Path.posix.join(libraryItemPath, file)
     const newLibraryFile = new LibraryFile()
@@ -182,126 +221,73 @@ function cleanFileObjects(libraryItemPath, files) {
     return newLibraryFile
   }))
 }
+module.exports.buildLibraryFile = buildLibraryFile
 
-// Scan folder
-async function scanFolder(library, folder) {
-  const folderPath = filePathToPOSIX(folder.fullPath)
-
-  const pathExists = await fs.pathExists(folderPath)
-  if (!pathExists) {
-    Logger.error(`[scandir] Invalid folder path does not exist "${folderPath}"`)
-    return []
-  }
-
-  const fileItems = await recurseFiles(folderPath)
-  const libraryItemGrouping = groupFileItemsIntoLibraryItemDirs(library.mediaType, fileItems, library.settings.audiobooksOnly)
-
-  if (!Object.keys(libraryItemGrouping).length) {
-    Logger.error(`Root path has no media folders: ${folderPath}`)
-    return []
-  }
-
-  const items = []
-  for (const libraryItemPath in libraryItemGrouping) {
-    let isFile = false // item is not in a folder
-    let libraryItemData = null
-    let fileObjs = []
-    if (library.mediaType === 'music') {
-      libraryItemData = {
-        path: Path.posix.join(folderPath, libraryItemPath),
-        relPath: libraryItemPath
-      }
-      fileObjs = await cleanFileObjects(folderPath, [libraryItemPath])
-      isFile = true
-    } else if (libraryItemPath === libraryItemGrouping[libraryItemPath]) {
-      // Media file in root only get title
-      libraryItemData = {
-        mediaMetadata: {
-          title: Path.basename(libraryItemPath, Path.extname(libraryItemPath))
-        },
-        path: Path.posix.join(folderPath, libraryItemPath),
-        relPath: libraryItemPath
-      }
-      fileObjs = await cleanFileObjects(folderPath, [libraryItemPath])
-      isFile = true
-    } else {
-      libraryItemData = getDataFromMediaDir(library.mediaType, folderPath, libraryItemPath)
-      fileObjs = await cleanFileObjects(libraryItemData.path, libraryItemGrouping[libraryItemPath])
-    }
-
-    const libraryItemFolderStats = await getFileTimestampsWithIno(libraryItemData.path)
-    items.push({
-      folderId: folder.id,
-      libraryId: folder.libraryId,
-      ino: libraryItemFolderStats.ino,
-      mtimeMs: libraryItemFolderStats.mtimeMs || 0,
-      ctimeMs: libraryItemFolderStats.ctimeMs || 0,
-      birthtimeMs: libraryItemFolderStats.birthtimeMs || 0,
-      path: libraryItemData.path,
-      relPath: libraryItemData.relPath,
-      isFile,
-      media: {
-        metadata: libraryItemData.mediaMetadata || null
-      },
-      libraryFiles: fileObjs
-    })
-  }
-  return items
-}
-module.exports.scanFolder = scanFolder
-
-// Input relative filepath, output all details that can be parsed
-function getBookDataFromDir(folderPath, relPath, parseSubtitle = false) {
-  relPath = filePathToPOSIX(relPath)
-  var splitDir = relPath.split('/')
+/**
+ * Get details parsed from filenames
+ * 
+ * @param {string} relPath 
+ * @param {boolean} parseSubtitle 
+ * @returns {LibraryItemFilenameMetadata}
+ */
+function getBookDataFromDir(relPath, parseSubtitle = false) {
+  const splitDir = relPath.split('/')
 
   var folder = splitDir.pop() // Audio files will always be in the directory named for the title
   series = (splitDir.length > 1) ? splitDir.pop() : null // If there are at least 2 more directories, next furthest will be the series
   author = (splitDir.length > 0) ? splitDir.pop() : null // There could be many more directories, but only the top 3 are used for naming /author/series/title/
 
   // The  may contain various other pieces of metadata, these functions extract it.
+  var [folder, asin] = getASIN(folder)
   var [folder, narrators] = getNarrator(folder)
   var [folder, sequence] = series ? getSequence(folder) : [folder, null]
   var [folder, publishedYear] = getPublishedYear(folder)
   var [title, subtitle] = parseSubtitle ? getSubtitle(folder) : [folder, null]
 
+
   return {
-    mediaMetadata: {
-      author,
-      title,
-      subtitle,
-      series,
-      sequence,
-      publishedYear,
-      narrators,
-    },
-    relPath: relPath, // relative audiobook path i.e. /Author Name/Book Name/..
-    path: Path.posix.join(folderPath, relPath) // i.e. /audiobook/Author Name/Book Name/..
+    title,
+    subtitle,
+    asin,
+    authors: parseNameString.parse(author)?.names || [],
+    narrators: parseNameString.parse(narrators)?.names || [],
+    seriesName: series,
+    seriesSequence: sequence,
+    publishedYear
   }
 }
 module.exports.getBookDataFromDir = getBookDataFromDir
 
+/**
+ * Extract narrator from folder name
+ * 
+ * @param {string} folder 
+ * @returns {[string, string]} [folder, narrator]
+ */
 function getNarrator(folder) {
   let pattern = /^(?<title>.*) \{(?<narrators>.*)\}$/
   let match = folder.match(pattern)
   return match ? [match.groups.title, match.groups.narrators] : [folder, null]
 }
 
+/**
+ * Extract series sequence from folder name
+ * 
+ * @example
+ * 'Book 2 - Title - Subtitle'
+ * 'Title - Subtitle - Vol 12'
+ * 'Title - volume 9 - Subtitle'
+ * 'Vol. 3 Title Here - Subtitle'
+ * '1980 - Book 2 - Title'
+ * 'Volume 12. Title - Subtitle'
+ * '100 - Book Title'
+ * '6. Title'
+ * '0.5 - Book Title'
+ * 
+ * @param {string} folder 
+ * @returns {[string, string]} [folder, sequence]
+ */
 function getSequence(folder) {
-  // Valid ways of including a volume number:
-  // [
-  //     'Book 2 - Title - Subtitle',
-  //     'Title - Subtitle - Vol 12',
-  //     'Title - volume 9 - Subtitle',
-  //     'Vol. 3 Title Here - Subtitle',
-  //     '1980 - Book 2 - Title',
-  //     'Volume 12. Title - Subtitle',
-  //     '100 - Book Title',
-  //     '2 - Book Title',
-  //     '6. Title',
-  //     '0.5 - Book Title'
-  // ]
-
   // Matches a valid volume string. Also matches a book whose title starts with a 1 to 3 digit number. Will handle that later.
   let pattern = /^(?<volumeLabel>vol\.? |volume |book )?(?<sequence>\d{0,3}(?:\.\d{1,2})?)(?<trailingDot>\.?)(?: (?<suffix>.*))?$/i
 
@@ -322,6 +308,12 @@ function getSequence(folder) {
   return [folder, volumeNumber]
 }
 
+/**
+ * Extract published year from folder name
+ * 
+ * @param {string} folder 
+ * @returns {[string, string]} [folder, publishedYear]
+ */
 function getPublishedYear(folder) {
   var publishedYear = null
 
@@ -335,90 +327,73 @@ function getPublishedYear(folder) {
   return [folder, publishedYear]
 }
 
+/**
+ * Extract subtitle from folder name
+ * 
+ * @param {string} folder 
+ * @returns {[string, string]} [folder, subtitle]
+ */
 function getSubtitle(folder) {
   // Subtitle is everything after " - "
   var splitTitle = folder.split(' - ')
   return [splitTitle.shift(), splitTitle.join(' - ')]
 }
 
-function getPodcastDataFromDir(folderPath, relPath) {
-  relPath = filePathToPOSIX(relPath)
+/**
+ * Extract asin from folder name
+ * 
+ * @param {string} folder 
+ * @returns {[string, string]} [folder, asin]
+ */
+function getASIN(folder) {
+  let asin = null
+
+  let pattern = /(?: |^)\[([A-Z0-9]{10})](?= |$)/ // Matches "[B0015T963C]"
+  const match = folder.match(pattern)
+  if (match) {
+    asin = match[1]
+    folder = folder.replace(match[0], '')
+  }
+  return [folder.trim(), asin]
+}
+
+/**
+ * 
+ * @param {string} relPath 
+ * @returns {LibraryItemFilenameMetadata}
+ */
+function getPodcastDataFromDir(relPath) {
   const splitDir = relPath.split('/')
 
   // Audio files will always be in the directory named for the title
   const title = splitDir.pop()
   return {
-    mediaMetadata: {
-      title
-    },
-    relPath: relPath, // relative podcast path i.e. /Podcast Name/..
-    path: Path.posix.join(folderPath, relPath) // i.e. /podcasts/Podcast Name/..
+    title
   }
 }
 
+/**
+ * 
+ * @param {string} libraryMediaType 
+ * @param {string} folderPath 
+ * @param {string} relPath 
+ * @returns {{ mediaMetadata: LibraryItemFilenameMetadata, relPath: string, path: string}}
+ */
 function getDataFromMediaDir(libraryMediaType, folderPath, relPath) {
+  relPath = filePathToPOSIX(relPath)
+  let fullPath = Path.posix.join(folderPath, relPath)
+  let mediaMetadata = null
+
   if (libraryMediaType === 'podcast') {
-    return getPodcastDataFromDir(folderPath, relPath)
-  } else if (libraryMediaType === 'book') {
-    return getBookDataFromDir(folderPath, relPath, !!global.ServerSettings.scannerParseSubtitle)
-  } else {
-    return getPodcastDataFromDir(folderPath, relPath)
+    mediaMetadata = getPodcastDataFromDir(relPath)
+  } else { // book
+    mediaMetadata = getBookDataFromDir(relPath, !!global.ServerSettings.scannerParseSubtitle)
+  }
+
+  return {
+    mediaMetadata,
+    relPath,
+    path: fullPath
   }
 }
-
-// Called from Scanner.js
-async function getLibraryItemFileData(libraryMediaType, folder, libraryItemPath, isSingleMediaItem) {
-  libraryItemPath = filePathToPOSIX(libraryItemPath)
-  const folderFullPath = filePathToPOSIX(folder.fullPath)
-
-  const libraryItemDir = libraryItemPath.replace(folderFullPath, '').slice(1)
-  let libraryItemData = {}
-
-  let fileItems = []
-
-  if (isSingleMediaItem) { // Single media item in root of folder
-    fileItems = [
-      {
-        fullpath: libraryItemPath,
-        path: libraryItemDir // actually the relPath (only filename here)
-      }
-    ]
-    libraryItemData = {
-      path: libraryItemPath, // full path
-      relPath: libraryItemDir, // only filename
-      mediaMetadata: {
-        title: Path.basename(libraryItemDir, Path.extname(libraryItemDir))
-      }
-    }
-  } else {
-    fileItems = await recurseFiles(libraryItemPath)
-    libraryItemData = getDataFromMediaDir(libraryMediaType, folderFullPath, libraryItemDir)
-  }
-
-  const libraryItemDirStats = await getFileTimestampsWithIno(libraryItemData.path)
-  const libraryItem = {
-    ino: libraryItemDirStats.ino,
-    mtimeMs: libraryItemDirStats.mtimeMs || 0,
-    ctimeMs: libraryItemDirStats.ctimeMs || 0,
-    birthtimeMs: libraryItemDirStats.birthtimeMs || 0,
-    folderId: folder.id,
-    libraryId: folder.libraryId,
-    path: libraryItemData.path,
-    relPath: libraryItemData.relPath,
-    isFile: isSingleMediaItem,
-    media: {
-      metadata: libraryItemData.mediaMetadata || null
-    },
-    libraryFiles: []
-  }
-
-  for (let i = 0; i < fileItems.length; i++) {
-    const fileItem = fileItems[i]
-    const newLibraryFile = new LibraryFile()
-    // fileItem.path is the relative path
-    await newLibraryFile.setDataFromPath(fileItem.fullpath, fileItem.path)
-    libraryItem.libraryFiles.push(newLibraryFile)
-  }
-  return libraryItem
-}
-module.exports.getLibraryItemFileData = getLibraryItemFileData
+module.exports.getDataFromMediaDir = getDataFromMediaDir

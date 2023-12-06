@@ -1,11 +1,13 @@
 const Logger = require('../Logger')
+const { encodeUriPath } = require('../utils/fileUtils')
 
 class BackupController {
   constructor() { }
 
   getAll(req, res) {
     res.json({
-      backups: this.backupManager.backups.map(b => b.toJSON())
+      backups: this.backupManager.backups.map(b => b.toJSON()),
+      backupLocation: this.backupManager.backupLocation
     })
   }
 
@@ -37,9 +39,13 @@ class BackupController {
    */
   download(req, res) {
     if (global.XAccel) {
-      Logger.debug(`Use X-Accel to serve static file ${req.backup.fullPath}`)
-      return res.status(204).header({ 'X-Accel-Redirect': global.XAccel + req.backup.fullPath }).send()
+      const encodedURI = encodeUriPath(global.XAccel + req.backup.fullPath)
+      Logger.debug(`Use X-Accel to serve static file ${encodedURI}`)
+      return res.status(204).header({ 'X-Accel-Redirect': encodedURI }).send()
     }
+
+    res.setHeader('Content-disposition', 'attachment; filename=' + req.backup.filename)
+
     res.sendFile(req.backup.fullPath)
   }
 

@@ -4,15 +4,13 @@ const fs = require('../libs/fsExtra')
 
 const workerThreads = require('worker_threads')
 const Logger = require('../Logger')
+const TaskManager = require('./TaskManager')
 const Task = require('../objects/Task')
-const filePerms = require('../utils/filePerms')
 const { writeConcatFile } = require('../utils/ffmpegHelpers')
 const toneHelpers = require('../utils/toneHelpers')
 
 class AbMergeManager {
-  constructor(taskManager) {
-    this.taskManager = taskManager
-
+  constructor() {
     this.itemsCacheDir = Path.join(global.MetadataPath, 'cache/items')
 
     this.pendingTasks = []
@@ -46,7 +44,7 @@ class AbMergeManager {
     }
     const taskDescription = `Encoding audiobook "${libraryItem.media.metadata.title}" into a single m4b file.`
     task.setData('encode-m4b', 'Encoding M4b', taskDescription, false, taskData)
-    this.taskManager.addTask(task)
+    TaskManager.addTask(task)
     Logger.info(`Start m4b encode for ${libraryItem.id} - TaskId: ${task.id}`)
 
     if (!await fs.pathExists(taskData.itemCachePath)) {
@@ -201,10 +199,6 @@ class AbMergeManager {
     Logger.debug(`[AbMergeManager] Moving m4b from ${task.data.tempFilepath} to ${task.data.targetFilepath}`)
     await fs.move(task.data.tempFilepath, task.data.targetFilepath)
 
-    // Set file permissions and ownership
-    await filePerms.setDefault(task.data.targetFilepath)
-    await filePerms.setDefault(task.data.itemCachePath)
-
     task.setFinished()
     await this.removeTask(task, false)
     Logger.info(`[AbMergeManager] Ab task finished ${task.id}`)
@@ -239,7 +233,7 @@ class AbMergeManager {
       }
     }
 
-    this.taskManager.taskFinished(task)
+    TaskManager.taskFinished(task)
   }
 }
 module.exports = AbMergeManager

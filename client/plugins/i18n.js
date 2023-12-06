@@ -5,6 +5,8 @@ import { supplant } from './utils'
 const defaultCode = 'en-us'
 
 const languageCodeMap = {
+  'cs': { label: 'Čeština', dateFnsLocale: 'cs' },
+  'da': { label: 'Dansk', dateFnsLocale: 'da' },
   'de': { label: 'Deutsch', dateFnsLocale: 'de' },
   'en-us': { label: 'English', dateFnsLocale: 'enUS' },
   'es': { label: 'Español', dateFnsLocale: 'es' },
@@ -13,8 +15,10 @@ const languageCodeMap = {
   'it': { label: 'Italiano', dateFnsLocale: 'it' },
   'lt': { label: 'Lietuvių', dateFnsLocale: 'lt' },
   'nl': { label: 'Nederlands', dateFnsLocale: 'nl' },
+  'no': { label: 'Norsk', dateFnsLocale: 'no' },
   'pl': { label: 'Polski', dateFnsLocale: 'pl' },
   'ru': { label: 'Русский', dateFnsLocale: 'ru' },
+  'sv': { label: 'Svenska', dateFnsLocale: 'sv' },
   'zh-cn': { label: '简体中文 (Simplified Chinese)', dateFnsLocale: 'zhCN' },
 }
 Vue.prototype.$languageCodeOptions = Object.keys(languageCodeMap).map(code => {

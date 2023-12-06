@@ -78,6 +78,11 @@ class PlaybackSession {
     }
   }
 
+  /**
+   * Session data to send to clients
+   * @param {[oldLibraryItem]} libraryItem optional
+   * @returns {object}
+   */
   toJSONForClient(libraryItem) {
     return {
       id: this.id,
@@ -105,8 +110,8 @@ class PlaybackSession {
       startedAt: this.startedAt,
       updatedAt: this.updatedAt,
       audioTracks: this.audioTracks.map(at => at.toJSON()),
-      videoTrack: this.videoTrack ? this.videoTrack.toJSON() : null,
-      libraryItem: libraryItem.toJSONExpanded()
+      videoTrack: this.videoTrack?.toJSON() || null,
+      libraryItem: libraryItem?.toJSONExpanded() || null
     }
   }
 
@@ -163,7 +168,13 @@ class PlaybackSession {
     this.currentTime = session.currentTime || 0
 
     this.startedAt = session.startedAt
-    this.updatedAt = session.updatedAt || null
+    this.updatedAt = session.updatedAt || session.startedAt
+
+    // Local playback sessions dont set this date field so set using updatedAt
+    if (!this.date && session.updatedAt) {
+      this.date = date.format(new Date(session.updatedAt), 'YYYY-MM-DD')
+      this.dayOfWeek = date.format(new Date(session.updatedAt), 'dddd')
+    }
   }
 
   get mediaItemId() {

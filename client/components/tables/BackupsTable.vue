@@ -190,6 +190,7 @@ export default {
       this.$axios
         .$get('/api/backups')
         .then((data) => {
+          this.$emit('loaded', data.backupLocation)
           this.setBackups(data.backups || [])
         })
         .catch((error) => {
