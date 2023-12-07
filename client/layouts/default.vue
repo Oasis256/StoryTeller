@@ -122,25 +122,6 @@ export default {
     init(payload) {
       console.log('Init Payload', payload)
 
-<<<<<<< HEAD
-      // Start scans currently running
-      if (payload.librariesScanning) {
-        payload.librariesScanning.forEach((libraryScan) => {
-          this.scanS < script >tart(libraryScan)
-        })
-      }
-
-      // Remove any current scans that are no longer running
-      var currentScans = [...this.$store.state.scanners.libraryScans]
-      currentScans.forEach((ls) => {
-        if (!payload.librariesScanning || !payload.librariesScanning.find((_ls) => _ls.id === ls.id)) {
-          this.$toast.dismiss(ls.toastId)
-          this.$store.commit('scanners/remove', ls)
-        }
-      })
-
-=======
->>>>>>> 34156af40330737cb188977a60960c6f78d53ef9
       if (payload.usersOnline) {
         this.$store.commit('users/setUsersOnline', payload.usersOnline)
       }
@@ -593,11 +574,13 @@ export default {
 #app-content {
   width: 100%;
 }
+
 #app-content.has-siderail {
   width: calc(100% - 80px);
   max-width: calc(100% - 80px);
   margin-left: 80px;
 }
+
 @media (max-width: 768px) {
   #app-content.has-siderail {
     width: 100%;

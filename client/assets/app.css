@@ -259,7 +259,27 @@ Bookshelf Label
 .no-bars .Vue-Toastification__container.top-right {
   padding-top: 8px;
 }
-<<<<<<< HEAD
+
+.abs-btn::before {
+  content: '';
+  position: absolute;
+  border-radius: 6px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0);
+  transition: all 0.1s ease-in-out;
+}
+
+.abs-btn:hover:not(:disabled)::before {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.abs-btn:disabled::before {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
 /* For The Love Editah The Custom CSS */
 
 .above,
@@ -291,25 +311,6 @@ Bookshelf Label
 
 .nuxt-progress {
   background-color: #0de448;
-=======
-
-.abs-btn::before {
-  content: '';
-  position: absolute;
-  border-radius: 6px;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0);
-  transition: all 0.1s ease-in-out;
 }
 
-.abs-btn:hover:not(:disabled)::before {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.abs-btn:disabled::before {
-  background-color: rgba(0, 0, 0, 0.2);
->>>>>>> 34156af40330737cb188977a60960c6f78d53ef9
-}
+  /* For The Love Editah The Custom CSS */

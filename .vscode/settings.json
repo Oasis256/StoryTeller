@@ -17,9 +17,5 @@
   "editor.formatOnSave": true,
   "editor.detectIndentation": true,
   "editor.tabSize": 2,
-<<<<<<< HEAD
-  "nuxt.isNuxtApp": false
-=======
   "javascript.format.semicolons": "remove"
->>>>>>> 34156af40330737cb188977a60960c6f78d53ef9
 }

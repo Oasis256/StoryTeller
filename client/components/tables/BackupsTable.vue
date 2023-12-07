@@ -2,7 +2,7 @@
   <div class="text-center mt-4">
     <div class="flex py-4">
       <ui-file-input ref="fileInput" class="mr-2" accept=".shelf" @change="backupUploaded">{{
-          $strings.ButtonUploadBackup
+        $strings.ButtonUploadBackup
       }}</ui-file-input>
       <div class="flex-grow" />
       <ui-btn :loading="isBackingUp" @click="clickCreateBackup">{{ $strings.ButtonCreateBackup }}</ui-btn>
@@ -20,38 +20,25 @@
             <p class="truncate text-xs sm:text-sm md:text-base">/{{ backup.path.replace(/\\/g, '/') }}</p>
           </td>
           <td class="hidden sm:table-cell font-sans text-sm">{{ $formatDatetime(backup.createdAt, dateFormat,
-              timeFormat)
+            timeFormat)
           }}</td>
           <td class="hidden sm:table-cell font-mono md:text-sm text-xs">{{ $bytesPretty(backup.fileSize) }}</td>
           <td>
             <div class="w-full flex flex-row items-center justify-center">
-<<<<<<< HEAD
-              <ui-btn v-if="backup.serverVersion" small color="primary" @click="applyBackup(backup)">{{
-                  $strings.ButtonRestore
-              }}</ui-btn>
-
-              <a v-if="backup.serverVersion" :href="`/metadata/${$encodeUriPath(backup.path)}?token=${userToken}`"
-                class="mx-1 pt-1 hover:text-opacity-100 text-opacity-70 text-white" download><span
-                  class="material-icons text-xl">download</span></a>
-              <ui-tooltip v-else
-                text="This backup was created with an old version of audiobookshelf no longer supported"
+              <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{
+                $strings.ButtonRestore }}</ui-btn>
+              <ui-tooltip v-else text="This backup was created with an old version of audiobookshelf no longer supported"
                 direction="bottom" class="mx-2 flex items-center">
                 <span class="material-icons-outlined text-2xl text-error">error_outline</span>
               </ui-tooltip>
 
-              <span
-                class="material-icons text-xl hover:text-error hover:text-opacity-100 text-opacity-70 text-white cursor-pointer mx-1"
-                @click="deleteBackupClick(backup)">delete</span>
-=======
-              <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{ $strings.ButtonRestore }}</ui-btn>
-              <ui-tooltip v-else text="This backup was created with an old version of audiobookshelf no longer supported" direction="bottom" class="mx-2 flex items-center">
-                <span class="material-icons-outlined text-2xl text-error">error_outline</span>
-              </ui-tooltip>
+              <button aria-label="Download Backup"
+                class="inline-flex material-icons text-xl mx-1 mt-1 text-white/70 hover:text-white/100"
+                @click.stop="downloadBackup(backup)">download</button>
 
-              <button aria-label="Download Backup" class="inline-flex material-icons text-xl mx-1 mt-1 text-white/70 hover:text-white/100" @click.stop="downloadBackup(backup)">download</button>
-
-              <button aria-label="Delete Backup" class="inline-flex material-icons text-xl mx-1 text-white/70 hover:text-error" @click="deleteBackupClick(backup)">delete</button>
->>>>>>> c2af96e7cd5f41eed91cddbceea8b128cdd59400
+              <button aria-label="Delete Backup"
+                class="inline-flex material-icons text-xl mx-1 text-white/70 hover:text-error"
+                @click="deleteBackupClick(backup)">delete</button>
             </div>
           </td>
         </tr>
@@ -71,7 +58,7 @@
         <p class="text-base py-1" v-html="$strings.MessageRestoreBackupWarning" />
 
         <p class="text-lg text-center my-8">{{ $strings.MessageRestoreBackupConfirm }} {{
-            $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat)
+          $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat)
         }}?</p>
         <div class="flex px-1 items-center">
           <ui-btn color="primary" @click="showConfirmApply = false">{{ $strings.ButtonNevermind }}</ui-btn>
@@ -244,5 +231,4 @@ export default {
   padding-top: 5px;
   padding-bottom: 5px;
   background-color: #333;
-}
-</style>
+}</style>

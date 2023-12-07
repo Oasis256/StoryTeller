@@ -81,13 +81,8 @@ class BackupManager {
   }
 
   async uploadBackup(req, res) {
-<<<<<<< HEAD
     var backupFile = req.files.file
     if (Path.extname(backupFile.name) !== '.shelf') {
-=======
-    const backupFile = req.files.file
-    if (Path.extname(backupFile.name) !== '.audiobookshelf') {
->>>>>>> c2af96e7cd5f41eed91cddbceea8b128cdd59400
       Logger.error(`[BackupManager] Invalid backup file uploaded "${backupFile.name}"`)
       return res.status(500).send('Invalid backup file')
     }
