@@ -1,6 +1,6 @@
 ---
 
-name: Build and Push Docker Image
+name: Build and Push Image to DockerHub
 
 on:
   # Allows you to run workflow manually from Actions tab
