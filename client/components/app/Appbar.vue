@@ -21,6 +21,9 @@
           <nuxt-link to="/">
             <nlp class="above"></nlp>
             <nlp class="text">
+              <non>
+                The
+              </non>
               {{ $strings.Title1 }}
               <tales>
                 {{ $strings.Title2 }}
