@@ -18,7 +18,7 @@ module.exports = {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'The Book Shelf',
+    title: 'The AudbleTales',
     htmlAttrs: {
       lang: 'en'
     },
@@ -27,7 +27,7 @@ module.exports = {
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' },
       { property: 'fb:app_id', content: '1607117262915201' },
-      { name: 'description', content: 'The Book Shelf' },
+      { name: 'description', content: 'The AudbleTales' },
       { name: 'author', content: 'Oasis Innocent &hearts; oasis.sybill@shule.life &hearts;' },
       { name: 'web_author', content: 'The N-line Project codeStudio' },
       { NAME: 'Copyright', CONTENT: 'The N-line Project' },
@@ -146,14 +146,14 @@ module.exports = {
     icon: false,
     meta: {
       appleStatusBarStyle: 'black',
-      name: 'The Book Shelf',
+      name: 'The AudbleTales',
       theme_color: '#373838',
       mobileAppIOS: true,
       nativeUI: true
     },
     manifest: {
-      name: 'The Book Shelf',
-      short_name: 'The Book Shelf',
+      name: 'The AudbleTales',
+      short_name: 'The AudbleTales',
       display: 'standalone',
       background_color: '#373838',
       icons: [

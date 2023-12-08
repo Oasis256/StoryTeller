@@ -287,7 +287,7 @@ Bookshelf Label
   border: solid #0ff;
   border-width: 3px 0;
   position: fixed;
-  padding: 13px 93px;
+  padding: 13px 103px;
 }
 
 .center {
@@ -312,5 +312,7 @@ Bookshelf Label
 .nuxt-progress {
   background-color: #0de448;
 }
-
+tales {
+  color: lightgreen;
+}
   /* For The Love Editah The Custom CSS */
