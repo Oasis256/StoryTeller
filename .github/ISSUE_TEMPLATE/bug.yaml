@@ -8,7 +8,7 @@ body:
       value: "### Please first search for your issue and check the [docs](https://audiobookshelf.org/docs)."
   - type: markdown
     attributes:
-      value: "### Mobile app issues report [here](https://github.com/advplyr/audiobookshelf-app/issues/new/choose)."
+      value: "### Mobile app issues report [here](https://github.com/Oasis256/StoryTeller-app/issues/new/choose)."
   - type: markdown
     attributes:
       value: "### Join the [discord server](https://discord.gg/pJsjuNCKRq) for questions or if you are not sure about a bug."

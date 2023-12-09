@@ -37,7 +37,7 @@ function generateXML(data) {
     var channel = [];
     channel.push({ title: { _cdata: data.title } });
     channel.push({ description: { _cdata: data.description || data.title } });
-    channel.push({ link: data.site_url || 'https://github.com/advplyr/audiobookshelf' });
+    channel.push({ link: data.site_url || 'https://github.com/Oasis256/StoryTeller' });
     // image_url set?
     if (data.image_url) {
         channel.push({ image: [{ url: data.image_url }, { title: data.title }, { link: data.site_url }] });

@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-   <img alt="Audiobookshelf Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
+   <img alt="Audiobookshelf Banner" src="https://github.com/Oasis256/StoryTeller/raw/master/images/banner.svg" width="600">
 
   <p align="center">
     <br />
@@ -18,41 +18,44 @@ Audiobookshelf is a self-hosted audiobook and podcast server.
 
 ### Features
 
-* Fully **open-source**, including the [android & iOS app](https://github.com/advplyr/audiobookshelf-app) *(in beta)*
-* Stream all audio formats on the fly
-* Search and add podcasts to download episodes w/ auto-download
-* Multi-user support w/ custom permissions
-* Keeps progress per user and syncs across devices
-* Auto-detects library updates, no need to re-scan
-* Upload books and podcasts w/ bulk upload drag and drop folders
-* Backup your metadata + automated daily backups
-* Progressive Web App (PWA)
-* Chromecast support on the web app and android app
-* Fetch metadata and cover art from several sources
-* Chapter editor and chapter lookup (using [Audnexus API](https://audnex.us/))
-* Merge your audio files into a single m4b
-* Embed metadata and cover image into your audio files (using [Tone](https://github.com/sandreas/tone))
-* Basic ebook support and ereader
-  * Epub, pdf, cbr, cbz
-  * Send ebook to device (i.e. Kindle)
-* Open RSS feeds for podcasts and audiobooks
+- Fully **open-source**, including the [android & iOS app](https://github.com/Oasis256/StoryTeller) _(in beta)_
+- Stream all audio formats on the fly
+- Search and add podcasts to download episodes w/ auto-download
+- Multi-user support w/ custom permissions
+- Keeps progress per user and syncs across devices
+- Auto-detects library updates, no need to re-scan
+- Upload books and podcasts w/ bulk upload drag and drop folders
+- Backup your metadata + automated daily backups
+- Progressive Web App (PWA)
+- Chromecast support on the web app and android app
+- Fetch metadata and cover art from several sources
+- Chapter editor and chapter lookup (using [Audnexus API](https://audnex.us/))
+- Merge your audio files into a single m4b
+- Embed metadata and cover image into your audio files (using [Tone](https://github.com/sandreas/tone))
+- Basic ebook support and ereader
+  - Epub, pdf, cbr, cbz
+  - Send ebook to device (i.e. Kindle)
+- Open RSS feeds for podcasts and audiobooks
 
-Is there a feature you are looking for? [Suggest it](https://github.com/advplyr/audiobookshelf/issues/new/choose)
+Is there a feature you are looking for? [Suggest it](https://github.com/Oasis256/StoryTellerssues/new/choose)
 
 Join us on [Discord](https://discord.gg/pJsjuNCKRq) or [Matrix](https://matrix.to/#/#audiobookshelf:matrix.org)
 
 ### Android App (beta)
+
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
 
 ### iOS App (beta)
-Available using Test Flight: https://testflight.apple.com/join/wiic7QIW - [Join the discussion](https://github.com/advplyr/audiobookshelf-app/discussions/60)
+
+Available using Test Flight: https://testflight.apple.com/join/wiic7QIW - [Join the discussion](https://github.com/Oasis256/StoryTellerpp/discussions/60)
 
 ### Build your own tools & clients
+
 Check out the [API documentation](https://api.audiobookshelf.org/)
 
 <br />
 
-<img alt="Library Screenshot" src="https://github.com/advplyr/audiobookshelf/raw/master/images/DemoLibrary.png" />
+<img alt="Library Screenshot" src="https://github.com/Oasis256/StoryTeller/raw/master/images/DemoLibrary.png" />
 
 <br />
 
@@ -60,7 +63,7 @@ Check out the [API documentation](https://api.audiobookshelf.org/)
 
 #### Directory structure and folder names are important to Audiobookshelf!
 
- See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
+See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
 <br />
 
@@ -74,7 +77,7 @@ See [install docs](https://www.audiobookshelf.org/docs)
 
 #### Important! Audiobookshelf requires a websocket connection.
 
-#### Note: Subfolder paths (e.g. /audiobooks) are not supported yet. See [issue](https://github.com/advplyr/audiobookshelf/issues/385)
+#### Note: Subfolder paths (e.g. /audiobooks) are not supported yet. See [issue](https://github.com/Oasis256/StoryTellerssues/385)
 
 ### NGINX Proxy Manager
 
@@ -85,7 +88,6 @@ Toggle websockets support.
 ### NGINX Reverse Proxy
 
 Add this to the site config file on your nginx server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
-
 
 ```bash
 server
@@ -119,12 +121,13 @@ server
 Add this to the site config file on your Apache server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
 
 For this to work you must enable at least the following mods using `a2enmod`:
-  - `ssl`
-  - `proxy`
-  - `proxy_http`
-  - `proxy_balancer`
-  - `proxy_wstunnel`
-  - `rewrite`
+
+- `ssl`
+- `proxy`
+- `proxy_http`
+- `proxy_balancer`
+- `proxy_wstunnel`
+- `rewrite`
 
 ```bash
 <IfModule mod_ssl.c>
@@ -149,9 +152,10 @@ For this to work you must enable at least the following mods using `a2enmod`:
 </IfModule>
 ```
 
-Some SSL certificates like those signed by Let's Encrypt require ACME validation. To allow Let's Encrypt to write and confirm 
+Some SSL certificates like those signed by Let's Encrypt require ACME validation. To allow Let's Encrypt to write and confirm
 the ACME challenge, edit your VirtualHost definition to prevent proxying traffic that queries `/.well-known` and instead
 serve that directly:
+
 ```bash
 <VirtualHost *:443>
     # ...
@@ -160,15 +164,14 @@ serve that directly:
     # within DocumentRoot and give the HTTP user recursive write
     # access to it.
     DocumentRoot /path/to/local/directory
-    
+
     ProxyPreserveHost On
     ProxyPass /.well-known !
     ProxyPass / http://localhost:<audiobookshelf_port>/
-    
-    # ...
-</VirtualHost>    
-```
 
+    # ...
+</VirtualHost>
+```
 
 ### SWAG Reverse Proxy
 
@@ -183,7 +186,7 @@ serve that directly:
 5. Click Create > WebSocket
 6. Click Save
 
-[from @silentArtifact](https://github.com/advplyr/audiobookshelf/issues/241#issuecomment-1036732329)
+[from @silentArtifact](https://github.com/Oasis256/StoryTellerssues/241#issuecomment-1036732329)
 
 ### [Traefik Reverse Proxy](https://doc.traefik.io/traefik/)
 
@@ -207,7 +210,6 @@ subdomain.domain.com {
 }
 ```
 
-
 # Run from source
 
 # Contributing
@@ -215,13 +217,15 @@ subdomain.domain.com {
 This application is built using [NodeJs](https://nodejs.org/).
 
 ### Dev Container Setup
+
 The easiest way to begin developing this project is to use a dev container. An introduction to dev containers in VSCode can be found [here](https://code.visualstudio.com/docs/devcontainers/containers).
 
 Required Software:
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-* [VSCode](https://code.visualstudio.com/download)
 
-*Note, it is possible to use other container software than Docker and IDEs other than VSCode. However, this setup is more complicated and not covered here.*
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [VSCode](https://code.visualstudio.com/download)
+
+_Note, it is possible to use other container software than Docker and IDEs other than VSCode. However, this setup is more complicated and not covered here._
 
 <div>
 <details>
@@ -298,10 +302,9 @@ You can also build a version of the client that supports live reloading. To do t
 
 If you are using VSCode, this project includes a couple of pre-defined targets to speed up this process. First, if you build the project (`ctrl+shift+b` or `cmd+shift+b`) it will automatically generate the client. Next, there are debug commands for running the server and client. You can view these targets using the debug panel (bring it up with (`ctrl+shift+d` or `cmd+shift+d`):
 
-* `Debug server`—Run the server.
-* `Debug client (nuxt)`—Run the client with live reload.
-* `Debug server and client (nuxt)`—Runs both the preceding two debug targets.
-
+- `Debug server`—Run the server.
+- `Debug client (nuxt)`—Run the client with live reload.
+- `Debug server and client (nuxt)`—Runs both the preceding two debug targets.
 
 # How to Support
 
