@@ -188,7 +188,7 @@
       <div class="flex-grow" />
       <p class="pr-2 text-sm text-yellow-400">
         {{ $strings.MessageReportBugsAndContribute }}
-        <a class="underline" href="https://github.com/Oasis256/StoryTeller" target="_blank">github</a>
+        <!-- <a class="underline" href="https://github.com/Oasis256/StoryTeller" target="_blank">github</a> -->
       </p>
       <a href="https://github.com/Oasis256/StoryTeller" target="_blank"
         class="text-white hover:text-gray-200 hover:scale-150 hover:rotate-6 transform duration-500">
