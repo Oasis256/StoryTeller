@@ -11,7 +11,7 @@ on:
         required: true
         default: 'latest'
   push:
-    branches: [main,master]
+    branches: [main,master,AudioTales]
     tags:
       - 'v*.*.*'
     # Only build when files in these directories have been changed
