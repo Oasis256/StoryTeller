@@ -24,7 +24,9 @@
               <non>
                 The
               </non>
-              {{ $strings.Title1 }}
+              <aud>
+                {{ $strings.Title1 }}
+              </aud>
               <tales>
                 {{ $strings.Title2 }}
               </tales>
