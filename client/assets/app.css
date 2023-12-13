@@ -312,11 +312,13 @@ Bookshelf Label
 .nuxt-progress {
   background-color: #0de448;
 }
-tales {
+.tales {
   color: lightgreen;
   position: absolute;
   font-family: initial;
   font-style: italic;
 }
-
+.non {
+  position: unset;
+}
   /* For The Love Editah The Custom CSS */

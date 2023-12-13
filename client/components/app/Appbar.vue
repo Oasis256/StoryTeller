@@ -21,13 +21,13 @@
           <nuxt-link to="/">
             <nlp class="above"></nlp>
             <nlp class="text">
-              <non>
+              <non class=" non tales">
                 The
               </non>
               <aud>
                 {{ $strings.Title1 }}
               </aud>
-              <tales>
+              <tales class="tales">
                 {{ $strings.Title2 }}
               </tales>
             </nlp>
