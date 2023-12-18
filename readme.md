@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-   <img alt="Audiobookshelf Banner" src="https://github.com/Oasis256/StoryTeller/raw/master/images/banner.svg" width="600">
+   <img alt="AudbleTales Banner" src="https://github.com/Oasis256/StoryTeller/raw/master/images/banner.svg" width="600">
 
   <p align="center">
     <br />
@@ -14,7 +14,7 @@
 
 # About
 
-Audiobookshelf is a self-hosted audiobook and podcast server.
+AudbleTales is a self-hosted audiobook and podcast server.
 
 ### Features
 
@@ -61,7 +61,7 @@ Check out the [API documentation](https://api.audiobookshelf.org/)
 
 # Organizing your audiobooks
 
-#### Directory structure and folder names are important to Audiobookshelf!
+#### Directory structure and folder names are important to AudbleTales!
 
 See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
@@ -75,7 +75,7 @@ See [install docs](https://www.audiobookshelf.org/docs)
 
 # Reverse Proxy Set Up
 
-#### Important! Audiobookshelf requires a websocket connection.
+#### Important! AudbleTales requires a websocket connection.
 
 #### Note: Subfolder paths (e.g. /audiobooks) are not supported yet. See [issue](https://github.com/Oasis256/StoryTellerssues/385)
 
