@@ -108,11 +108,11 @@ export default {
       let tanColor = '#ffdb70'
       ctx.fillStyle = tanColor
       ctx.font = '32px absicons'
-      ctx.fillText('\ue900', 15, 32)
+      // ctx.fillText('\ue900', 15, 32)
 
       // Top text
-      addText('audiobookshelf', '22px', 'normal', tanColor, '0px', 55, 22)
-      addText(`${this.year} YEAR IN REVIEW`, '14px', 'bold', 'white', '1px', 55, 44)
+      addText('AudbleTales', '22px', 'normal', tanColor, '0px', 140, 22)
+      addText(`${this.year} YEAR IN REVIEW`, '14px', 'bold', 'white', '1px', 120, 44)
 
       // Top left box
       createRoundedRect(10, 65, 185, 80)
@@ -162,6 +162,14 @@ export default {
         addText(topAuthor.name, '18px', 'bolder', 'white', '0px', 20, 357, 180)
         addText(this.$elapsedPrettyExtended(topAuthor.time, true, false), '14px', 'lighter', 'white', '1px', 20, 377)
       }
+      // TO DO
+      // const topSeries = this.yearStats.topSeries[0]
+      // if (topSeries) {
+      //   addText('TOP SERIES', '12px', 'normal', tanColor, '1px', 215, 335)
+      //   addText(topSeries.genre, '18px', 'bolder', 'white', '0px', 215, 357, 180)
+      //   addText(this.$elapsedPrettyExtended(topSeries.time, true, false), '14px', 'lighter', 'white', '1px', 215, 302)
+      // }
+
 
       this.dataUrl = canvas.toDataURL('png')
     },
