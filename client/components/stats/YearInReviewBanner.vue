@@ -9,7 +9,8 @@
     <div class="flex items-center">
       <p class="hidden md:block text-xl font-semibold">{{ yearInReviewYear }} Year in Review</p>
       <div class="hidden md:block flex-grow" />
-      <ui-btn class="w-full md:w-auto" @click.stop="clickShowYearInReview">{{ showYearInReview ? 'Hide Year in Review' : 'See Year in Review' }}</ui-btn>
+      <ui-btn class="w-full md:w-auto" @click.stop="clickShowYearInReview">{{ showYearInReview ? 'Hide Year in Review' :
+        'See Year in Review' }}</ui-btn>
     </div>
 
     <!-- your year in review -->
@@ -18,12 +19,15 @@
 
       <div class="flex items-center justify-center mb-2 max-w-[800px] mx-auto">
         <!-- previous button -->
-        <ui-btn small :disabled="!yearInReviewVariant || processingYearInReview" class="inline-flex items-center font-semibold" @click="yearInReviewVariant--">
+        <ui-btn small :disabled="!yearInReviewVariant || processingYearInReview"
+          class="inline-flex items-center font-semibold" @click="yearInReviewVariant--">
           <span class="material-icons text-lg sm:pr-1 py-px sm:py-0">chevron_left</span>
           <span class="hidden sm:inline-block pr-2">Previous</span>
         </ui-btn>
         <!-- share button -->
-        <ui-btn v-if="showShareButton" small :disabled="processingYearInReview" class="inline-flex sm:hidden items-center font-semibold ml-1 sm:ml-2" @click="shareYearInReview"> Share </ui-btn>
+        <ui-btn v-if="showShareButton" small :disabled="processingYearInReview"
+          class="inline-flex sm:hidden items-center font-semibold ml-1 sm:ml-2" @click="shareYearInReview"> Share
+        </ui-btn>
 
         <div class="flex-grow" />
         <p class="hidden sm:block text-lg font-semibold">Your Year in Review ({{ yearInReviewVariant + 1 }})</p>
@@ -31,35 +35,43 @@
         <div class="flex-grow" />
 
         <!-- refresh button -->
-        <ui-btn small :disabled="processingYearInReview" class="inline-flex items-center font-semibold mr-1 sm:mr-2" @click="refreshYearInReview">
+        <ui-btn small :disabled="processingYearInReview" class="inline-flex items-center font-semibold mr-1 sm:mr-2"
+          @click="refreshYearInReview">
           <span class="hidden sm:inline-block">Refresh</span>
           <span class="material-icons sm:!hidden text-lg py-px">refresh</span>
         </ui-btn>
         <!-- next button -->
-        <ui-btn small :disabled="yearInReviewVariant >= 2 || processingYearInReview" class="inline-flex items-center font-semibold" @click="yearInReviewVariant++">
+        <ui-btn small :disabled="yearInReviewVariant >= 2 || processingYearInReview"
+          class="inline-flex items-center font-semibold" @click="yearInReviewVariant++">
           <span class="hidden sm:inline-block pl-2">Next</span>
           <span class="material-icons-outlined text-lg sm:pl-1 py-px sm:py-0">chevron_right</span>
         </ui-btn>
       </div>
-      <stats-year-in-review ref="yearInReview" :variant="yearInReviewVariant" :year="yearInReviewYear" :processing.sync="processingYearInReview" />
+      <stats-year-in-review ref="yearInReview" :variant="yearInReviewVariant" :year="yearInReviewYear"
+        :processing.sync="processingYearInReview" />
 
       <!-- your year in review short -->
       <div class="w-full max-w-[800px] mx-auto my-4">
         <!-- share button -->
-        <ui-btn v-if="showShareButton" small :disabled="processingYearInReviewShort" class="inline-flex sm:hidden items-center font-semibold mb-1" @click="shareYearInReviewShort"> Share </ui-btn>
-        <stats-year-in-review-short ref="yearInReviewShort" :year="yearInReviewYear" :processing.sync="processingYearInReviewShort" />
+        <ui-btn v-if="showShareButton" small :disabled="processingYearInReviewShort"
+          class="inline-flex sm:hidden items-center font-semibold mb-1" @click="shareYearInReviewShort"> Share </ui-btn>
+        <stats-year-in-review-short ref="yearInReviewShort" :year="yearInReviewYear"
+          :processing.sync="processingYearInReviewShort" />
       </div>
 
       <!-- your server in review -->
       <div v-if="isAdminOrUp" class="w-full max-w-[800px] mx-auto mb-2 mt-4 border-t pt-4 border-white/10">
         <div class="flex items-center justify-center mb-2">
           <!-- previous button -->
-          <ui-btn small :disabled="!yearInReviewServerVariant || processingYearInReviewServer" class="inline-flex items-center font-semibold" @click="yearInReviewServerVariant--">
+          <ui-btn small :disabled="!yearInReviewServerVariant || processingYearInReviewServer"
+            class="inline-flex items-center font-semibold" @click="yearInReviewServerVariant--">
             <span class="material-icons text-lg sm:pr-1 py-px sm:py-0">chevron_left</span>
             <span class="hidden sm:inline-block pr-2">Previous</span>
           </ui-btn>
           <!-- share button -->
-          <ui-btn v-if="showShareButton" small :disabled="processingYearInReviewServer" class="inline-flex sm:hidden items-center font-semibold ml-1 sm:ml-2" @click="shareYearInReviewServer"> Share </ui-btn>
+          <ui-btn v-if="showShareButton" small :disabled="processingYearInReviewServer"
+            class="inline-flex sm:hidden items-center font-semibold ml-1 sm:ml-2" @click="shareYearInReviewServer"> Share
+          </ui-btn>
 
           <div class="flex-grow" />
           <p class="hidden sm:block text-lg font-semibold">Server Year in Review ({{ yearInReviewServerVariant + 1 }})</p>
@@ -67,18 +79,21 @@
           <div class="flex-grow" />
 
           <!-- refresh button -->
-          <ui-btn small :disabled="processingYearInReviewServer" class="inline-flex items-center font-semibold mr-1 sm:mr-2" @click="refreshYearInReviewServer">
+          <ui-btn small :disabled="processingYearInReviewServer"
+            class="inline-flex items-center font-semibold mr-1 sm:mr-2" @click="refreshYearInReviewServer">
             <span class="hidden sm:inline-block">Refresh</span>
             <span class="material-icons sm:!hidden text-lg py-px">refresh</span>
           </ui-btn>
           <!-- next button -->
-          <ui-btn small :disabled="yearInReviewServerVariant >= 2 || processingYearInReviewServer" class="inline-flex items-center font-semibold" @click="yearInReviewServerVariant++">
+          <ui-btn small :disabled="yearInReviewServerVariant >= 2 || processingYearInReviewServer"
+            class="inline-flex items-center font-semibold" @click="yearInReviewServerVariant++">
             <span class="hidden sm:inline-block pl-2">Next</span>
             <span class="material-icons-outlined text-lg sm:pl-1 py-px sm:py-0">chevron_right</span>
           </ui-btn>
         </div>
       </div>
-      <stats-year-in-review-server v-if="isAdminOrUp" ref="yearInReviewServer" :year="yearInReviewYear" :variant="yearInReviewServerVariant" :processing.sync="processingYearInReviewServer" />
+      <stats-year-in-review-server v-if="isAdminOrUp" ref="yearInReviewServer" :year="yearInReviewYear"
+        :variant="yearInReviewServerVariant" :processing.sync="processingYearInReviewServer" />
     </div>
   </div>
 </template>
@@ -94,7 +109,7 @@ export default {
       processingYearInReview: false,
       processingYearInReviewShort: false,
       processingYearInReviewServer: false,
-      showShareButton: true
+      showShareButton: false
     }
   },
   computed: {
