@@ -94,7 +94,7 @@ export default {
       processingYearInReview: false,
       processingYearInReviewShort: false,
       processingYearInReviewServer: false,
-      showShareButton: false
+      showShareButton: true
     }
   },
   computed: {

@@ -149,8 +149,8 @@ export default {
       // ctx.fillText('\ue900', 15, 32)
 
       // Top text
-      addText('AudbleTales', '22px', 'normal', tanColor, '0px', 140, 22)
-      addText(`${this.year} YEAR IN REVIEW`, '14px', 'bold', 'white', '1px', 120, 44)
+      addText('AudbleTales', '28px', 'normal', tanColor, '0px', 340, 28)
+      addText(`${this.year} YEAR IN REVIEW`, '18px', 'bold', 'white', '1px', 320, 51)
 
       // Top left box
       createRoundedRect(50, 100, 340, 160)

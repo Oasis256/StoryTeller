@@ -137,11 +137,11 @@ export default {
       let tanColor = '#ffdb70'
       ctx.fillStyle = tanColor
       ctx.font = '42px absicons'
-      ctx.fillText('\ue900', 15, 36)
+      // ctx.fillText('\ue900', 15, 36)
 
       // Top text
-      addText('audiobookshelf', '28px', 'normal', tanColor, '0px', 65, 28)
-      addText(`${this.year} YEAR IN REVIEW`, '18px', 'bold', 'white', '1px', 65, 51)
+      addText('AudbleTales', '28px', 'normal', tanColor, '0px', 340, 28)
+      addText(`${this.year} YEAR IN REVIEW`, '18px', 'bold', 'white', '1px', 320, 51)
 
       // Top left box
       createRoundedRect(40, 100, 230, 100)
