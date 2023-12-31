@@ -205,7 +205,6 @@ Bookshelf Label
   color: #fce3a6;
 }
 
-
 .cover-bg {
   width: calc(100% + 40px);
   height: calc(100% + 40px);
@@ -216,7 +215,6 @@ Bookshelf Label
   opacity: 1;
   filter: blur(20px);
 }
-
 
 .episode-subtitle {
   word-break: break-word;
@@ -245,7 +243,6 @@ Bookshelf Label
   /* number of lines to show */
   -webkit-box-orient: vertical;
 }
-
 
 /* Padding for toastification toasts in the top right to not cover appbar/toolbar */
 .app-bar-and-toolbar .Vue-Toastification__container.top-right {
@@ -287,7 +284,7 @@ Bookshelf Label
   border: solid #0ff;
   border-width: 3px 0;
   position: fixed;
-  padding: 13px 100px;
+  padding: 13px 97px;
 }
 
 .center {

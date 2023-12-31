@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-   <img alt="AudbleTales Banner" src="https://github.com/Oasis256/StoryTeller/raw/master/images/banner.svg" width="600">
+   <img alt="AudbleTales Banner" src="https://reads.shule.life/icon.svg" width="600">
 
   <p align="center">
     <br />
