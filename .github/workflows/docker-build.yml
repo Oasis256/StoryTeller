@@ -11,7 +11,7 @@ on:
         required: true
         default: 'latest'
   push:
-    branches: [main,master,AudioTales]
+    branches: [AudioTales]
     tags:
       - 'v*.*.*'
     # Only build when files in these directories have been changed
@@ -35,7 +35,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           # images: advplyr/audiobookshelf,ghcr.io/${{ github.repository_owner }}/audiobookshelf
-          image: Oasis256/StoryTale
+          image: oasis256/storytales
           tags: |
             type=edge,branch=master
             type=semver,pattern={{version}}
