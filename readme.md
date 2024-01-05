@@ -39,7 +39,7 @@ AudbleTales is a self-hosted audiobook and podcast server.
 
 Is there a feature you are looking for? [Suggest it](https://github.com/Oasis256/StoryTellerssues/new/choose)
 
-Join us on [Discord](https://discord.gg/pJsjuNCKRq) or [Matrix](https://matrix.to/#/#audiobookshelf:matrix.org)
+Join us on [Discord](https://discord.gg/HQgCbd6E75) or [Matrix](https://matrix.to/#/#audiobookshelf:matrix.org)
 
 ### Android App (beta)
 
