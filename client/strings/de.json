@@ -400,6 +400,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRm2Rmm6OUouPeKXKJSVVSFNB4LiJeW/LpGHlxQzhb
   "LabelPlayMethod": "Abspielmethode",
   "LabelPodcast": "Podcast",
   "LabelPodcasts": "Podcasts",
+  "LabelPodcastSearchRegion": "Podcast-Suchregion",
   "LabelPodcastType": "Podcast Typ",
   "LabelPort": "Port",
   "LabelPrefixesToIgnore": "Zu ignorierende(s) Vorwort(e) (Groß- und Kleinschreibung wird nicht berücksichtigt)",
