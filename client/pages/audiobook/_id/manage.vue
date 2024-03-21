@@ -6,19 +6,19 @@
       </div>
       <div class="w-full max-w-2xl">
         <div class="flex justify-end">
-          <ui-dropdown v-model="selectedTool" :items="availableTools" :disabled="processing" class="max-w-sm" @input="selectedToolUpdated" />
+          <ui-dropdown v-model="selectedTool" :items="availableTools" :disabled="processing" class="max-w-sm"
+            @input="selectedToolUpdated" />
         </div>
       </div>
     </div>
-
     <div class="flex justify-center">
       <div class="w-full max-w-2xl">
         <p class="text-xl mb-1">{{ $strings.HeaderMetadataToEmbed }}</p>
-        <p class="mb-2 text-base text-gray-300">audiobookshelf uses <a href="https://github.com/sandreas/tone" target="_blank" class="hover:underline text-blue-400 hover:text-blue-300">tone</a> to write metadata.</p>
+        <p class="mb-2 text-base text-gray-300">AudbleTales uses <a href="https://github.com/sandreas/tone"
+            target="_blank" class="hover:underline text-blue-400 hover:text-blue-300">tone</a> to write metadata.</p>
       </div>
       <div class="w-full max-w-2xl"></div>
     </div>
-
     <div class="flex justify-center flex-wrap">
       <div class="w-full max-w-2xl border border-white border-opacity-10 bg-bg mx-2">
         <div class="flex py-2 px-4">
@@ -58,9 +58,7 @@
         </div>
       </div>
     </div>
-
     <div class="w-full h-px bg-white bg-opacity-10 my-8" />
-
     <div class="w-full max-w-4xl mx-auto">
       <!-- queued alert -->
       <widgets-alert v-if="isMetadataEmbedQueued" type="warning" class="mb-4">
@@ -68,41 +66,49 @@
       </widgets-alert>
       <!-- metadata embed action buttons -->
       <div v-else-if="isEmbedTool" class="w-full flex justify-end items-center mb-4">
-        <ui-checkbox v-if="!isTaskFinished" v-model="shouldBackupAudioFiles" :disabled="processing" label="Backup audio files" medium checkbox-bg="bg" label-class="pl-2 text-base md:text-lg" @input="toggleBackupAudioFiles" />
-
+        <ui-checkbox v-if="!isTaskFinished" v-model="shouldBackupAudioFiles" :disabled="processing"
+          label="Backup audio files" medium checkbox-bg="bg" label-class="pl-2 text-base md:text-lg"
+          @input="toggleBackupAudioFiles" />
         <div class="flex-grow" />
-
-        <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" @click.stop="embedClick">{{ $strings.ButtonStartMetadataEmbed }}</ui-btn>
+        <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" @click.stop="embedClick">{{
+    $strings.ButtonStartMetadataEmbed }}</ui-btn>
         <p v-else class="text-success text-lg font-semibold">{{ $strings.MessageEmbedFinished }}</p>
       </div>
       <!-- m4b embed action buttons -->
       <div v-else class="w-full flex items-center mb-4">
-        <button :disabled="processing" class="text-sm uppercase text-gray-200 flex items-center pt-px pl-1 pr-2 hover:bg-white/5 rounded-md" @click="showEncodeOptions = !showEncodeOptions">
-          <span class="material-icons text-xl">{{ showEncodeOptions ? 'check_box' : 'check_box_outline_blank' }}</span> <span class="pl-1">Use Advanced Options</span>
+        <button :disabled="processing"
+          class="text-sm uppercase text-gray-200 flex items-center pt-px pl-1 pr-2 hover:bg-white/5 rounded-md"
+          @click="showEncodeOptions = !showEncodeOptions">
+          <span class="material-icons text-xl">{{ showEncodeOptions ? 'check_box' : 'check_box_outline_blank' }}</span>
+          <span class="pl-1">Use Advanced Options</span>
         </button>
-
         <div class="flex-grow" />
-
-        <ui-btn v-if="!isTaskFinished && processing" color="error" :loading="isCancelingEncode" class="mr-2" @click.stop="cancelEncodeClick">{{ $strings.ButtonCancelEncode }}</ui-btn>
-        <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" @click.stop="encodeM4bClick">{{ $strings.ButtonStartM4BEncode }}</ui-btn>
-        <p v-else-if="taskFailed" class="text-error text-lg font-semibold">{{ $strings.MessageM4BFailed }} {{ taskError }}</p>
+        <ui-btn v-if="!isTaskFinished && processing" color="error" :loading="isCancelingEncode" class="mr-2"
+          @click.stop="cancelEncodeClick">{{ $strings.ButtonCancelEncode }}</ui-btn>
+        <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" @click.stop="encodeM4bClick">{{
+    $strings.ButtonStartM4BEncode }}</ui-btn>
+        <p v-else-if="taskFailed" class="text-error text-lg font-semibold">{{ $strings.MessageM4BFailed }} {{ taskError
+          }}
+        </p>
         <p v-else class="text-success text-lg font-semibold">{{ $strings.MessageM4BFinished }}</p>
       </div>
-
       <!-- advanced encoding options -->
       <div v-if="isM4BTool" class="overflow-hidden">
         <transition name="slide">
           <div v-if="showEncodeOptions" class="mb-4 pb-4 border-b border-white/10">
             <div class="flex flex-wrap -mx-2">
-              <ui-text-input-with-label ref="bitrateInput" v-model="encodingOptions.bitrate" :disabled="processing || isTaskFinished" :label="'Audio Bitrate (e.g. 128k)'" class="m-2 max-w-40" />
-              <ui-text-input-with-label ref="channelsInput" v-model="encodingOptions.channels" :disabled="processing || isTaskFinished" :label="'Audio Channels (1 or 2)'" class="m-2 max-w-40" />
-              <ui-text-input-with-label ref="codecInput" v-model="encodingOptions.codec" :disabled="processing || isTaskFinished" :label="'Audio Codec'" class="m-2 max-w-40" />
+              <ui-text-input-with-label ref="bitrateInput" v-model="encodingOptions.bitrate"
+                :disabled="processing || isTaskFinished" :label="'Audio Bitrate (e.g. 128k)'" class="m-2 max-w-40" />
+              <ui-text-input-with-label ref="channelsInput" v-model="encodingOptions.channels"
+                :disabled="processing || isTaskFinished" :label="'Audio Channels (1 or 2)'" class="m-2 max-w-40" />
+              <ui-text-input-with-label ref="codecInput" v-model="encodingOptions.codec"
+                :disabled="processing || isTaskFinished" :label="'Audio Codec'" class="m-2 max-w-40" />
             </div>
-            <p class="text-sm text-warning">Warning: Do not update these settings unless you are familiar with ffmpeg encoding options.</p>
+            <p class="text-sm text-warning">Warning: Do not update these settings unless you are familiar with ffmpeg
+              encoding options.</p>
           </div>
         </transition>
       </div>
-
       <div class="mb-4">
         <div v-if="isEmbedTool" class="flex items-start mb-2">
           <span class="material-icons text-base text-warning pt-1">star</span>
@@ -111,14 +117,17 @@
         <div v-else class="flex items-start mb-2">
           <span class="material-icons text-base text-warning pt-1">star</span>
           <p class="text-gray-200 ml-2">
-            Finished M4B will be put into your audiobook folder at <span class="rounded-md bg-neutral-600 text-sm text-white py-0.5 px-1 font-mono">.../{{ libraryItemRelPath }}/</span>.
+            Finished M4B will be put into your audiobook folder at <span
+              class="rounded-md bg-neutral-600 text-sm text-white py-0.5 px-1 font-mono">.../{{ libraryItemRelPath
+              }}/</span>.
           </p>
         </div>
-
         <div v-if="shouldBackupAudioFiles || isM4BTool" class="flex items-start mb-2">
           <span class="material-icons text-base text-warning pt-1">star</span>
           <p class="text-gray-200 ml-2">
-            A backup of your original audio files will be stored in <span class="rounded-md bg-neutral-600 text-sm text-white py-0.5 px-1 font-mono">/metadata/cache/items/{{ libraryItemId }}/</span>. Make sure to periodically purge items cache.
+            A backup of your original audio files will be stored in <span
+              class="rounded-md bg-neutral-600 text-sm text-white py-0.5 px-1 font-mono">/metadata/cache/items/{{
+    libraryItemId }}/</span>. Make sure to periodically purge items cache.
           </p>
         </div>
         <div v-if="isEmbedTool && audioFiles.length > 1" class="flex items-start mb-2">
@@ -131,7 +140,9 @@
         </div>
         <div v-if="isM4BTool" class="flex items-start mb-2">
           <span class="material-icons text-base text-warning pt-1">star</span>
-          <p class="text-gray-200 ml-2">If you have the watcher disabled you will need to re-scan this audiobook afterwards.</p>
+          <p class="text-gray-200 ml-2">If you have the watcher disabled you will need to re-scan this audiobook
+            afterwards.
+          </p>
         </div>
         <div class="flex items-start mb-2">
           <span class="material-icons text-base text-warning pt-1">star</span>
@@ -139,7 +150,6 @@
         </div>
       </div>
     </div>
-
     <div class="w-full max-w-4xl mx-auto">
       <p class="mb-2 font-semibold">{{ $strings.HeaderAudioTracks }}</p>
       <div class="w-full mx-auto border border-white border-opacity-10 bg-bg">
@@ -150,7 +160,8 @@
           <div class="w-24"></div>
         </div>
         <template v-for="file in audioFiles">
-          <div :key="file.index" class="flex py-2 px-4 text-sm" :class="file.index % 2 === 0 ? 'bg-primary bg-opacity-25' : ''">
+          <div :key="file.index" class="flex py-2 px-4 text-sm"
+            :class="file.index % 2 === 0 ? 'bg-primary bg-opacity-25' : ''">
             <div class="w-10">{{ file.index }}</div>
             <div class="flex-grow">
               {{ file.metadata.filename }}
@@ -160,7 +171,8 @@
             </div>
             <div class="w-24">
               <div class="flex justify-center">
-                <span v-if="audiofilesFinished[file.ino]" class="material-icons text-xl text-success leading-none">check_circle</span>
+                <span v-if="audiofilesFinished[file.ino]"
+                  class="material-icons text-xl text-success leading-none">check_circle</span>
                 <div v-else-if="audiofilesEncoding[file.ino]">
                   <widgets-loading-spinner />
                 </div>
@@ -172,7 +184,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   async asyncData({ store, params, app, redirect, route }) {
@@ -198,7 +209,6 @@ export default {
       cnosole.error('No audio files')
       return redirect('/?error=no audio files')
     }
-
     return {
       libraryItem
     }
@@ -326,7 +336,6 @@ export default {
       if (this.$refs.bitrateInput) this.$refs.bitrateInput.blur()
       if (this.$refs.channelsInput) this.$refs.channelsInput.blur()
       if (this.$refs.codecInput) this.$refs.codecInput.blur()
-
       let queryStr = ''
       if (this.showEncodeOptions) {
         const options = []
@@ -395,9 +404,7 @@ export default {
           this.selectedToolUpdated()
         }
       }
-
       if (this.task) this.taskUpdated(this.task)
-
       const shouldBackupAudioFiles = localStorage.getItem('embedMetadataShouldBackup')
       this.shouldBackupAudioFiles = shouldBackupAudioFiles != 0
     },

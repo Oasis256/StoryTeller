@@ -20,22 +20,20 @@
             <p class="truncate text-xs sm:text-sm md:text-base">/{{ backup.path.replace(/\\/g, '/') }}</p>
           </td>
           <td class="hidden sm:table-cell font-sans text-sm">{{ $formatDatetime(backup.createdAt, dateFormat,
-            timeFormat)
-          }}</td>
+        timeFormat)
+            }}</td>
           <td class="hidden sm:table-cell font-mono md:text-sm text-xs">{{ $bytesPretty(backup.fileSize) }}</td>
           <td>
             <div class="w-full flex flex-row items-center justify-center">
               <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{
-                $strings.ButtonRestore }}</ui-btn>
-              <ui-tooltip v-else text="This backup was created with an old version of audiobookshelf no longer supported"
+        $strings.ButtonRestore }}</ui-btn>
+              <ui-tooltip v-else text="This backup was created with an old version of AudbleTales no longer supported"
                 direction="bottom" class="mx-2 flex items-center">
                 <span class="material-icons-outlined text-2xl text-error">error_outline</span>
               </ui-tooltip>
-
               <button aria-label="Download Backup"
                 class="inline-flex material-icons text-xl mx-1 mt-1 text-white/70 hover:text-white/100"
                 @click.stop="downloadBackup(backup)">download</button>
-
               <button aria-label="Delete Backup"
                 class="inline-flex material-icons text-xl mx-1 text-white/70 hover:text-error"
                 @click="deleteBackupClick(backup)">delete</button>
@@ -51,15 +49,13 @@
         <ui-loading-indicator />
       </div>
     </div>
-
     <prompt-dialog v-model="showConfirmApply" :width="675">
       <div v-if="selectedBackup" class="px-4 w-full text-sm py-6 rounded-lg bg-bg shadow-lg border border-black-300">
         <p class="text-error text-lg font-semibold">{{ $strings.MessageImportantNotice }}</p>
         <p class="text-base py-1" v-html="$strings.MessageRestoreBackupWarning" />
-
         <p class="text-lg text-center my-8">{{ $strings.MessageRestoreBackupConfirm }} {{
-          $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat)
-        }}?</p>
+        $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat)
+      }}?</p>
         <div class="flex px-1 items-center">
           <ui-btn color="primary" @click="showConfirmApply = false">{{ $strings.ButtonNevermind }}</ui-btn>
           <div class="flex-grow" />
@@ -67,13 +63,12 @@
         </div>
       </div>
     </prompt-dialog>
-
-    <div v-if="isApplyingBackup" class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 rounded-md">
+    <div v-if="isApplyingBackup"
+      class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 rounded-md">
       <ui-loading-indicator />
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -104,7 +99,6 @@ export default {
     confirm() {
       this.showConfirmApply = false
       this.isApplyingBackup = true
-
       this.$axios
         .$get(`/api/backups/${this.selectedBackup.id}/apply`)
         .then(() => {
@@ -158,9 +152,7 @@ export default {
     backupUploaded(file) {
       var form = new FormData()
       form.set('file', file)
-
       this.processing = true
-
       this.$axios
         .$post('/api/backups/upload', form)
         .then((data) => {
@@ -204,37 +196,32 @@ export default {
   }
 }
 </script>
-
 <style>
 #backups {
   table-layout: fixed;
   border-collapse: collapse;
   width: 100%;
 }
-
 #backups td,
 #backups th {
   border: 1px solid #2e2e2e;
   padding: 8px 8px;
   text-align: left;
 }
-
 #backups tr.staticrow td {
   text-align: center;
 }
-
 #backups tr:nth-child(even):not(.bg-error) {
   background-color: #3a3a3a;
 }
-
 #backups tr:not(.staticrow):not(.bg-error):hover {
   background-color: #444;
 }
-
 #backups th {
   font-size: 0.8rem;
   font-weight: 600;
   padding-top: 5px;
   padding-bottom: 5px;
   background-color: #333;
-}</style>
+}
+</style>
