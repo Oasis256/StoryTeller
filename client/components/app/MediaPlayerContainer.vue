@@ -1,12 +1,12 @@
 <template>
   <div v-if="streamLibraryItem" id="mediaPlayerContainer"
-    class="w-full fixed bottom-0 left-0 right-0 h-48 md:h-40 z-50 bg-primary px-2 md:px-4 pb-1 md:pb-4 pt-2">
+    class="w-full fixed bottom-0 left-0 right-0 h-48 lg:h-40 z-50 bg-primary px-2 lg:px-4 pb-1 lg:pb-4 pt-2">
     <div id="videoDock" />
-    <div class="absolute left-2 top-2 md:left-4 cursor-pointer">
+    <div class="absolute left-2 top-2 lg:left-4 cursor-pointer">
       <covers-book-cover expand-on-click :library-item="streamLibraryItem" :width="bookCoverWidth"
         :book-cover-aspect-ratio="coverAspectRatio" />
     </div>
-    <div class="flex items-start mb-6 md:mb-0"
+    <div class="flex items-start mb-6 lg:mb-0"
       :class="playerHandler.isVideo ? 'ml-4 pl-96' : isSquareCover ? 'pl-18 sm:pl-24' : 'pl-12 sm:pl-16'">
       <div class="min-w-0">
         <nuxt-link :to="`/item/${streamLibraryItem.id}`"
@@ -27,7 +27,6 @@
             <widgets-explicit-indicator :explicit="isExplicit"></widgets-explicit-indicator>
           </div>
         </div>
-
         <div class="text-gray-400 flex items-center">
           <span class="material-icons text-xs">schedule</span>
           <p class="font-mono text-xs sm:text-sm pl-1 sm:pl-1.5 pb-px">{{ totalDurationPretty }}</p>
@@ -36,30 +35,26 @@
       <div class="flex-grow" />
       <ui-tooltip direction="top" :text="$strings.LabelClosePlayer">
         <button :aria-label="$strings.LabelClosePlayer"
-          class="material-icons sm:px-2 py-1 md:p-4 cursor-pointer text-xl sm:text-2xl"
+          class="material-icons sm:px-2 py-1 lg:p-4 cursor-pointer text-xl sm:text-2xl"
           @click="closePlayer">close</button>
       </ui-tooltip>
     </div>
-    <player-ui ref="audioPlayer" :chapters="chapters" :paused="!isPlaying" :loading="playerLoading" :bookmarks="bookmarks"
-      :sleep-timer-set="sleepTimerSet" :sleep-timer-remaining="sleepTimerRemaining" :is-podcast="isPodcast"
-      @playPause="playPause" @jumpForward="jumpForward" @jumpBackward="jumpBackward" @setVolume="setVolume"
-      @setPlaybackRate="setPlaybackRate" @seek="seek" @close="closePlayer" @showBookmarks="showBookmarks"
-      @showSleepTimer="showSleepTimerModal = true" @showPlayerQueueItems="showPlayerQueueItemsModal = true" />
-
+    <player-ui ref="audioPlayer" :chapters="chapters" :paused="!isPlaying" :loading="playerLoading"
+      :bookmarks="bookmarks" :sleep-timer-set="sleepTimerSet" :sleep-timer-remaining="sleepTimerRemaining"
+      :is-podcast="isPodcast" @playPause="playPause" @jumpForward="jumpForward" @jumpBackward="jumpBackward"
+      @setVolume="setVolume" @setPlaybackRate="setPlaybackRate" @seek="seek" @close="closePlayer"
+      @showBookmarks="showBookmarks" @showSleepTimer="showSleepTimerModal = true"
+      @showPlayerQueueItems="showPlayerQueueItemsModal = true" />
     <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime"
       :library-item-id="libraryItemId" @select="selectBookmark" />
-
     <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-time="sleepTimerTime"
       :remaining="sleepTimerRemaining" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer"
       @decrement="decrementSleepTimer" />
-
     <modals-player-queue-items-modal v-model="showPlayerQueueItemsModal" :library-item-id="libraryItemId" />
   </div>
 </template>
-
 <script>
 import PlayerHandler from '@/players/PlayerHandler'
-
 export default {
   data() {
     return {
@@ -216,7 +211,6 @@ export default {
         var elapsed = Date.now() - lastTick
         lastTick = Date.now()
         this.sleepTimerRemaining -= elapsed / 1000
-
         if (this.sleepTimerRemaining <= 0) {
           this.clearSleepTimer()
           this.playerHandler.pause()
@@ -343,7 +337,6 @@ export default {
         console.error('setMediaSession: No library item set')
         return
       }
-
       if ('mediaSession' in navigator) {
         var coverImageSrc = this.$store.getters['globals/getLibraryItemCoverSrc'](this.streamLibraryItem, '/Logo.png', true)
         const artwork = [
@@ -351,7 +344,6 @@ export default {
             src: coverImageSrc
           }
         ]
-
         navigator.mediaSession.metadata = new MediaMetadata({
           title: this.title,
           artist: this.playerHandler.displayAuthor || this.mediaMetadata.authorName || 'Unknown',
@@ -359,7 +351,6 @@ export default {
           artwork
         })
         console.log('Set media session metadata', navigator.mediaSession.metadata)
-
         navigator.mediaSession.setActionHandler('play', this.mediaSessionPlay)
         navigator.mediaSession.setActionHandler('pause', this.mediaSessionPause)
         navigator.mediaSession.setActionHandler('stop', this.mediaSessionStop)
@@ -432,7 +423,6 @@ export default {
     async playLibraryItem(payload) {
       const libraryItemId = payload.libraryItemId
       const episodeId = payload.episodeId || null
-
       if (this.playerHandler.libraryItemId == libraryItemId && this.playerHandler.episodeId == episodeId) {
         if (payload.startTime !== null && !isNaN(payload.startTime)) {
           this.seek(payload.startTime)
@@ -441,13 +431,11 @@ export default {
         }
         return
       }
-
       const libraryItem = await this.$axios.$get(`/api/items/${libraryItemId}?expanded=1`).catch((error) => {
         console.error('Failed to fetch full item', error)
         return null
       })
       if (!libraryItem) return
-
       this.$store.commit('setMediaPlaying', {
         libraryItem,
         episodeId,
@@ -456,7 +444,6 @@ export default {
       this.$nextTick(() => {
         if (this.$refs.audioPlayer) this.$refs.audioPlayer.checkUpdateChapterTrack()
       })
-
       this.playerHandler.load(libraryItem, episodeId, true, this.currentPlaybackRate, payload.startTime)
     },
     pauseItem() {
@@ -490,7 +477,6 @@ export default {
   }
 }
 </script>
-
 <style>
 #mediaPlayerContainer {
   box-shadow: 0px -6px 8px #1111113f;
