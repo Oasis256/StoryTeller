@@ -9,10 +9,12 @@
     <div class="flex items-start mb-6 lg:mb-0"
       :class="playerHandler.isVideo ? 'ml-4 pl-96' : isSquareCover ? 'pl-18 sm:pl-24' : 'pl-12 sm:pl-16'">
       <div class="min-w-0">
-        <nuxt-link :to="`/item/${streamLibraryItem.id}`"
-          class="hover:underline cursor-pointer text-sm sm:text-lg block truncate">
-          {{ title }}
-        </nuxt-link>
+        <div class="flex items-center">
+          <nuxt-link :to="`/item/${streamLibraryItem.id}`" class="hover:underline cursor-pointer text-sm sm:text-lg block truncate">
+            {{ title }}
+          </nuxt-link>
+          <widgets-explicit-indicator v-if="isExplicit" />
+        </div>
         <div v-if="!playerHandler.isVideo" class="text-gray-400 flex items-center">
           <span class="material-icons text-sm">person</span>
           <div class="flex items-center">
@@ -24,7 +26,6 @@
                   v-if="index < authors.length - 1">,&nbsp;</span></nuxt-link>
             </div>
             <div v-else class="text-xs sm:text-base cursor-pointer pl-1 sm:pl-1.5">{{ $strings.LabelUnknown }}</div>
-            <widgets-explicit-indicator :explicit="isExplicit"></widgets-explicit-indicator>
           </div>
         </div>
         <div class="text-gray-400 flex items-center">
@@ -73,13 +74,11 @@ export default {
       sleepTimer: null,
       displayTitle: null,
       currentPlaybackRate: 1,
-      syncFailedToast: null
+      syncFailedToast: null,
+      coverAspectRatio: 1
     }
   },
   computed: {
-    coverAspectRatio() {
-      return this.$store.getters['libraries/getBookCoverAspectRatio']
-    },
     isSquareCover() {
       return this.coverAspectRatio === 1
     },
@@ -129,7 +128,7 @@ export default {
       return this.streamLibraryItem?.mediaType === 'music'
     },
     isExplicit() {
-      return this.mediaMetadata.explicit || false
+      return !!this.mediaMetadata.explicit
     },
     mediaMetadata() {
       return this.media.metadata || {}
@@ -441,6 +440,8 @@ export default {
         episodeId,
         queueItems: payload.queueItems || []
       })
+      // Set cover aspect ratio for this item's library since the library may change
+      this.coverAspectRatio = this.$store.getters['libraries/getBookCoverAspectRatio']
       this.$nextTick(() => {
         if (this.$refs.audioPlayer) this.$refs.audioPlayer.checkUpdateChapterTrack()
       })

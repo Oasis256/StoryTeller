@@ -27,7 +27,7 @@
               <h1 class="text-2xl md:text-3xl font-semibold">
                 <div class="flex items-center">
                   {{ title }}
-                  <widgets-explicit-indicator :explicit="isExplicit" />
+                  <widgets-explicit-indicator v-if="isExplicit" />
                   <widgets-abridged-indicator v-if="isAbridged" />
                 </div>
               </h1>
@@ -130,7 +130,7 @@
           <div class="my-4 w-full">
             <p ref="description" id="item-description" dir="auto" class="text-base text-gray-100 whitespace-pre-line mb-1" :class="{ 'show-full': showFullDescription }">{{ description }}</p>
             <button v-if="isDescriptionClamped" class="py-0.5 flex items-center text-slate-300 hover:text-white" @click="showFullDescription = !showFullDescription">
-              {{ showFullDescription ? 'Read less' : 'Read more' }} <span class="material-icons text-xl pl-1">{{ showFullDescription ? 'expand_less' : 'expand_more' }}</span>
+              {{ showFullDescription ? $strings.ButtonReadLess : $strings.ButtonReadMore }} <span class="material-icons text-xl pl-1">{{ showFullDescription ? 'expand_less' : 'expand_more' }}</span>
             </button>
           </div>
 
