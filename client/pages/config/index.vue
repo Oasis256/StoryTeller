@@ -7,8 +7,7 @@
             <h2 class="font-semibold">{{ $strings.HeaderSettingsGeneral }}</h2>
           </div>
           <div class="flex items-end py-2">
-            <ui-toggle-switch labeledBy="settings-store-cover-with-items" v-model="newServerSettings.storeCoverWithItem"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('storeCoverWithItem', val)" />
+            <ui-toggle-switch labeledBy="settings-store-cover-with-items" v-model="newServerSettings.storeCoverWithItem" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('storeCoverWithItem', val)" />
             <ui-tooltip :text="$strings.LabelSettingsStoreCoversWithItemHelp">
               <p class="pl-4">
                 <span id="settings-store-cover-with-items">{{ $strings.LabelSettingsStoreCoversWithItem }}</span>
@@ -16,11 +15,8 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-store-metadata-with-items"
-              v-model="newServerSettings.storeMetadataWithItem" :disabled="updatingServerSettings"
-              @input="(val) => updateSettingsKey('storeMetadataWithItem', val)" />
+            <ui-toggle-switch labeledBy="settings-store-metadata-with-items" v-model="newServerSettings.storeMetadataWithItem" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('storeMetadataWithItem', val)" />
             <ui-tooltip :text="$strings.LabelSettingsStoreMetadataWithItemHelp">
               <p class="pl-4">
                 <span id="settings-store-metadata-with-items">{{ $strings.LabelSettingsStoreMetadataWithItem }}</span>
@@ -28,10 +24,8 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-sorting-ignore-prefixes" v-model="newServerSettings.sortingIgnorePrefix"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('sortingIgnorePrefix', val)" />
+            <ui-toggle-switch labeledBy="settings-sorting-ignore-prefixes" v-model="newServerSettings.sortingIgnorePrefix" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('sortingIgnorePrefix', val)" />
             <ui-tooltip :text="$strings.LabelSettingsSortingIgnorePrefixesHelp">
               <p class="pl-4">
                 <span id="settings-sorting-ignore-prefixes">{{ $strings.LabelSettingsSortingIgnorePrefixes }}</span>
@@ -40,27 +34,20 @@
             </ui-tooltip>
           </div>
           <div v-if="newServerSettings.sortingIgnorePrefix" class="w-72 ml-14 mb-2">
-            <ui-multi-select v-model="newServerSettings.sortingPrefixes" small :items="newServerSettings.sortingPrefixes"
-              :label="$strings.LabelPrefixesToIgnore" @input="sortingPrefixesUpdated" :disabled="savingPrefixes" />
+            <ui-multi-select v-model="newServerSettings.sortingPrefixes" small :items="newServerSettings.sortingPrefixes" :label="$strings.LabelPrefixesToIgnore" @input="sortingPrefixesUpdated" :disabled="savingPrefixes" />
             <div class="flex justify-end py-1">
-              <ui-btn v-if="hasPrefixesChanged" color="success" :loading="savingPrefixes" small
-                @click="updateSortingPrefixes">Save</ui-btn>
+              <ui-btn v-if="hasPrefixesChanged" color="success" :loading="savingPrefixes" small @click="updateSortingPrefixes">Save</ui-btn>
             </div>
           </div>
-
           <div class="flex items-center py-2 mb-2">
-            <ui-toggle-switch labeledBy="settings-chromecast-support" v-model="newServerSettings.chromecastEnabled"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('chromecastEnabled', val)" />
+            <ui-toggle-switch labeledBy="settings-chromecast-support" v-model="newServerSettings.chromecastEnabled" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('chromecastEnabled', val)" />
             <p class="pl-4" id="settings-chromecast-support">{{ $strings.LabelSettingsChromecastSupport }}</p>
           </div>
-
           <div class="pt-4">
             <h2 class="font-semibold">{{ $strings.HeaderSettingsScanner }}</h2>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-parse-subtitles" v-model="newServerSettings.scannerParseSubtitle"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerParseSubtitle', val)" />
+            <ui-toggle-switch labeledBy="settings-parse-subtitles" v-model="newServerSettings.scannerParseSubtitle" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerParseSubtitle', val)" />
             <ui-tooltip :text="$strings.LabelSettingsParseSubtitlesHelp">
               <p class="pl-4">
                 <span id="settings-parse-subtitles">{{ $strings.LabelSettingsParseSubtitles }}</span>
@@ -68,10 +55,8 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-find-covers" v-model="newServerSettings.scannerFindCovers"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerFindCovers', val)" />
+            <ui-toggle-switch labeledBy="settings-find-covers" v-model="newServerSettings.scannerFindCovers" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerFindCovers', val)" />
             <ui-tooltip :text="$strings.LabelSettingsFindCoversHelp">
               <p class="pl-4">
                 <span id="settings-find-covers">{{ $strings.LabelSettingsFindCovers }}</span>
@@ -81,14 +66,10 @@
             <div class="flex-grow" />
           </div>
           <div v-if="newServerSettings.scannerFindCovers" class="w-44 ml-14 mb-2">
-            <ui-dropdown v-model="newServerSettings.scannerCoverProvider" small :items="providers" label="Cover Provider"
-              @input="updateScannerCoverProvider" :disabled="updatingServerSettings" />
+            <ui-dropdown v-model="newServerSettings.scannerCoverProvider" small :items="providers" label="Cover Provider" @input="updateScannerCoverProvider" :disabled="updatingServerSettings" />
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-prefer-matched-metadata"
-              v-model="newServerSettings.scannerPreferMatchedMetadata" :disabled="updatingServerSettings"
-              @input="(val) => updateSettingsKey('scannerPreferMatchedMetadata', val)" />
+            <ui-toggle-switch labeledBy="settings-prefer-matched-metadata" v-model="newServerSettings.scannerPreferMatchedMetadata" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerPreferMatchedMetadata', val)" />
             <ui-tooltip :text="$strings.LabelSettingsPreferMatchedMetadataHelp">
               <p class="pl-4">
                 <span id="settings-prefer-matched-metadata">{{ $strings.LabelSettingsPreferMatchedMetadata }}</span>
@@ -96,10 +77,8 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-disable-watcher" v-model="scannerEnableWatcher"
-              :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerDisableWatcher', !val)" />
+            <ui-toggle-switch labeledBy="settings-disable-watcher" v-model="scannerEnableWatcher" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('scannerDisableWatcher', !val)" />
             <ui-tooltip :text="$strings.LabelSettingsEnableWatcherHelp">
               <p class="pl-4">
                 <span id="settings-disable-watcher">{{ $strings.LabelSettingsEnableWatcher }}</span>
@@ -108,15 +87,12 @@
             </ui-tooltip>
           </div>
         </div>
-
         <div class="flex-1">
           <div class="pt-4">
             <h2 class="font-semibold">{{ $strings.HeaderSettingsDisplay }}</h2>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-home-page-uses-bookshelf" v-model="homepageUseBookshelfView"
-              :disabled="updatingServerSettings" @input="updateHomeUseBookshelfView" />
+            <ui-toggle-switch labeledBy="settings-home-page-uses-bookshelf" v-model="homepageUseBookshelfView" :disabled="updatingServerSettings" @input="updateHomeUseBookshelfView" />
             <ui-tooltip :text="$strings.LabelSettingsBookshelfViewHelp">
               <p class="pl-4">
                 <span id="settings-home-page-uses-bookshelf">{{ $strings.LabelSettingsHomePageBookshelfView }}</span>
@@ -124,10 +100,8 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex items-center py-2">
-            <ui-toggle-switch labeledBy="settings-library-uses-bookshelf" v-model="useBookshelfView"
-              :disabled="updatingServerSettings" @input="updateUseBookshelfView" />
+            <ui-toggle-switch labeledBy="settings-library-uses-bookshelf" v-model="useBookshelfView" :disabled="updatingServerSettings" @input="updateUseBookshelfView" />
             <ui-tooltip :text="$strings.LabelSettingsBookshelfViewHelp">
               <p class="pl-4">
                 <span id="settings-library-uses-bookshelf">{{ $strings.LabelSettingsLibraryBookshelfView }}</span>
@@ -135,30 +109,21 @@
               </p>
             </ui-tooltip>
           </div>
-
           <div class="flex-grow py-2">
-            <ui-dropdown :label="$strings.LabelSettingsDateFormat" v-model="newServerSettings.dateFormat"
-              :items="dateFormats" small class="max-w-52" @input="(val) => updateSettingsKey('dateFormat', val)" />
+            <ui-dropdown :label="$strings.LabelSettingsDateFormat" v-model="newServerSettings.dateFormat" :items="dateFormats" small class="max-w-52" @input="(val) => updateSettingsKey('dateFormat', val)" />
             <p class="text-xs ml-1 text-white text-opacity-60">{{ $strings.LabelExample }}: {{ dateExample }}</p>
           </div>
-
           <div class="flex-grow py-2">
-            <ui-dropdown :label="$strings.LabelSettingsTimeFormat" v-model="newServerSettings.timeFormat"
-              :items="timeFormats" small class="max-w-52" @input="(val) => updateSettingsKey('timeFormat', val)" />
+            <ui-dropdown :label="$strings.LabelSettingsTimeFormat" v-model="newServerSettings.timeFormat" :items="timeFormats" small class="max-w-52" @input="(val) => updateSettingsKey('timeFormat', val)" />
             <p class="text-xs ml-1 text-white text-opacity-60">{{ $strings.LabelExample }}: {{ timeExample }}</p>
           </div>
-
           <div class="py-2">
-            <ui-dropdown :label="$strings.LabelLanguageDefaultServer" ref="langDropdown"
-              v-model="newServerSettings.language" :items="$languageCodeOptions" small class="max-w-52"
-              @input="updateServerLanguage" />
+            <ui-dropdown :label="$strings.LabelLanguageDefaultServer" ref="langDropdown" v-model="newServerSettings.language" :items="$languageCodeOptions" small class="max-w-52" @input="updateServerLanguage" />
           </div>
-
           <!-- old experimental features -->
           <!-- <div class="pt-4">
             <h2 class="font-semibold">{{ $strings.HeaderSettingsExperimental }}</h2>
           </div>
-
           <div class="flex items-center py-2">
             <ui-toggle-switch labeledBy="settings-experimental-features" v-model="showExperimentalFeatures" />
             <ui-tooltip :text="$strings.LabelSettingsExperimentalFeaturesHelp">
@@ -173,28 +138,23 @@
         </div>
       </div>
     </app-settings-content>
-
     <div class="h-0.5 bg-primary bg-opacity-30 w-full" />
-
     <div class="flex items-center py-4">
       <div class="flex-grow" />
-      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache"
-        @click.stop="purgeCache">{{ $strings.ButtonPurgeAllCache }}</ui-btn>
-      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache"
-        @click.stop="purgeItemsCache">{{ $strings.ButtonPurgeItemsCache }}</ui-btn>
+      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeCache">{{ $strings.ButtonPurgeAllCache }}</ui-btn>
+      <ui-btn color="bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeItemsCache">{{ $strings.ButtonPurgeItemsCache }}</ui-btn>
     </div>
-
     <div class="flex items-center py-4">
       <div class="flex-grow" />
       <p class="pr-2 text-sm text-yellow-400">
         {{ $strings.MessageReportBugsAndContribute }}
         <!-- <a class="underline" href="https://github.com/Oasis256/StoryTeller" target="_blank">github</a> -->
       </p>
-      <a href="https://github.com/Oasis256/StoryTeller" target="_blank"
-        class="text-white hover:text-gray-200 hover:scale-150 hover:rotate-6 transform duration-500">
+      <a href="https://github.com/Oasis256/StoryTeller" target="_blank" class="text-white hover:text-gray-200 hover:scale-150 hover:rotate-6 transform duration-500">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="24" height="24" viewBox="0 0 24 24">
           <path
-            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+          />
         </svg>
       </a>
       <!-- <p class="pl-4 pr-2 text-sm text-yellow-400">
@@ -217,26 +177,21 @@
         </svg>
       </a> -->
     </div>
-
     <div class="h-0.5 bg-primary bg-opacity-30 w-full" />
-
+    <!-- confirm cache purge dialog -->
     <prompt-dialog v-model="showConfirmPurgeCache" :width="675">
       <div class="px-4 w-full text-sm py-6 rounded-lg bg-bg shadow-lg border border-black-300">
-        <p class="text-error font-semibold">Important Notice!</p>
-        <p class="my-2 text-center">Purge cache will delete the entire directory at <span
-            class="font-mono">/metadata/cache</span>.</p>
-
-        <p class="text-center mb-8">Are you sure you want to remove the cache directory?</p>
+        <p class="text-error font-semibold">{{ $strings.MessageImportantNotice }}</p>
+        <p class="my-8 text-center" v-html="$strings.MessageConfirmPurgeCache" />
         <div class="flex px-1 items-center">
-          <ui-btn color="primary" @click="showConfirmPurgeCache = false">Nevermind</ui-btn>
+          <ui-btn color="primary" @click="showConfirmPurgeCache = false">{{ $strings.ButtonNevermind }}</ui-btn>
           <div class="flex-grow" />
-          <ui-btn color="success" @click="confirmPurge">Yes, Purge!</ui-btn>
+          <ui-btn color="success" @click="confirmPurge">{{ $strings.ButtonYes }}</ui-btn>
         </div>
       </div>
     </prompt-dialog>
   </div>
 </template>
-
 <script>
 export default {
   asyncData({ store, redirect }) {
@@ -297,15 +252,14 @@ export default {
     updateSortingPrefixes() {
       const prefixes = [...new Set(this.newServerSettings.sortingPrefixes.map((prefix) => prefix.trim().toLowerCase()) || [])]
       if (!prefixes.length) {
-        this.$toast.error('Must have at least 1 prefix')
+        this.$toast.error(this.$strings.ToastSortingPrefixesEmptyError)
         return
       }
-
       this.savingPrefixes = true
       this.$axios
         .$patch(`/api/sorting-prefixes`, { sortingPrefixes: prefixes })
         .then((data) => {
-          this.$toast.success(`Sorting prefixes updated. ${data.rowsUpdated} rows`)
+          this.$toast.success(this.$getString('ToastSortingPrefixesUpdateSuccess', [data.rowsUpdated]))
           if (data.serverSettings) {
             this.$store.commit('setServerSettings', data.serverSettings)
           }
@@ -313,7 +267,7 @@ export default {
         })
         .catch((error) => {
           console.error('Failed to update prefixes', error)
-          this.$toast.error('Failed to update sorting prefixes')
+          this.$toast.error(this.$strings.ToastSortingPrefixesUpdateFailed)
         })
         .finally(() => {
           this.savingPrefixes = false
@@ -351,8 +305,7 @@ export default {
         .dispatch('updateServerSettings', payload)
         .then(() => {
           this.updatingServerSettings = false
-          this.$toast.success('Server settings updated')
-
+          this.$toast.success(this.$strings.ToastServerSettingsUpdateSuccess)
           if (payload.language) {
             // Updating language after save allows for re-rendering
             this.$setLanguageCode(payload.language)
@@ -361,14 +314,13 @@ export default {
         .catch((error) => {
           console.error('Failed to update server settings', error)
           this.updatingServerSettings = false
-          this.$toast.error('Failed to update server settings')
+          this.$toast.error(this.$strings.ToastServerSettingsUpdateFailed)
         })
     },
     initServerSettings() {
       this.newServerSettings = this.serverSettings ? { ...this.serverSettings } : {}
       this.newServerSettings.sortingPrefixes = [...(this.newServerSettings.sortingPrefixes || [])]
       this.scannerEnableWatcher = !this.newServerSettings.scannerDisableWatcher
-
       this.homepageUseBookshelfView = this.newServerSettings.homeBookshelfView != this.$constants.BookshelfView.DETAIL
       this.useBookshelfView = this.newServerSettings.bookshelfView != this.$constants.BookshelfView.DETAIL
     },
@@ -381,11 +333,11 @@ export default {
       await this.$axios
         .$post('/api/cache/purge')
         .then(() => {
-          this.$toast.success('Cache Purged!')
+          this.$toast.success(this.$strings.ToastCachePurgeSuccess)
         })
         .catch((error) => {
           console.error('Failed to purge cache', error)
-          this.$toast.error('Failed to purge cache')
+          this.$toast.error(this.$strings.ToastCachePurgeFailed)
         })
       this.isPurgingCache = false
     },
@@ -406,11 +358,11 @@ export default {
       await this.$axios
         .$post('/api/cache/items/purge')
         .then(() => {
-          this.$toast.success('Items Cache Purged!')
+          this.$toast.success(this.$strings.ToastCachePurgeSuccess)
         })
         .catch((error) => {
           console.error('Failed to purge items cache', error)
-          this.$toast.error('Failed to purge items cache')
+          this.$toast.error(this.$strings.ToastCachePurgeFailed)
         })
       this.isPurgingCache = false
     }
