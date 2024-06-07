@@ -1,32 +1,25 @@
 <template>
-  <div v-if="streamLibraryItem" id="mediaPlayerContainer"
-    class="w-full fixed bottom-0 left-0 right-0 h-48 lg:h-40 z-50 bg-primary px-2 lg:px-4 pb-1 lg:pb-4 pt-2">
+  <div v-if="streamLibraryItem" id="mediaPlayerContainer" class="w-full fixed bottom-0 left-0 right-0 h-48 lg:h-40 z-50 bg-primary px-2 lg:px-4 pb-1 lg:pb-4 pt-2">
     <div id="videoDock" />
     <div class="absolute left-2 top-2 lg:left-4 cursor-pointer">
-      <covers-book-cover expand-on-click :library-item="streamLibraryItem" :width="bookCoverWidth"
-        :book-cover-aspect-ratio="coverAspectRatio" />
+      <covers-book-cover expand-on-click :library-item="streamLibraryItem" :width="bookCoverWidth" :book-cover-aspect-ratio="coverAspectRatio" />
     </div>
-    <div class="flex items-start mb-6 lg:mb-0"
-      :class="playerHandler.isVideo ? 'ml-4 pl-96' : isSquareCover ? 'pl-18 sm:pl-24' : 'pl-12 sm:pl-16'">
-      <div class="min-w-0">
+    <div class="flex items-start mb-6 lg:mb-0" :class="playerHandler.isVideo ? 'ml-4 pl-96' : isSquareCover ? 'pl-18 sm:pl-24' : 'pl-12 sm:pl-16'">
+      <div class="min-w-0 w-full">
         <div class="flex items-center">
           <nuxt-link :to="`/item/${streamLibraryItem.id}`" class="hover:underline cursor-pointer text-sm sm:text-lg block truncate">
             {{ title }}
           </nuxt-link>
           <widgets-explicit-indicator v-if="isExplicit" />
         </div>
-        <div v-if="!playerHandler.isVideo" class="text-gray-400 flex items-center">
+        <div v-if="!playerHandler.isVideo" class="text-gray-400 flex items-center w-1/2 sm:w-4/5 lg:w-2/5">
           <span class="material-icons text-sm">person</span>
-          <div class="flex items-center">
-            <div v-if="podcastAuthor" class="pl-1 sm:pl-1.5 text-xs sm:text-base">{{ podcastAuthor }}</div>
-            <div v-else-if="musicArtists" class="pl-1 sm:pl-1.5 text-xs sm:text-base">{{ musicArtists }}</div>
-            <div v-else-if="authors.length" class="pl-1 sm:pl-1.5 text-xs sm:text-base">
-              <nuxt-link v-for="(author, index) in authors" :key="index" :to="`/author/${author.id}`"
-                class="hover:underline">{{ author.name }}<span
-                  v-if="index < authors.length - 1">,&nbsp;</span></nuxt-link>
-            </div>
-            <div v-else class="text-xs sm:text-base cursor-pointer pl-1 sm:pl-1.5">{{ $strings.LabelUnknown }}</div>
+          <div v-if="podcastAuthor" class="pl-1 sm:pl-1.5 text-xs sm:text-base">{{ podcastAuthor }}</div>
+          <div v-else-if="musicArtists" class="pl-1 sm:pl-1.5 text-xs sm:text-base">{{ musicArtists }}</div>
+          <div v-else-if="authors.length" class="pl-1 sm:pl-1.5 text-xs sm:text-base truncate">
+            <nuxt-link v-for="(author, index) in authors" :key="index" :to="`/author/${author.id}`" class="hover:underline">{{ author.name }}<span v-if="index < authors.length - 1">,&nbsp;</span></nuxt-link>
           </div>
+          <div v-else class="text-xs sm:text-base cursor-pointer pl-1 sm:pl-1.5">{{ $strings.LabelUnknown }}</div>
         </div>
         <div class="text-gray-400 flex items-center">
           <span class="material-icons text-xs">schedule</span>
@@ -35,22 +28,31 @@
       </div>
       <div class="flex-grow" />
       <ui-tooltip direction="top" :text="$strings.LabelClosePlayer">
-        <button :aria-label="$strings.LabelClosePlayer"
-          class="material-icons sm:px-2 py-1 lg:p-4 cursor-pointer text-xl sm:text-2xl"
-          @click="closePlayer">close</button>
+        <button :aria-label="$strings.LabelClosePlayer" class="material-icons sm:px-2 py-1 lg:p-4 cursor-pointer text-xl sm:text-2xl" @click="closePlayer">close</button>
       </ui-tooltip>
     </div>
-    <player-ui ref="audioPlayer" :chapters="chapters" :paused="!isPlaying" :loading="playerLoading"
-      :bookmarks="bookmarks" :sleep-timer-set="sleepTimerSet" :sleep-timer-remaining="sleepTimerRemaining"
-      :is-podcast="isPodcast" @playPause="playPause" @jumpForward="jumpForward" @jumpBackward="jumpBackward"
-      @setVolume="setVolume" @setPlaybackRate="setPlaybackRate" @seek="seek" @close="closePlayer"
-      @showBookmarks="showBookmarks" @showSleepTimer="showSleepTimerModal = true"
-      @showPlayerQueueItems="showPlayerQueueItemsModal = true" />
-    <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime"
-      :library-item-id="libraryItemId" @select="selectBookmark" />
-    <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-time="sleepTimerTime"
-      :remaining="sleepTimerRemaining" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer"
-      @decrement="decrementSleepTimer" />
+    <player-ui
+      ref="audioPlayer"
+      :chapters="chapters"
+      :paused="!isPlaying"
+      :loading="playerLoading"
+      :bookmarks="bookmarks"
+      :sleep-timer-set="sleepTimerSet"
+      :sleep-timer-remaining="sleepTimerRemaining"
+      :is-podcast="isPodcast"
+      @playPause="playPause"
+      @jumpForward="jumpForward"
+      @jumpBackward="jumpBackward"
+      @setVolume="setVolume"
+      @setPlaybackRate="setPlaybackRate"
+      @seek="seek"
+      @close="closePlayer"
+      @showBookmarks="showBookmarks"
+      @showSleepTimer="showSleepTimerModal = true"
+      @showPlayerQueueItems="showPlayerQueueItemsModal = true"
+    />
+    <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime" :library-item-id="libraryItemId" @select="selectBookmark" />
+    <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-time="sleepTimerTime" :remaining="sleepTimerRemaining" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer" @decrement="decrementSleepTimer" />
     <modals-player-queue-items-modal v-model="showPlayerQueueItemsModal" :library-item-id="libraryItemId" />
   </div>
 </template>
