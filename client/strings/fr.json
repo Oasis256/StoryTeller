@@ -309,6 +309,7 @@
   "LabelFolder": "Dossier",
   "LabelFolders": "Dossiers",
   "LabelFontBold": "Gras",
+  "LabelFontBoldness": "Font Boldness",
   "LabelFontFamily": "Polices de caractères",
   "LabelFontItalic": "Italique",
   "LabelFontScale": "Taille de la police de caractère",

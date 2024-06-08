@@ -309,6 +309,7 @@
   "LabelFolder": "Folder",
   "LabelFolders": "Folders",
   "LabelFontBold": "Bold",
+  "LabelFontBoldness": "Font Boldness",
   "LabelFontFamily": "Font family",
   "LabelFontItalic": "Italic",
   "LabelFontScale": "Font scale",
