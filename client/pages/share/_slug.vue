@@ -1,9 +1,10 @@
 <template>
-  <div id="page-wrapper" class="w-full h-screen max-h-screen overflow-hidden">
-    <div class="w-full h-full flex items-center justify-center">
+  <div class="w-full h-screen max-h-screen overflow-hidden" :style="{ backgroundColor: coverRgb }">
+    <div class="w-screen h-screen absolute inset-0 pointer-events-none" style="background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(38, 38, 38, 1) 80%)"></div>
+    <div class="absolute inset-0 w-screen h-screen flex items-center justify-center z-10">
       <div class="w-full p-2 sm:p-4 md:p-8">
         <div v-if="!isMobileLandscape" :style="{ width: coverWidth + 'px', height: coverHeight + 'px' }" class="mx-auto overflow-hidden rounded-xl my-2">
-          <img :src="coverUrl" class="object-contain w-full h-full" />
+          <img ref="coverImg" :src="coverUrl" class="object-contain w-full h-full" @load="coverImageLoaded" />
         </div>
         <p class="text-2xl lg:text-3xl font-semibold text-center mb-1 line-clamp-2">{{ mediaItemShare.playbackSession.displayTitle || 'No title' }}</p>
         <p v-if="mediaItemShare.playbackSession.displayAuthor" class="text-lg lg:text-xl text-slate-400 font-semibold text-center mb-1 truncate">{{ mediaItemShare.playbackSession.displayAuthor }}</p>
@@ -18,16 +19,21 @@
 
 <script>
 import LocalAudioPlayer from '../../players/LocalAudioPlayer'
+import { FastAverageColor } from 'fast-average-color'
 
 export default {
   layout: 'blank',
-  async asyncData({ params, error, app }) {
-    const mediaItemShare = await app.$axios.$get(`/public/share/${params.slug}`).catch((error) => {
+  async asyncData({ params, error, app, query }) {
+    let endpoint = `/public/share/${params.slug}`
+    if (query.t && !isNaN(query.t)) {
+      endpoint += `?t=${query.t}`
+    }
+    const mediaItemShare = await app.$axios.$get(endpoint, { timeout: 10000 }).catch((error) => {
       console.error('Failed', error)
       return null
     })
     if (!mediaItemShare) {
-      return error({ statusCode: 404, message: 'Not found' })
+      return error({ statusCode: 404, message: 'Media item not found or expired' })
     }
 
     return {
@@ -43,7 +49,9 @@ export default {
       totalDuration: 0,
       windowWidth: 0,
       windowHeight: 0,
-      listeningTimeSinceSync: 0
+      listeningTimeSinceSync: 0,
+      coverRgb: null,
+      coverBgIsLight: false
     }
   },
   computed: {
@@ -97,6 +105,19 @@ export default {
     }
   },
   methods: {
+    async coverImageLoaded(e) {
+      if (!this.playbackSession.coverPath) return
+      const fac = new FastAverageColor()
+      fac
+        .getColorAsync(e.target)
+        .then((color) => {
+          this.coverRgb = color.rgba
+          this.coverBgIsLight = color.isLight
+        })
+        .catch((e) => {
+          console.log(e)
+        })
+    },
     playPause() {
       if (!this.localAudioPlayer || !this.hasLoaded) return
       this.localAudioPlayer.playPause()
@@ -216,6 +237,13 @@ export default {
     resize() {
       this.windowWidth = window.innerWidth
       this.windowHeight = window.innerHeight
+    },
+    playerError(error) {
+      console.error('Player error', error)
+      this.$toast.error('Failed to play audio on device')
+    },
+    playerFinished() {
+      console.log('Player finished')
     }
   },
   mounted() {
@@ -231,12 +259,17 @@ export default {
     this.localAudioPlayer.set(null, this.audioTracks, false, startTime, false)
     this.localAudioPlayer.on('stateChange', this.playerStateChange.bind(this))
     this.localAudioPlayer.on('timeupdate', this.playerTimeUpdate.bind(this))
+    this.localAudioPlayer.on('error', this.playerError.bind(this))
+    this.localAudioPlayer.on('finished', this.playerFinished.bind(this))
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resize)
     window.removeEventListener('keydown', this.keyDown)
 
-    this.localAudioPlayer.off('stateChange', this.playerStateChange)
+    this.localAudioPlayer.off('stateChange', this.playerStateChange.bind(this))
+    this.localAudioPlayer.off('timeupdate', this.playerTimeUpdate.bind(this))
+    this.localAudioPlayer.off('error', this.playerError.bind(this))
+    this.localAudioPlayer.off('finished', this.playerFinished.bind(this))
     this.localAudioPlayer.destroy()
   }
 }
