@@ -21,14 +21,9 @@ class BackupManager {
   get backupPath() {
     return global.ServerSettings.backupPath
   }
-<<<<<<< HEAD
-=======
-
   get backupPathEnvSet() {
     return !!process.env.BACKUP_PATH
   }
-
->>>>>>> 93114b2181d1ee5f0026fcf04c0a2946e3e96641
   get backupSchedule() {
     return global.ServerSettings.backupSchedule
   }

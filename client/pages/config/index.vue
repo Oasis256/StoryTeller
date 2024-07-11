@@ -11,7 +11,7 @@
             <ui-tooltip :text="$strings.LabelSettingsStoreCoversWithItemHelp">
               <p class="pl-4">
                 <span id="settings-store-cover-with-items">{{ $strings.LabelSettingsStoreCoversWithItem }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -20,7 +20,7 @@
             <ui-tooltip :text="$strings.LabelSettingsStoreMetadataWithItemHelp">
               <p class="pl-4">
                 <span id="settings-store-metadata-with-items">{{ $strings.LabelSettingsStoreMetadataWithItem }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -29,7 +29,7 @@
             <ui-tooltip :text="$strings.LabelSettingsSortingIgnorePrefixesHelp">
               <p class="pl-4">
                 <span id="settings-sorting-ignore-prefixes">{{ $strings.LabelSettingsSortingIgnorePrefixes }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -51,7 +51,7 @@
             <ui-tooltip :text="$strings.LabelSettingsParseSubtitlesHelp">
               <p class="pl-4">
                 <span id="settings-parse-subtitles">{{ $strings.LabelSettingsParseSubtitles }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -60,7 +60,7 @@
             <ui-tooltip :text="$strings.LabelSettingsFindCoversHelp">
               <p class="pl-4">
                 <span id="settings-find-covers">{{ $strings.LabelSettingsFindCovers }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
             <div class="flex-grow" />
@@ -73,7 +73,7 @@
             <ui-tooltip :text="$strings.LabelSettingsPreferMatchedMetadataHelp">
               <p class="pl-4">
                 <span id="settings-prefer-matched-metadata">{{ $strings.LabelSettingsPreferMatchedMetadata }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -82,7 +82,7 @@
             <ui-tooltip :text="$strings.LabelSettingsEnableWatcherHelp">
               <p class="pl-4">
                 <span id="settings-disable-watcher">{{ $strings.LabelSettingsEnableWatcher }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -96,7 +96,7 @@
             <ui-tooltip :text="$strings.LabelSettingsBookshelfViewHelp">
               <p class="pl-4">
                 <span id="settings-home-page-uses-bookshelf">{{ $strings.LabelSettingsHomePageBookshelfView }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -105,7 +105,7 @@
             <ui-tooltip :text="$strings.LabelSettingsBookshelfViewHelp">
               <p class="pl-4">
                 <span id="settings-library-uses-bookshelf">{{ $strings.LabelSettingsLibraryBookshelfView }}</span>
-                <span class="material-icons icon-text">info_outlined</span>
+                <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
           </div>
@@ -129,8 +129,8 @@
             <ui-tooltip :text="$strings.LabelSettingsExperimentalFeaturesHelp">
               <p class="pl-4">
                 <span id="settings-experimental-features">{{ $strings.LabelSettingsExperimentalFeatures }}</span>
-                <a :aria-label="$strings.LabelSettingsExperimentalFeaturesHelp" href="https://github.com/Oasis256/StoryTeller/discussions/75" target="_blank">
-                  <span class="material-icons icon-text">info_outlined</span>
+                <a :aria-label="$strings.LabelSettingsExperimentalFeaturesHelp" href="https://github.com/advplyr/audiobookshelf/discussions/75" target="_blank">
+                  <span class="material-symbols icon-text">info</span>
                 </a>
               </p>
             </ui-tooltip>

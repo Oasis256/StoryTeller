@@ -8,25 +8,19 @@
       <p class="text-sm text-gray-300 pr-2">{{ $strings.LabelMetadataOrderOfPrecedenceDescription }}</p>
       <ui-tooltip :text="$strings.LabelClickForMoreInfo" class="inline-flex">
         <a href="https://www.audiobookshelf.org/guides/book-scanner" target="_blank" class="inline-flex">
-          <span class="material-icons text-xl w-5">help_outline</span>
+          <span class="material-symbols text-xl w-5">help_outline</span>
         </a>
       </ui-tooltip>
     </div>
-    <draggable v-model="metadataSourceMapped" v-bind="dragOptions" class="list-group" draggable=".item"
-      handle=".drag-handle" tag="ul" @start="drag = true" @end="drag = false" @update="draggableUpdate">
+    <draggable v-model="metadataSourceMapped" v-bind="dragOptions" class="list-group" draggable=".item" handle=".drag-handle" tag="ul" @start="drag = true" @end="drag = false" @update="draggableUpdate">
       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-        <li v-for="(source, index) in metadataSourceMapped" :key="source.id"
-          :class="source.include ? 'item' : 'opacity-50'"
-          class="w-full px-2 flex items-center relative border border-white/10">
-          <span class="material-icons drag-handle text-xl text-gray-400 hover:text-gray-50 mr-2 md:mr-4">reorder</span>
+        <li v-for="(source, index) in metadataSourceMapped" :key="source.id" :class="source.include ? 'item' : 'opacity-50'" class="w-full px-2 flex items-center relative border border-white/10">
+          <span class="material-symbols drag-handle text-xl text-gray-400 hover:text-gray-50 mr-2 md:mr-4">reorder</span>
           <div class="text-center py-1 w-8 min-w-8">
             {{ source.include ? getSourceIndex(source.id) : '' }}
           </div>
           <div class="flex-grow inline-flex justify-between px-4 py-3">
-            {{ source.name }} <span
-              v-if="source.include && (index === firstActiveSourceIndex || index === lastActiveSourceIndex)"
-              class="px-2 italic font-semibold text-xs text-gray-400">{{ index === firstActiveSourceIndex ?
-        $strings.LabelHighestPriority : $strings.LabelLowestPriority }}</span>
+            {{ source.name }} <span v-if="source.include && (index === firstActiveSourceIndex || index === lastActiveSourceIndex)" class="px-2 italic font-semibold text-xs text-gray-400">{{ index === firstActiveSourceIndex ? $strings.LabelHighestPriority : $strings.LabelLowestPriority }}</span>
           </div>
           <div class="px-2 opacity-100">
             <ui-toggle-switch v-model="source.include" :off-color="'error'" @input="includeToggled(source)" />

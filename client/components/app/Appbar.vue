@@ -3,27 +3,20 @@
     <div id="appbar" class="absolute top-0 bottom-0 left-0 w-full h-full px-2 md:px-6 py-1 z-60">
       <div class="flex h-full items-center">
         <nuxt-link to="/">
-          <img src="~static/icon.svg" :alt="$strings.ButtonHome"
-            class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
+          <img src="~static/icon.svg" :alt="$strings.ButtonHome" class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
         </nuxt-link>
-
-        <!--         
+        <!--
         <nuxt-link to="/">
           <h1 class="text-xl mr-6 hidden lg:block hover:underline">audiobookshelf</h1>
-        </nuxt-link> 
+        </nuxt-link>
         -->
-
-
         <ui-libraries-dropdown class="mr-2" />
-
         <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
         <h1 class="text-2xl font-book mr-6 hidden lg:block center">
           <nuxt-link to="/">
             <nlp class="above"></nlp>
             <nlp class="text">
-              <non class=" non tales">
-                The
-              </non>
+              <non class="non tales"> The </non>
               <aud>
                 {{ $strings.Title1 }}
               </aud>
@@ -33,93 +26,67 @@
             </nlp>
           </nuxt-link>
         </h1>
-
         <div class="flex-grow" />
-
-        <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom"
-          text="Casting requires a secure connection" class="flex items-center">
-          <span class="material-icons-outlined text-2xl text-warning text-opacity-50"> cast </span>
+        <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom" text="Casting requires a secure connection" class="flex items-center">
+          <span class="material-symbols-outlined text-2xl text-warning text-opacity-50"> cast </span>
         </ui-tooltip>
         <div v-if="isChromecastInitialized" class="w-6 min-w-6 h-6 ml-2 mr-1 sm:mx-2 cursor-pointer">
           <google-cast-launcher></google-cast-launcher>
         </div>
-
         <widgets-notification-widget class="hidden md:block" />
-
-        <nuxt-link v-if="currentLibrary" to="/config/stats"
-          class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
+        <nuxt-link v-if="currentLibrary" to="/config/stats" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderYourStats" direction="bottom" class="flex items-center">
-            <span class="material-icons text-2xl" aria-label="User Stats" role="button">equalizer</span>
+            <span class="material-symbols text-2xl" aria-label="User Stats" role="button">equalizer</span>
           </ui-tooltip>
         </nuxt-link>
-
-        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload"
-          class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.ButtonUpload" direction="bottom" class="flex items-center">
-            <span class="material-icons text-2xl" aria-label="Upload Media" role="button">upload</span>
+            <span class="material-symbols text-2xl" aria-label="Upload Media" role="button">upload</span>
           </ui-tooltip>
         </nuxt-link>
-
-        <nuxt-link v-if="userIsAdminOrUp" to="/config"
-          class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
+        <nuxt-link v-if="userIsAdminOrUp" to="/config" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderSettings" direction="bottom" class="flex items-center">
-            <span class="material-icons text-2xl" aria-label="System Settings" role="button">settings</span>
+            <span class="material-symbols text-2xl" aria-label="System Settings" role="button">settings</span>
           </ui-tooltip>
         </nuxt-link>
-
-        <nuxt-link to="/account"
-          class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40"
-          aria-haspopup="listbox" aria-expanded="true">
+        <nuxt-link to="/account" class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40" aria-haspopup="listbox" aria-expanded="true">
           <span class="items-center hidden md:flex">
             <span class="block truncate">{{ username }}</span>
           </span>
-          <span
-            class="h-full md:ml-3 md:absolute inset-y-0 md:right-0 flex items-center justify-center md:pr-2 pointer-events-none">
-            <span class="material-icons text-xl text-gray-100">person</span>
+          <span class="h-full md:ml-3 md:absolute inset-y-0 md:right-0 flex items-center justify-center md:pr-2 pointer-events-none">
+            <span class="material-symbols text-xl text-gray-100">person</span>
           </span>
         </nuxt-link>
       </div>
       <div v-show="numMediaItemsSelected" class="absolute top-0 left-0 w-full h-full px-4 bg-primary flex items-center">
         <h1 class="text-lg md:text-2xl px-4">{{ $getString('MessageItemsSelected', [numMediaItemsSelected]) }}</h1>
         <div class="flex-grow" />
-        <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small
-          class="flex items-center h-9 mr-2" @click="playSelectedItems">
-          <span class="material-icons text-2xl -ml-2 pr-1 text-white">play_arrow</span>
+        <ui-btn v-if="!isPodcastLibrary && selectedMediaItemsArePlayable" color="success" :padding-x="4" small class="flex items-center h-9 mr-2" @click="playSelectedItems">
+          <span class="material-symbols fill text-2xl -ml-2 pr-1 text-white">play_arrow</span>
           {{ $strings.ButtonPlay }}
         </ui-btn>
-        <ui-tooltip v-if="isBookLibrary"
-          :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished"
-          direction="bottom">
-          <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead"
-            class="mx-1.5" />
+        <ui-tooltip v-if="isBookLibrary" :text="selectedIsFinished ? $strings.MessageMarkAsNotFinished : $strings.MessageMarkAsFinished" direction="bottom">
+          <ui-read-icon-btn :disabled="processingBatch" :is-read="selectedIsFinished" @click="toggleBatchRead" class="mx-1.5" />
         </ui-tooltip>
         <ui-tooltip v-if="userCanUpdate && isBookLibrary" :text="$strings.LabelAddToCollection" direction="bottom">
-          <ui-icon-btn :disabled="processingBatch" icon="collections_bookmark" @click="batchAddToCollectionClick"
-            class="mx-1.5" />
+          <ui-icon-btn :disabled="processingBatch" icon="collections_bookmark" @click="batchAddToCollectionClick" class="mx-1.5" />
         </ui-tooltip>
         <template v-if="userCanUpdate">
           <ui-tooltip :text="$strings.LabelEdit" direction="bottom">
-            <ui-icon-btn :disabled="processingBatch" icon="edit" bg-color="warning" class="mx-1.5"
-              @click="batchEditClick" />
+            <ui-icon-btn :disabled="processingBatch" icon="edit" bg-color="warning" class="mx-1.5" @click="batchEditClick" />
           </ui-tooltip>
         </template>
         <ui-tooltip v-if="userCanDelete" :text="$strings.ButtonRemove" direction="bottom">
-          <ui-icon-btn :disabled="processingBatch" icon="delete" bg-color="error" class="mx-1.5"
-            @click="batchDeleteClick" />
+          <ui-icon-btn :disabled="processingBatch" icon="delete" bg-color="error" class="mx-1.5" @click="batchDeleteClick" />
         </ui-tooltip>
-
-        <ui-context-menu-dropdown v-if="contextMenuItems.length && !processingBatch" :items="contextMenuItems"
-          class="ml-1" @action="contextMenuAction" />
-
+        <ui-context-menu-dropdown v-if="contextMenuItems.length && !processingBatch" :items="contextMenuItems" class="ml-1" @action="contextMenuAction" />
         <ui-tooltip :text="$strings.LabelDeselectAll" direction="bottom" class="flex items-center">
-          <span class="material-icons text-3xl px-4 hover:text-gray-100 cursor-pointer"
-            :class="processingBatch ? 'text-gray-400' : ''" @click="cancelSelectionMode">close</span>
+          <span class="material-symbols text-3xl px-4 hover:text-gray-100 cursor-pointer" :class="processingBatch ? 'text-gray-400' : ''" @click="cancelSelectionMode">close</span>
         </ui-tooltip>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -197,26 +164,22 @@ export default {
     },
     contextMenuItems() {
       if (!this.userIsAdminOrUp) return []
-
       const options = [
         {
           text: this.$strings.ButtonQuickMatch,
           action: 'quick-match'
         }
       ]
-
       if (!this.isPodcastLibrary && this.selectedMediaItemsArePlayable) {
         options.push({
-          text: 'Quick Embed Metadata',
+          text: this.$strings.ButtonQuickEmbedMetadata,
           action: 'quick-embed'
         })
       }
-
       options.push({
-        text: 'Re-Scan',
+        text: this.$strings.ButtonReScan,
         action: 'rescan'
       })
-
       return options
     }
   },
@@ -280,7 +243,6 @@ export default {
     },
     async playSelectedItems() {
       this.$store.commit('setProcessingBatch', true)
-
       const libraryItemIds = this.selectedMediaItems.map((i) => i.id)
       const libraryItems = await this.$axios
         .$post(`/api/items/batch/get`, { libraryItemIds })
@@ -291,12 +253,10 @@ export default {
           this.$toast.error(errorMsg)
           return []
         })
-
       if (!libraryItems.length) {
         this.$store.commit('setProcessingBatch', false)
         return
       }
-
       const queueItems = []
       libraryItems.forEach((item) => {
         let subtitle = ''
@@ -313,7 +273,6 @@ export default {
           coverPath: item.media.coverPath || null
         })
       })
-
       this.$eventBus.$emit('play-item', {
         libraryItemId: queueItems[0].libraryItemId,
         queueItems
@@ -361,9 +320,7 @@ export default {
         callback: (confirmed, hardDelete) => {
           if (confirmed) {
             localStorage.setItem('softDeleteDefault', hardDelete ? 0 : 1)
-
             this.$store.commit('setProcessingBatch', true)
-
             this.$axios
               .$post(`/api/items/batch/delete?hard=${hardDelete ? 1 : 0}`, {
                 libraryItemIds: this.selectedMediaItems.map((i) => i.id)
@@ -407,7 +364,6 @@ export default {
   }
 }
 </script>
-
 <style>
 #appbar {
   box-shadow: 0px 5px 5px #11111155;

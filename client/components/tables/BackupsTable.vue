@@ -1,9 +1,7 @@
 <template>
   <div class="text-center mt-4 relative">
     <div class="flex py-4">
-      <ui-file-input ref="fileInput" class="mr-2" accept=".shelf" @change="backupUploaded">{{
-        $strings.ButtonUploadBackup
-      }}</ui-file-input>
+      <ui-file-input ref="fileInput" class="mr-2" accept=".shelf" @change="backupUploaded">{{ $strings.ButtonUploadBackup }}</ui-file-input>
       <div class="flex-grow" />
       <ui-btn :loading="isBackingUp" @click="clickCreateBackup">{{ $strings.ButtonCreateBackup }}</ui-btn>
     </div>
@@ -19,24 +17,16 @@
           <td>
             <p class="truncate text-xs sm:text-sm md:text-base">/{{ backup.path.replace(/\\/g, '/') }}</p>
           </td>
-          <td class="hidden sm:table-cell font-sans text-sm">{{ $formatDatetime(backup.createdAt, dateFormat,
-        timeFormat)
-            }}</td>
+          <td class="hidden sm:table-cell font-sans text-sm">{{ $formatDatetime(backup.createdAt, dateFormat, timeFormat) }}</td>
           <td class="hidden sm:table-cell font-mono md:text-sm text-xs">{{ $bytesPretty(backup.fileSize) }}</td>
           <td>
             <div class="w-full flex flex-row items-center justify-center">
-              <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{
-        $strings.ButtonRestore }}</ui-btn>
-              <ui-tooltip v-else text="This backup was created with an old version of AudbleTales no longer supported"
-                direction="bottom" class="mx-2 flex items-center">
-                <span class="material-icons-outlined text-2xl text-error">error_outline</span>
+              <ui-btn v-if="backup.serverVersion && backup.key" small color="primary" @click="applyBackup(backup)">{{ $strings.ButtonRestore }}</ui-btn>
+              <ui-tooltip v-else text="This backup was created with an old version of audiobookshelf no longer supported" direction="bottom" class="mx-2 flex items-center">
+                <span class="material-symbols-outlined text-2xl text-error">error_outline</span>
               </ui-tooltip>
-              <button aria-label="Download Backup"
-                class="inline-flex material-icons text-xl mx-1 mt-1 text-white/70 hover:text-white/100"
-                @click.stop="downloadBackup(backup)">download</button>
-              <button aria-label="Delete Backup"
-                class="inline-flex material-icons text-xl mx-1 text-white/70 hover:text-error"
-                @click="deleteBackupClick(backup)">delete</button>
+              <button aria-label="Download Backup" class="inline-flex material-symbols text-xl mx-1 mt-1 text-white/70 hover:text-white/100" @click.stop="downloadBackup(backup)">download</button>
+              <button aria-label="Delete Backup" class="inline-flex material-symbols text-xl mx-1 text-white/70 hover:text-error" @click="deleteBackupClick(backup)">delete</button>
             </div>
           </td>
         </tr>
@@ -44,8 +34,7 @@
           <td colspan="4" class="text-lg">{{ $strings.MessageNoBackups }}</td>
         </tr>
       </table>
-      <div v-show="processing"
-        class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-25 flex items-center justify-center">
+      <div v-show="processing" class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-25 flex items-center justify-center">
         <ui-loading-indicator />
       </div>
     </div>
@@ -53,9 +42,7 @@
       <div v-if="selectedBackup" class="px-4 w-full text-sm py-6 rounded-lg bg-bg shadow-lg border border-black-300">
         <p class="text-error text-lg font-semibold">{{ $strings.MessageImportantNotice }}</p>
         <p class="text-base py-1" v-html="$strings.MessageRestoreBackupWarning" />
-        <p class="text-lg text-center my-8">{{ $strings.MessageRestoreBackupConfirm }} {{
-        $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat)
-      }}?</p>
+        <p class="text-lg text-center my-8">{{ $strings.MessageRestoreBackupConfirm }} {{ $formatDatetime(selectedBackup.createdAt, dateFormat, timeFormat) }}?</p>
         <div class="flex px-1 items-center">
           <ui-btn color="primary" @click="showConfirmApply = false">{{ $strings.ButtonNevermind }}</ui-btn>
           <div class="flex-grow" />
@@ -63,8 +50,7 @@
         </div>
       </div>
     </prompt-dialog>
-    <div v-if="isApplyingBackup"
-      class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 rounded-md">
+    <div v-if="isApplyingBackup" class="absolute inset-0 w-full h-full flex items-center justify-center bg-black/20 rounded-md">
       <ui-loading-indicator />
     </div>
   </div>

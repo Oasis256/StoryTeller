@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
   "name": "audbletales-client",
-  "version": "2.10.1",
-=======
-  "name": "audiobookshelf-client",
   "version": "2.11.0",
->>>>>>> 93114b2181d1ee5f0026fcf04c0a2946e3e96641
   "buildNumber": 1,
   "description": "Self-hosted audiobook and podcast client",
   "main": "index.js",
