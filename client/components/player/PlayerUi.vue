@@ -11,7 +11,7 @@
             <span v-if="!sleepTimerSet" class="material-symbols text-2xl">snooze</span>
             <div v-else class="flex items-center">
               <span class="material-symbols text-lg text-warning">snooze</span>
-              <p class="text-xl text-warning font-mono font-semibold text-center px-0.5 pb-0.5" style="min-width: 30px">{{ sleepTimerRemainingString }}</p>
+              <p class="text-sm sm:text-lg text-warning font-mono font-semibold text-center px-0.5 sm:pb-0.5 sm:min-w-8">{{ sleepTimerRemainingString }}</p>
             </div>
           </button>
         </ui-tooltip>
@@ -61,12 +61,14 @@ export default {
       type: Array,
       default: () => []
     },
+    currentChapter: Object,
     bookmarks: {
       type: Array,
       default: () => []
     },
     sleepTimerSet: Boolean,
     sleepTimerRemaining: Number,
+    sleepTimerType: String,
     isPodcast: Boolean,
     hideBookmarks: Boolean,
     hideSleepTimer: Boolean
@@ -93,16 +95,20 @@ export default {
   },
   computed: {
     sleepTimerRemainingString() {
-      var rounded = Math.round(this.sleepTimerRemaining)
-      if (rounded < 90) {
-        return `${rounded}s`
+      if (this.sleepTimerType === this.$constants.SleepTimerTypes.CHAPTER) {
+        return 'EoC'
+      } else {
+        var rounded = Math.round(this.sleepTimerRemaining)
+        if (rounded < 90) {
+          return `${rounded}s`
+        }
+        var minutesRounded = Math.round(rounded / 60)
+        if (minutesRounded <= 90) {
+          return `${minutesRounded}m`
+        }
+        var hoursRounded = Math.round(minutesRounded / 60)
+        return `${hoursRounded}h`
       }
-      var minutesRounded = Math.round(rounded / 60)
-      if (minutesRounded < 90) {
-        return `${minutesRounded}m`
-      }
-      var hoursRounded = Math.round(minutesRounded / 60)
-      return `${hoursRounded}h`
     },
     token() {
       return this.$store.getters['user/getToken']
@@ -125,9 +131,6 @@ export default {
       const time = this.useChapterTrack ? Math.max(this.currentTime - this.currentChapterStart) : this.currentTime
       if (!duration) return 0
       return Math.round((100 * time) / duration)
-    },
-    currentChapter() {
-      return this.chapters.find((chapter) => chapter.start <= this.currentTime && this.currentTime < chapter.end)
     },
     currentChapterName() {
       return this.currentChapter ? this.currentChapter.title : ''
