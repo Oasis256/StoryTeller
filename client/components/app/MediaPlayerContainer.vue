@@ -55,15 +55,8 @@
       @showPlayerSettings="showPlayerSettingsModal = true"
     />
     <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime" :library-item-id="libraryItemId" @select="selectBookmark" />
-<<<<<<< HEAD
-    <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-time="sleepTimerTime" :remaining="sleepTimerRemaining" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer" @decrement="decrementSleepTimer" />
-=======
-
     <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-type="sleepTimerType" :remaining="sleepTimerRemaining" :has-chapters="!!chapters.length" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer" @decrement="decrementSleepTimer" />
-
->>>>>>> 733f61075f2fd5dc2965d996979836eb1403b936
     <modals-player-queue-items-modal v-model="showPlayerQueueItemsModal" :library-item-id="libraryItemId" />
-
     <modals-player-settings-modal v-model="showPlayerSettingsModal" />
   </div>
 </template>
@@ -216,7 +209,6 @@ export default {
     setSleepTimer(time) {
       this.sleepTimerSet = true
       this.showSleepTimerModal = false
-
       this.sleepTimerType = time.timerType
       if (this.sleepTimerType === this.$constants.SleepTimerTypes.COUNTDOWN) {
         this.runSleepTimer(time)
@@ -224,7 +216,6 @@ export default {
     },
     runSleepTimer(time) {
       this.sleepTimerRemaining = time.seconds
-
       var lastTick = Date.now()
       clearInterval(this.sleepTimer)
       this.sleepTimer = setInterval(() => {
@@ -299,7 +290,6 @@ export default {
       if (this.$refs.audioPlayer) {
         this.$refs.audioPlayer.setCurrentTime(time)
       }
-
       if (this.sleepTimerType === this.$constants.SleepTimerTypes.CHAPTER && this.sleepTimerSet) {
         this.checkChapterEnd(time)
       }
