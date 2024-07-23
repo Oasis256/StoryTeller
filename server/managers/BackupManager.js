@@ -179,7 +179,9 @@ class BackupManager {
     await fs.move(tempDbPath, dbPath)
     Logger.info(`[BackupManager] Saved backup sqlite file at "${dbPath}"`)
     // Extract /metadata/items and /metadata/authors folders
+    await fs.ensureDir(this.ItemsMetadataPath)
     await zip.extract('metadata-items/', this.ItemsMetadataPath)
+    await fs.ensureDir(this.AuthorsMetadataPath)
     await zip.extract('metadata-authors/', this.AuthorsMetadataPath)
     await zip.close()
     // Reconnect db
