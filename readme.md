@@ -4,9 +4,9 @@
   <p align="center">
     <br />
     <a href="https://audiobookshelf.org/docs">Documentation</a>
-    ·
+    
     <a href="https://audiobookshelf.org/guides">User Guides</a>
-    ·
+
     <a href="https://audiobookshelf.org/support">Support</a>
   </p>
 </div>
@@ -36,26 +36,20 @@ Join us on [Discord](https://discord.gg/HQgCbd6E75) or [Matrix](https://matrix.t
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
 ### iOS App (beta)
-**Beta is currently full. Apple has a hard limit of 10k beta testers. Updates will be posted in Discord/Matrix.**
+**Beta is currently full. Apple has a hard limit of 10k beta testers. Updates will be posted in Discord.**
 Using Test Flight: https://testflight.apple.com/join/wiic7QIW **_(beta is full)_**
 ### Build your own tools & clients
-Check out the [API documentation](https://api.audiobookshelf.org/)
-<br />
-<img alt="Library Screenshot" src="https://github.com/Oasis256/StoryTeller/raw/master/images/DemoLibrary.png" />
-<br />
+Check out the [API documentation](https://api.audiobookshelf.org/) <br /> <img alt="Library Screenshot" src="https://github.com/Oasis256/StoryTeller/raw/master/images/DemoLibrary.png" /> <br />
 # Organizing your audiobooks
 #### Directory structure and folder names are important to AudbleTales!
-See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
-<br />
+See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage. <br />
 # Installation
-See [install docs](https://www.audiobookshelf.org/docs)
-<br />
+See [install docs](https://www.audiobookshelf.org/docs) <br />
 # Reverse Proxy Set Up
 #### Important! AudbleTales requires a websocket connection.
 #### Note: Subfolder paths (e.g. /audiobooks) are not supported yet. See [issue](https://github.com/Oasis256/StoryTellerssues/385)
 ### NGINX Proxy Manager
-Toggle websockets support.
-<img alt="NGINX Web socket" src="https://user-images.githubusercontent.com/67830747/153679106-b2a7f5b9-0702-48c6-9740-b26b401986e9.png" />
+Toggle websockets support. <img alt="NGINX Web socket" src="https://user-images.githubusercontent.com/67830747/153679106-b2a7f5b9-0702-48c6-9740-b26b401986e9.png" />
 ### NGINX Reverse Proxy
 Add this to the site config file on your nginx server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
 ```bash
@@ -80,8 +74,7 @@ server
 }
 ```
 ### Apache Reverse Proxy
-Add this to the site config file on your Apache server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
-For this to work you must enable at least the following mods using `a2enmod`:
+Add this to the site config file on your Apache server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths. For this to work you must enable at least the following mods using `a2enmod`:
 - `ssl`
 - `proxy`
 - `proxy_http`
@@ -127,31 +120,13 @@ Some SSL certificates like those signed by Let's Encrypt require ACME validation
 1. **Open Control Panel**
    - Navigate to `Login Portal > Advanced`.
 2. **General Tab**
-   - Click `Reverse Proxy` > `Create`.
-   | Setting            | Value          |
-   | ------------------ | -------------- |
-   | Reverse Proxy Name | audiobookshelf |
-3. **Source Configuration**
-   | Setting                | Value                                    |
-   | ---------------------- | ---------------------------------------- |
-   | Protocol               | HTTPS                                    |
-   | Hostname               | `<sub>.<quickconnectdomain>.synology.me` |
-   | Port                   | 443                                      |
-   | Access Control Profile | Leave as is                              |
+   - Click `Reverse Proxy` > `Create`. | Setting | Value | | ------------------ | -------------- | | Reverse Proxy Name | audiobookshelf |
+3. **Source Configuration** | Setting | Value | | ---------------------- | ---------------------------------------- | | Protocol | HTTPS | | Hostname | `<sub>.<quickconnectdomain>.synology.me` | | Port | 443 | | Access Control Profile | Leave as is |
    - Example Hostname: `audiobookshelf.mydomain.synology.me`
-4. **Destination Configuration**
-   | Setting  | Value       |
-   | -------- | ----------- |
-   | Protocol | HTTP        |
-   | Hostname | Your NAS IP |
-   | Port     | 13378       |
+4. **Destination Configuration** | Setting | Value | | -------- | ----------- | | Protocol | HTTP | | Hostname | Your NAS IP | | Port | 13378 |
 5. **Custom Header Tab**
    - Go to `Create > Websocket`.
-   - Configure Headers (leave as is):
-   | Header Name | Value                 |
-   | ----------- | --------------------- |
-   | Upgrade     | `$http_upgrade`       |
-   | Connection  | `$connection_upgrade` |
+   - Configure Headers (leave as is): | Header Name | Value | | ----------- | --------------------- | | Upgrade | `$http_upgrade` | | Connection | `$connection_upgrade` |
 6. **Advanced Settings Tab**
    - Leave as is.
 ### [Traefik Reverse Proxy](https://doc.traefik.io/traefik/)
