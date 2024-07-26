@@ -2,7 +2,6 @@ const Sequelize = require('sequelize')
 const Database = require('../../Database')
 const Logger = require('../../Logger')
 const authorFilters = require('./authorFilters')
-const { asciiOnlyToLowerCase } = require('../index')
 
 const ShareManager = require('../../managers/ShareManager')
 
@@ -274,6 +273,8 @@ module.exports = {
       return [[Sequelize.literal(`CAST(\`series.bookSeries.sequence\` AS FLOAT) ${nullDir}`)]]
     } else if (sortBy === 'progress') {
       return [[Sequelize.literal('mediaProgresses.updatedAt'), dir]]
+    } else if (sortBy === 'random') {
+      return [Database.sequelize.random()]
     }
     return []
   },
@@ -1038,25 +1039,9 @@ module.exports = {
       const libraryItem = book.libraryItem
       delete book.libraryItem
       libraryItem.media = book
-
-      let matchText = null
-      let matchKey = null
-      for (const key of ['title', 'subtitle', 'asin', 'isbn']) {
-        const valueToLower = asciiOnlyToLowerCase(book[key])
-        if (valueToLower.includes(query)) {
-          matchText = book[key]
-          matchKey = key
-          break
-        }
-      }
-
-      if (matchKey) {
-        itemMatches.push({
-          matchText,
-          matchKey,
-          libraryItem: Database.libraryItemModel.getOldLibraryItem(libraryItem).toJSONExpanded()
-        })
-      }
+      itemMatches.push({
+        libraryItem: Database.libraryItemModel.getOldLibraryItem(libraryItem).toJSONExpanded()
+      })
     }
 
     // Search narrators

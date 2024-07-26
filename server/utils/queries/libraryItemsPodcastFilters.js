@@ -89,6 +89,8 @@ module.exports = {
       }
     } else if (sortBy === 'media.numTracks') {
       return [['numEpisodes', dir]]
+    } else if (sortBy === 'random') {
+      return [Database.sequelize.random()]
     }
     return []
   },
@@ -361,25 +363,9 @@ module.exports = {
       const libraryItem = podcast.libraryItem
       delete podcast.libraryItem
       libraryItem.media = podcast
-
-      let matchText = null
-      let matchKey = null
-      for (const key of ['title', 'author', 'itunesId', 'itunesArtistId']) {
-        const valueToLower = asciiOnlyToLowerCase(podcast[key])
-        if (valueToLower.includes(query)) {
-          matchText = podcast[key]
-          matchKey = key
-          break
-        }
-      }
-
-      if (matchKey) {
-        itemMatches.push({
-          matchText,
-          matchKey,
-          libraryItem: Database.libraryItemModel.getOldLibraryItem(libraryItem).toJSONExpanded()
-        })
-      }
+      itemMatches.push({
+        libraryItem: Database.libraryItemModel.getOldLibraryItem(libraryItem).toJSONExpanded()
+      })
     }
 
     // Search tags
