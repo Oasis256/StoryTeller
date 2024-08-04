@@ -41,6 +41,7 @@ const LibraryScanner = require('./scanner/LibraryScanner')
 //Import the main Passport and Express-Session library
 const passport = require('passport')
 const expressSession = require('express-session')
+const MemoryStore = require('./libs/memorystore')(expressSession)
 
 class Server {
   constructor(SOURCE, PORT, HOST, CONFIG_PATH, METADATA_PATH, ROUTER_BASE_PATH) {
@@ -105,6 +106,8 @@ class Server {
   async init() {
     Logger.info('[Server] Init v' + version)
     Logger.info('[Server] Node.js Version:', process.version)
+    Logger.info('[Server] Platform:', process.platform)
+    Logger.info('[Server] Arch:', process.arch)
 
     await this.playbackSessionManager.removeOrphanStreams()
 
@@ -216,7 +219,12 @@ class Server {
         cookie: {
           // also send the cookie if were are not on https (not every use has https)
           secure: false
-        }
+        },
+        store: new MemoryStore({
+          checkPeriod: 86400000, // prune expired entries every 24h
+          ttl: 86400000, // 24h
+          max: 1000
+        })
       })
     )
     // init passport.js
@@ -383,31 +391,24 @@ class Server {
     }
 
     // Remove series from hide from continue listening that no longer exist
-    const users = await Database.userModel.getOldUsers()
-    for (const _user of users) {
-      let hasUpdated = false
-      if (_user.seriesHideFromContinueListening.length) {
-        const seriesHiding = (
-          await Database.seriesModel.findAll({
-            where: {
-              id: _user.seriesHideFromContinueListening
-            },
-            attributes: ['id'],
-            raw: true
-          })
-        ).map((se) => se.id)
-        _user.seriesHideFromContinueListening = _user.seriesHideFromContinueListening.filter((seriesId) => {
-          if (!seriesHiding.includes(seriesId)) {
-            // Series removed
-            hasUpdated = true
-            return false
-          }
-          return true
-        })
+    try {
+      const users = await Database.sequelize.query(`SELECT u.id, u.username, u.extraData, json_group_array(value) AS seriesIdsToRemove FROM users u, json_each(u.extraData->"seriesHideFromContinueListening") LEFT JOIN series se ON se.id = value WHERE se.id IS NULL GROUP BY u.id;`, {
+        model: Database.userModel,
+        type: Sequelize.QueryTypes.SELECT
+      })
+      for (const user of users) {
+        const extraData = JSON.parse(user.extraData)
+        const existingSeriesIds = extraData.seriesHideFromContinueListening
+        const seriesIdsToRemove = JSON.parse(user.dataValues.seriesIdsToRemove)
+        Logger.info(`[Server] Found ${seriesIdsToRemove.length} non-existent series in seriesHideFromContinueListening for user "${user.username}" - Removing (${seriesIdsToRemove.join(',')})`)
+        const newExtraData = {
+          ...extraData,
+          seriesHideFromContinueListening: existingSeriesIds.filter((s) => !seriesIdsToRemove.includes(s))
+        }
+        await user.update({ extraData: newExtraData })
       }
-      if (hasUpdated) {
-        await Database.updateUser(_user)
-      }
+    } catch (error) {
+      Logger.error(`[Server] Failed to cleanup users seriesHideFromContinueListening`, error)
     }
   }
 
