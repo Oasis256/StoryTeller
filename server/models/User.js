@@ -2,8 +2,19 @@ const uuidv4 = require('uuid').v4
 const sequelize = require('sequelize')
 const Logger = require('../Logger')
 const oldUser = require('../objects/user/User')
+const AudioBookmark = require('../objects/user/AudioBookmark')
 const SocketAuthority = require('../SocketAuthority')
+const { isNullOrNaN } = require('../utils')
+
 const { DataTypes, Model } = sequelize
+
+/**
+ * @typedef AudioBookmarkObject
+ * @property {string} libraryItemId
+ * @property {string} title
+ * @property {number} time
+ * @property {number} createdAt
+ */
 
 class User extends Model {
   constructor(values, options) {
@@ -29,7 +40,7 @@ class User extends Model {
     this.lastSeen
     /** @type {Object} */
     this.permissions
-    /** @type {Object} */
+    /** @type {AudioBookmarkObject[]} */
     this.bookmarks
     /** @type {Object} */
     this.extraData
@@ -408,11 +419,17 @@ class User extends Model {
     )
   }
 
+  get isRoot() {
+    return this.type === 'root'
+  }
   get isAdminOrUp() {
-    return this.type === 'root' || this.type === 'admin'
+    return this.isRoot || this.type === 'admin'
   }
   get isUser() {
     return this.type === 'user'
+  }
+  get isGuest() {
+    return this.type === 'guest'
   }
   get canAccessExplicitContent() {
     return !!this.permissions?.accessExplicitContent && this.isActive
@@ -576,6 +593,230 @@ class User extends Model {
       return mp.extraData?.libraryItemId === libraryItemId
     })
     return mediaProgress?.getOldMediaProgress() || null
+  }
+
+  /**
+   * TODO: Uses old model and should account for the different between ebook/audiobook progress
+   *
+   * @typedef ProgressUpdatePayload
+   * @property {string} libraryItemId
+   * @property {string} [episodeId]
+   * @property {number} [duration]
+   * @property {number} [progress]
+   * @property {number} [currentTime]
+   * @property {boolean} [isFinished]
+   * @property {boolean} [hideFromContinueListening]
+   * @property {string} [ebookLocation]
+   * @property {number} [ebookProgress]
+   * @property {string} [finishedAt]
+   * @property {number} [lastUpdate]
+   *
+   * @param {ProgressUpdatePayload} progressPayload
+   * @returns {Promise<{ mediaProgress: import('./MediaProgress'), error: [string], statusCode: [number] }>}
+   */
+  async createUpdateMediaProgressFromPayload(progressPayload) {
+    /** @type {import('./MediaProgress')|null} */
+    let mediaProgress = null
+    let mediaItemId = null
+    if (progressPayload.episodeId) {
+      const podcastEpisode = await this.sequelize.models.podcastEpisode.findByPk(progressPayload.episodeId, {
+        attributes: ['id', 'podcastId'],
+        include: [
+          {
+            model: this.sequelize.models.mediaProgress,
+            where: { userId: this.id },
+            required: false
+          },
+          {
+            model: this.sequelize.models.podcast,
+            attributes: ['id', 'title'],
+            include: {
+              model: this.sequelize.models.libraryItem,
+              attributes: ['id']
+            }
+          }
+        ]
+      })
+      if (!podcastEpisode) {
+        Logger.error(`[User] createUpdateMediaProgress: episode ${progressPayload.episodeId} not found`)
+        return {
+          error: 'Episode not found',
+          statusCode: 404
+        }
+      }
+      mediaItemId = podcastEpisode.id
+      mediaProgress = podcastEpisode.mediaProgresses?.[0]
+    } else {
+      const libraryItem = await this.sequelize.models.libraryItem.findByPk(progressPayload.libraryItemId, {
+        attributes: ['id', 'mediaId', 'mediaType'],
+        include: {
+          model: this.sequelize.models.book,
+          attributes: ['id', 'title'],
+          required: false,
+          include: {
+            model: this.sequelize.models.mediaProgress,
+            where: { userId: this.id },
+            required: false
+          }
+        }
+      })
+      if (!libraryItem) {
+        Logger.error(`[User] createUpdateMediaProgress: library item ${progressPayload.libraryItemId} not found`)
+        return {
+          error: 'Library item not found',
+          statusCode: 404
+        }
+      }
+      mediaItemId = libraryItem.media.id
+      mediaProgress = libraryItem.media.mediaProgresses?.[0]
+    }
+
+    if (mediaProgress) {
+      mediaProgress = await mediaProgress.applyProgressUpdate(progressPayload)
+      this.mediaProgresses = this.mediaProgresses.map((mp) => (mp.id === mediaProgress.id ? mediaProgress : mp))
+    } else {
+      const newMediaProgressPayload = {
+        userId: this.id,
+        mediaItemId,
+        mediaItemType: progressPayload.episodeId ? 'podcastEpisode' : 'book',
+        duration: isNullOrNaN(progressPayload.duration) ? 0 : Number(progressPayload.duration),
+        currentTime: isNullOrNaN(progressPayload.currentTime) ? 0 : Number(progressPayload.currentTime),
+        isFinished: !!progressPayload.isFinished,
+        hideFromContinueListening: !!progressPayload.hideFromContinueListening,
+        ebookLocation: progressPayload.ebookLocation || null,
+        ebookProgress: isNullOrNaN(progressPayload.ebookProgress) ? 0 : Number(progressPayload.ebookProgress),
+        finishedAt: progressPayload.finishedAt || null,
+        extraData: {
+          libraryItemId: progressPayload.libraryItemId,
+          progress: isNullOrNaN(progressPayload.progress) ? 0 : Number(progressPayload.progress)
+        }
+      }
+      if (newMediaProgressPayload.isFinished) {
+        newMediaProgressPayload.finishedAt = new Date()
+        newMediaProgressPayload.extraData.progress = 1
+      } else {
+        newMediaProgressPayload.finishedAt = null
+      }
+      mediaProgress = await this.sequelize.models.mediaProgress.create(newMediaProgressPayload)
+      this.mediaProgresses.push(mediaProgress)
+    }
+    return {
+      mediaProgress
+    }
+  }
+
+  /**
+   * Find bookmark
+   * TODO: Bookmarks should use mediaItemId instead of libraryItemId to support podcast episodes
+   *
+   * @param {string} libraryItemId
+   * @param {number} time
+   * @returns {AudioBookmarkObject|null}
+   */
+  findBookmark(libraryItemId, time) {
+    return this.bookmarks.find((bm) => bm.libraryItemId === libraryItemId && bm.time == time)
+  }
+
+  /**
+   * Create bookmark
+   *
+   * @param {string} libraryItemId
+   * @param {number} time
+   * @param {string} title
+   * @returns {Promise<AudioBookmarkObject>}
+   */
+  async createBookmark(libraryItemId, time, title) {
+    const existingBookmark = this.findBookmark(libraryItemId, time)
+    if (existingBookmark) {
+      Logger.warn('[User] Create Bookmark already exists for this time')
+      if (existingBookmark.title !== title) {
+        existingBookmark.title = title
+        this.changed('bookmarks', true)
+        await this.save()
+      }
+      return existingBookmark
+    }
+
+    const newBookmark = {
+      libraryItemId,
+      time,
+      title,
+      createdAt: Date.now()
+    }
+    this.bookmarks.push(newBookmark)
+    this.changed('bookmarks', true)
+    await this.save()
+    return newBookmark
+  }
+
+  /**
+   * Update bookmark
+   *
+   * @param {string} libraryItemId
+   * @param {number} time
+   * @param {string} title
+   * @returns {Promise<AudioBookmarkObject>}
+   */
+  async updateBookmark(libraryItemId, time, title) {
+    const bookmark = this.findBookmark(libraryItemId, time)
+    if (!bookmark) {
+      Logger.error(`[User] updateBookmark not found`)
+      return null
+    }
+    bookmark.title = title
+    this.changed('bookmarks', true)
+    await this.save()
+    return bookmark
+  }
+
+  /**
+   * Remove bookmark
+   *
+   * @param {string} libraryItemId
+   * @param {number} time
+   * @returns {Promise<boolean>} - true if bookmark was removed
+   */
+  async removeBookmark(libraryItemId, time) {
+    if (!this.findBookmark(libraryItemId, time)) {
+      Logger.error(`[User] removeBookmark not found`)
+      return false
+    }
+    this.bookmarks = this.bookmarks.filter((bm) => bm.libraryItemId !== libraryItemId || bm.time !== time)
+    this.changed('bookmarks', true)
+    await this.save()
+    return true
+  }
+
+  /**
+   *
+   * @param {string} seriesId
+   * @returns {Promise<boolean>}
+   */
+  async addSeriesToHideFromContinueListening(seriesId) {
+    if (!this.extraData) this.extraData = {}
+    const seriesHideFromContinueListening = this.extraData.seriesHideFromContinueListening || []
+    if (seriesHideFromContinueListening.includes(seriesId)) return false
+    seriesHideFromContinueListening.push(seriesId)
+    this.extraData.seriesHideFromContinueListening = seriesHideFromContinueListening
+    this.changed('extraData', true)
+    await this.save()
+    return true
+  }
+
+  /**
+   *
+   * @param {string} seriesId
+   * @returns {Promise<boolean>}
+   */
+  async removeSeriesFromHideFromContinueListening(seriesId) {
+    if (!this.extraData) this.extraData = {}
+    let seriesHideFromContinueListening = this.extraData.seriesHideFromContinueListening || []
+    if (!seriesHideFromContinueListening.includes(seriesId)) return false
+    seriesHideFromContinueListening = seriesHideFromContinueListening.filter((sid) => sid !== seriesId)
+    this.extraData.seriesHideFromContinueListening = seriesHideFromContinueListening
+    this.changed('extraData', true)
+    await this.save()
+    return true
   }
 }
 
