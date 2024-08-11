@@ -89,9 +89,25 @@ class Server {
     this.io = null
   }
 
+  /**
+   * Middleware to check if the current request is authenticated
+   * req.user is set if authenticated to the OLD user object
+   * req.userNew is set if authenticated to the NEW user object
+   *
+   * @param {import('express').Request} req
+   * @param {import('express').Response} res
+   * @param {import('express').NextFunction} next
+   */
   authMiddleware(req, res, next) {
     // ask passportjs if the current request is authenticated
-    this.auth.isAuthenticated(req, res, next)
+    this.auth.isAuthenticated(req, res, () => {
+      if (req.user) {
+        // TODO: req.userNew to become req.user
+        req.userNew = req.user
+        req.user = Database.userModel.getOldUser(req.user)
+      }
+      next()
+    })
   }
 
   cancelLibraryScan(libraryId) {
@@ -110,7 +126,14 @@ class Server {
 
     await this.playbackSessionManager.removeOrphanStreams()
 
-    await this.binaryManager.init()
+    /**
+     * Docker container ffmpeg/ffprobe binaries are included in the image.
+     * Docker is currently using ffmpeg/ffprobe v6.1 instead of v5.1 so skipping the check
+     * TODO: Support binary check for all sources
+     */
+    if (global.Source !== 'docker') {
+      await this.binaryManager.init()
+    }
 
     await Database.init(false)
 

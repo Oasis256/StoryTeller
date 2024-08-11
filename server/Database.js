@@ -207,7 +207,6 @@ class Database {
 
     try {
       await this.sequelize.authenticate()
-      await this.loadExtensions([process.env.SQLEAN_UNICODE_PATH])
       Logger.info(`[Database] Db connection was successful`)
       return true
     } catch (error) {
@@ -217,7 +216,7 @@ class Database {
   }
 
   /**
-   *
+   * TODO: Temporarily disabled
    * @param {string[]} extensions paths to extension binaries
    */
   async loadExtensions(extensions) {
@@ -364,7 +363,7 @@ class Database {
    */
   async createRootUser(username, pash, auth) {
     if (!this.sequelize) return false
-    await this.models.user.createRootUser(username, pash, auth)
+    await this.userModel.createRootUser(username, pash, auth)
     this.hasRootUser = true
     return true
   }
@@ -389,11 +388,6 @@ class Database {
   updateUser(oldUser) {
     if (!this.sequelize) return false
     return this.models.user.updateFromOld(oldUser)
-  }
-
-  updateBulkUsers(oldUsers) {
-    if (!this.sequelize) return false
-    return Promise.all(oldUsers.map((u) => this.updateUser(u)))
   }
 
   removeUser(userId) {
@@ -827,7 +821,7 @@ class Database {
   }
 
   /**
-   *
+   * TODO: Temporarily unused
    * @param {string} value
    * @returns {string}
    */
@@ -836,7 +830,7 @@ class Database {
   }
 
   /**
-   *
+   * TODO: Temporarily unused
    * @param {string} query
    * @returns {Promise<string>}
    */
@@ -855,7 +849,7 @@ class Database {
    */
   matchExpression(column, normalizedQuery) {
     const normalizedPattern = this.sequelize.escape(`%${normalizedQuery}%`)
-    const normalizedColumn = this.normalize(column)
+    const normalizedColumn = column
     return `${normalizedColumn} LIKE ${normalizedPattern}`
   }
 }
