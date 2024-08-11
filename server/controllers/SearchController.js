@@ -8,11 +8,10 @@ const Database = require('../Database')
 const { isValidASIN } = require('../utils')
 
 /**
- * @typedef RequestUserObjects
- * @property {import('../models/User')} userNew
- * @property {import('../objects/user/User')} user
+ * @typedef RequestUserObject
+ * @property {import('../models/User')} user
  *
- * @typedef {Request & RequestUserObjects} RequestWithUser
+ * @typedef {Request & RequestUserObject} RequestWithUser
  */
 
 class SearchController {

@@ -1,3 +1,4 @@
+const { Request, Response, NextFunction } = require('express')
 const Sequelize = require('sequelize')
 const Logger = require('../Logger')
 const SocketAuthority = require('../SocketAuthority')
@@ -5,18 +6,26 @@ const Database = require('../Database')
 
 const Collection = require('../objects/Collection')
 
+/**
+ * @typedef RequestUserObject
+ * @property {import('../models/User')} user
+ *
+ * @typedef {Request & RequestUserObject} RequestWithUser
+ */
+
 class CollectionController {
   constructor() {}
 
   /**
    * POST: /api/collections
    * Create new collection
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async create(req, res) {
     const newCollection = new Collection()
-    req.body.userId = req.userNew.id
+    req.body.userId = req.user.id
     if (!newCollection.setData(req.body)) {
       return res.status(400).send('Invalid collection data')
     }
@@ -49,17 +58,29 @@ class CollectionController {
     res.json(jsonExpanded)
   }
 
+  /**
+   * GET: /api/collections
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   */
   async findAll(req, res) {
-    const collectionsExpanded = await Database.collectionModel.getOldCollectionsJsonExpanded(req.userNew)
+    const collectionsExpanded = await Database.collectionModel.getOldCollectionsJsonExpanded(req.user)
     res.json({
       collections: collectionsExpanded
     })
   }
 
+  /**
+   * GET: /api/collections/:id
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   */
   async findOne(req, res) {
     const includeEntities = (req.query.include || '').split(',')
 
-    const collectionExpanded = await req.collection.getOldJsonExpanded(req.userNew, includeEntities)
+    const collectionExpanded = await req.collection.getOldJsonExpanded(req.user, includeEntities)
     if (!collectionExpanded) {
       // This may happen if the user is restricted from all books
       return res.sendStatus(404)
@@ -71,8 +92,9 @@ class CollectionController {
   /**
    * PATCH: /api/collections/:id
    * Update collection
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async update(req, res) {
     let wasUpdated = false
@@ -123,6 +145,12 @@ class CollectionController {
     res.json(jsonExpanded)
   }
 
+  /**
+   * DELETE: /api/collections/:id
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   */
   async delete(req, res) {
     const jsonExpanded = await req.collection.getOldJsonExpanded()
 
@@ -139,8 +167,9 @@ class CollectionController {
    * POST: /api/collections/:id/book
    * Add a single book to a collection
    * Req.body { id: <library item id> }
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async addBook(req, res) {
     const libraryItem = await Database.libraryItemModel.getOldById(req.body.id)
@@ -172,8 +201,9 @@ class CollectionController {
    * DELETE: /api/collections/:id/book/:bookId
    * Remove a single book from a collection. Re-order books
    * TODO: bookId is actually libraryItemId. Clients need updating to use bookId
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async removeBook(req, res) {
     const libraryItem = await Database.libraryItemModel.getOldById(req.params.bookId)
@@ -216,8 +246,9 @@ class CollectionController {
    * POST: /api/collections/:id/batch/add
    * Add multiple books to collection
    * Req.body { books: <Array of library item ids> }
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async addBatch(req, res) {
     // filter out invalid libraryItemIds
@@ -274,8 +305,9 @@ class CollectionController {
    * POST: /api/collections/:id/batch/remove
    * Remove multiple books from collection
    * Req.body { books: <Array of library item ids> }
-   * @param {*} req
-   * @param {*} res
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
    */
   async removeBatch(req, res) {
     // filter out invalid libraryItemIds
@@ -325,6 +357,12 @@ class CollectionController {
     res.json(jsonExpanded)
   }
 
+  /**
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   * @param {NextFunction} next
+   */
   async middleware(req, res, next) {
     if (req.params.id) {
       const collection = await Database.collectionModel.findByPk(req.params.id)
@@ -334,11 +372,11 @@ class CollectionController {
       req.collection = collection
     }
 
-    if (req.method == 'DELETE' && !req.userNew.canDelete) {
-      Logger.warn(`[CollectionController] User "${req.userNew.username}" attempted to delete without permission`)
+    if (req.method == 'DELETE' && !req.user.canDelete) {
+      Logger.warn(`[CollectionController] User "${req.user.username}" attempted to delete without permission`)
       return res.sendStatus(403)
-    } else if ((req.method == 'PATCH' || req.method == 'POST') && !req.userNew.canUpdate) {
-      Logger.warn(`[CollectionController] User "${req.userNew.username}" attempted to update without permission`)
+    } else if ((req.method == 'PATCH' || req.method == 'POST') && !req.user.canUpdate) {
+      Logger.warn(`[CollectionController] User "${req.user.username}" attempted to update without permission`)
       return res.sendStatus(403)
     }
 

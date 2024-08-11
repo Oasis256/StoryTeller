@@ -3,11 +3,10 @@ const Database = require('../Database')
 const { version } = require('../../package.json')
 
 /**
- * @typedef RequestUserObjects
- * @property {import('../models/User')} userNew
- * @property {import('../objects/user/User')} user
+ * @typedef RequestUserObject
+ * @property {import('../models/User')} user
  *
- * @typedef {Request & RequestUserObjects} RequestWithUser
+ * @typedef {Request & RequestUserObject} RequestWithUser
  */
 
 class NotificationController {
@@ -135,7 +134,7 @@ class NotificationController {
    * @param {NextFunction} next
    */
   middleware(req, res, next) {
-    if (!req.userNew.isAdminOrUp) {
+    if (!req.user.isAdminOrUp) {
       return res.sendStatus(403)
     }
 
