@@ -33,8 +33,8 @@ android {
         applicationId "com.book.shelf"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 105
-        versionName "0.9.74-beta"
+        versionCode 107
+        versionName "0.9.76-beta"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
           "appAuthRedirectScheme": "com.book.shelf"
