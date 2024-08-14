@@ -34,7 +34,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 107
-        versionName "0.9.76-beta"
+        versionName "0.9.76"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
           "appAuthRedirectScheme": "com.book.shelf"
