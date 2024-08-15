@@ -1,6 +1,6 @@
 {
   "name": "audbletales",
-  "version": "0.9.76-beta",
+  "version": "0.9.76",
   "author": "Oasis Innocent",
   "scripts": {
     "dev": "nuxt --hostname 0.0.0.0 --port 1337",
