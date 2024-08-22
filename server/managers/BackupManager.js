@@ -11,6 +11,11 @@ const fileUtils = require('../utils/fileUtils')
 // Utils
 const { getFileSize } = require('../utils/fileUtils')
 const Backup = require('../objects/Backup')
+<<<<<<< HEAD
+=======
+const CacheManager = require('./CacheManager')
+
+>>>>>>> 1c0d6e9c670ebb1b6f1e427a4c4d9250a7fb9b80
 class BackupManager {
   constructor(notificationManager) {
     this.ItemsMetadataPath = Path.join(global.MetadataPath, 'items')
@@ -190,6 +195,10 @@ class BackupManager {
     await Database.reconnect()
     // Reset api cache, set hooks again
     await apiCacheManager.reset()
+
+    // Clear metadata cache
+    await CacheManager.purgeAll()
+
     res.sendStatus(200)
     // Triggers browser refresh for all clients
     SocketAuthority.emitter('backup_applied')
