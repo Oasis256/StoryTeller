@@ -19,7 +19,6 @@
   "ButtonDeleteLocalItem": "Smazat místní položku",
   "ButtonDisableAutoTimer": "Zakázat automatický časovač",
   "ButtonDisconnect": "Odpojit",
-  "ButtonGoToWebClient": "Go to Web Client",
   "ButtonHistory": "Historie",
   "ButtonHome": "Domů",
   "ButtonIssues": "Problémy",
@@ -187,7 +186,6 @@
   "LabelPlaybackLocal": "Místní",
   "LabelPlaybackSpeed": "Rychlost přehrávání",
   "LabelPlaybackTranscode": "Překódovává se",
-  "LabelPodcast": "Podcast",
   "LabelPodcasts": "Podcasty",
   "LabelPreventIndexing": "Zabránit indexování vašeho kanálu v adresářích podcastů iTunes a Google",
   "LabelProgress": "Průběh",
@@ -197,6 +195,7 @@
   "LabelRSSFeedCustomOwnerName": "Vlastní jméno vlastníka",
   "LabelRSSFeedPreventIndexing": "Zabránit indexování",
   "LabelRSSFeedSlug": "Klíčové slovo kanálu RSS",
+  "LabelRandomly": "Náhodně",
   "LabelRead": "Číst",
   "LabelReadAgain": "Číst znovu",
   "LabelRecentSeries": "Nedávné série",
@@ -259,7 +258,11 @@
   "MessageDownloadCompleteProcessing": "Stahování dokončeno. Zpracovává se...",
   "MessageDownloading": "Stahuje se...",
   "MessageDownloadingEpisode": "Stahuji epizodu",
+<<<<<<< HEAD
   "MessageEpisodesQueuedForDownload": "{0} epizod ve frontě ke stažení",
+=======
+  "MessageEpisodesQueuedForDownload": "{0} Epizody zařazené do fronty ke stažení",
+>>>>>>> bcc202ff3b76989eb24d4bbe738d1d79ad85622e
   "MessageFeedURLWillBe": "URL zdroje bude {0}",
   "MessageFetching": "Získává se...",
   "MessageFollowTheProjectOnGithub": "Sledujte projekt na GitHubu",
@@ -280,7 +283,6 @@
   "MessageNoMediaFolders": "Žádné složky médií",
   "MessageNoNetworkConnection": "Žádné připojení k síti",
   "MessageNoPodcastsFound": "Nebyly nalezeny žádné podcasty",
-  "MessageNoSeries": "No series",
   "MessageNoUpdatesWereNecessary": "Nebyly nutné žádné aktualizace",
   "MessageNoUserPlaylists": "Nemáte žádné seznamy skladeb",
   "MessageReportBugsAndContribute": "Nahlašte chyby, vyžádejte si funkce a přispěte na",
