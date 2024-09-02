@@ -196,7 +196,7 @@ module.exports = {
    * @param {import('../../models/User')} user
    * @param {string[]} include
    * @param {number} limit
-   * @returns {{ series:import('../../objects/entities/Series')[], count:number}}
+   * @returns {{ series:any[], count:number}}
    */
   async getSeriesMostRecentlyAdded(library, user, include, limit) {
     if (!library.isBook) return { series: [], count: 0 }
@@ -276,7 +276,7 @@ module.exports = {
 
     const allOldSeries = []
     for (const s of series) {
-      const oldSeries = s.getOldSeries().toJSON()
+      const oldSeries = s.toOldJSON()
 
       if (s.feeds?.length) {
         oldSeries.rssFeed = Database.feedModel.getOldFeed(s.feeds[0]).toJSONMinified()
