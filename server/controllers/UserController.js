@@ -205,9 +205,12 @@ class UserController {
   async update(req, res) {
     const user = req.reqUser
 
-    if (user.type === 'root' && !req.user.isRoot) {
+    if (user.isRoot && !req.user.isRoot) {
       Logger.error(`[UserController] Admin user "${req.user.username}" attempted to update root user`)
       return res.sendStatus(403)
+    } else if (user.isRoot) {
+      // Root user cannot update type
+      delete req.body.type
     }
 
     const updatePayload = req.body
@@ -270,8 +273,10 @@ class UserController {
       const permissions = {
         ...user.permissions
       }
+      const defaultPermissions = Database.userModel.getDefaultPermissionsForUserType(updatePayload.type || user.type || 'user')
       for (const key in updatePayload.permissions) {
-        if (permissions[key] !== undefined) {
+        // Check that the key is a valid permission key or is included in the default permissions
+        if (permissions[key] !== undefined || defaultPermissions[key] !== undefined) {
           if (typeof updatePayload.permissions[key] !== 'boolean') {
             Logger.warn(`[UserController] update: Invalid permission value for key ${key}. Should be boolean`)
           } else if (permissions[key] !== updatePayload.permissions[key]) {
