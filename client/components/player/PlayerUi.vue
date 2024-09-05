@@ -167,6 +167,7 @@ export default {
   methods: {
     toggleFullscreen(isFullscreen) {
       this.$store.commit('setPlayerIsFullscreen', isFullscreen)
+<<<<<<< HEAD
       var videoPlayerEl = document.getElementById('video-player')
       if (videoPlayerEl) {
         if (isFullscreen) {
@@ -182,6 +183,8 @@ export default {
           videoPlayerEl.style.left = '16px'
         }
       }
+=======
+>>>>>>> 0344a63b480ac9385c5ee019c25eea86c2ed6802
     },
     setDuration(duration) {
       this.duration = duration
