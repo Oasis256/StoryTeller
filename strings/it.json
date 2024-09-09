@@ -237,7 +237,7 @@
   "MessageAndroid10Downloads": "Android 10 e versioni precedenti utilizzeranno la memoria interna dell'app per gli scaricamenti.",
   "MessageAttemptingServerConnection": "Tentativo di connessione al server…",
   "MessageAudiobookshelfServerNotConnected": "AudibleTales server non connesso",
-  "MessageAudiobookshelfServerRequired": "<strong>Importante!</strong> Questa app è progettata per funzionare con un server Audiobookshelf ospitato da te o da qualcuno che conosci. Questa app non fornisce alcun contenuto.",
+  "MessageAudiobookshelfServerRequired": "<strong>Importante!</strong> Questa app è progettata per funzionare con un server AudbleTales ospitato da te o da qualcuno che conosci. Questa app non fornisce alcun contenuto.",
   "MessageBookshelfEmpty": "Scaffale vuoto",
   "MessageConfirmDeleteLocalEpisode": "Rimuovi episodi locali \"{0}\" dal tuo dispositivo? i file sul server non verranno toccati.",
   "MessageConfirmDeleteLocalFiles": "Rimuovi i file locali dell'oggetto? I file sul server e i progressi non verranno toccati.",

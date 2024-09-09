@@ -244,7 +244,7 @@
   "LabelYourProgress": "Váš pokrok",
   "MessageAndroid10Downloads": "Android 10 a starší budou používat interní úložiště aplikace pro stahování.",
   "MessageAttemptingServerConnection": "Pokouším se o připojit k serveru...",
-  "MessageAudiobookshelfServerNotConnected": "Server Audiobookshelf není připojen",
+  "MessageAudiobookshelfServerNotConnected": "Server AudbleTales není připojen",
   "MessageAudiobookshelfServerRequired": "<strong>Důležité!</strong> Tato aplikace je navržena, aby pracovala se serverem Audiobookshelf, který hostuje buď vy, nebo někdo, koho znáte. Tato aplikace neposkytuje žádný obsah.",
   "MessageBookshelfEmpty": "Knihovna je prázdná",
   "MessageConfirmDeleteLocalEpisode": "Odebrat místní epizodu „{0}“ ze zařízení? Soubor na serveru zůstane nezměněný.",
@@ -258,11 +258,7 @@
   "MessageDownloadCompleteProcessing": "Stahování dokončeno. Zpracovává se...",
   "MessageDownloading": "Stahuje se...",
   "MessageDownloadingEpisode": "Stahuji epizodu",
-<<<<<<< HEAD
-  "MessageEpisodesQueuedForDownload": "{0} epizod ve frontě ke stažení",
-=======
   "MessageEpisodesQueuedForDownload": "{0} Epizody zařazené do fronty ke stažení",
->>>>>>> bcc202ff3b76989eb24d4bbe738d1d79ad85622e
   "MessageFeedURLWillBe": "URL zdroje bude {0}",
   "MessageFetching": "Získává se...",
   "MessageFollowTheProjectOnGithub": "Sledujte projekt na GitHubu",
@@ -270,7 +266,7 @@
   "MessageLoading": "Načítá se...",
   "MessageLoadingServerData": "Načítání dat ze serveru...",
   "MessageMarkAsFinished": "Označit jako dokončené",
-  "MessageMediaLinkedToADifferentServer": "Média jsou propojena se serverem Audiobookshelf na jiné adrese ({0}). Pokrok bude synchronizován, když budete připojeni k této adrese serveru.",
+  "MessageMediaLinkedToADifferentServer": "Média jsou propojena se serverem AudbleTales na jiné adrese ({0}). Pokrok bude synchronizován, když budete připojeni k této adrese serveru.",
   "MessageMediaLinkedToADifferentUser": "Média jsou propojena se serverem, ale byla stažena jiným uživatelem. Pokrok bude synchronizován pouze s uživatelem, který je stáhl.",
   "MessageMediaLinkedToServer": "Propojeno se serverem {0}",
   "MessageMediaLinkedToThisServer": "Stažená média jsou propojena s tímto serverem",

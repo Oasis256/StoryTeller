@@ -249,7 +249,7 @@
   "LabelYourProgress": "Ваш прогрес",
   "MessageAndroid10Downloads": "У Android 10 та нижче для завантажень буде використано внутрішню пам'ять додатку.",
   "MessageAttemptingServerConnection": "Спроба підключення до сервера...",
-  "MessageAudiobookshelfServerNotConnected": "Сервер Audiobookshelf не підключений",
+  "MessageAudiobookshelfServerNotConnected": "Сервер AudbleTales не підключений",
   "MessageAudiobookshelfServerRequired": "<strong>Важливо!</strong> Цей додаток розроблений для роботи з сервером Audiobookshelf, яким володієте ви або ваші знайомі. Цей додаток не надає жодного контенту.",
   "MessageBookshelfEmpty": "Полиця порожня",
   "MessageConfirmDeleteLocalEpisode": "Видалити локальний епізод \"{0}\" з вашого пристрою? Файл лишиться на сервері.",

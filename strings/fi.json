@@ -186,7 +186,7 @@
   "LabelYourProgress": "Edistymisesi",
   "MessageAndroid10Downloads": "Android 10 ja sitä vanhemmat käyttävät sovelluksen sisäistä tallennustilaa latauksiin.",
   "MessageAttemptingServerConnection": "Yritetään palvelinyhteyttä...",
-  "MessageAudiobookshelfServerNotConnected": "Audiobookshelf palvelinta ei ole yhdistetty",
+  "MessageAudiobookshelfServerNotConnected": "AudbleTales palvelinta ei ole yhdistetty",
   "MessageBookshelfEmpty": "Kirjahylly on tyhjä",
   "MessageConfirmDiscardProgress": "Haluatko varmasti nollata edistymisesi?",
   "MessageConfirmDownloadUsingCellular": "Olet lataamassa mobiilidatan avulla. Tämä voi aiheuttaa operaattorin datamaksuja. Haluatko jatkaa?",

@@ -39,7 +39,7 @@ body:
   - type: dropdown
     id: version
     attributes:
-      label: Audiobookshelf App Version
+      label: AudbleTales App Version
       description: Please ensure your app is up to date. *If you are using a 3rd-party app, please reach out to them directly.*
       multiple: true
       options:

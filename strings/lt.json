@@ -134,24 +134,6 @@
   "LabelUsername": "Vartotojo vardas",
   "LabelYourBookmarks": "Jūsų skirtukai",
   "LabelYourProgress": "Jūsų pažanga",
-<<<<<<< HEAD
-  "MessageAndroid10Downloads": "Android 10 and below will use internal app storage for downloads.",
-  "MessageAttemptingServerConnection": "Attempting server connection...",
-  "MessageAudiobookshelfServerNotConnected": "AudibleTales Server not connected",
-  "MessageAudiobookshelfServerRequired": "<strong>Important!</strong> This app is designed to work with an AudibleTales Server that you or someone you know is hosting. This app does not provide any content.",
-  "MessageBookshelfEmpty": "Bookshelf empty",
-  "MessageConfirmDeleteLocalEpisode": "Remove local episode \"{0}\" from your device? The file on the server will be unaffected.",
-  "MessageConfirmDeleteLocalFiles": "Remove local files of this item from your device? The files on the server and your progress will be unaffected.",
-  "MessageConfirmDiscardProgress": "Are you sure you want to reset your progress?",
-  "MessageConfirmDownloadUsingCellular": "You are about to download using cellular data. This may include carrier data charges. Do you wish to continue?",
-  "MessageConfirmMarkAsFinished": "Are you sure you want to mark this item as finished?",
-  "MessageConfirmRemoveBookmark": "Are you sure you want to remove bookmark?",
-  "MessageConfirmStreamingUsingCellular": "You are about to stream using cellular data. This may include carrier data charges. Do you wish to continue?",
-  "MessageDiscardProgress": "Discard Progress",
-  "MessageDownloadCompleteProcessing": "Download complete. Processing...",
-  "MessageDownloading": "Downloading...",
-=======
->>>>>>> bcc202ff3b76989eb24d4bbe738d1d79ad85622e
   "MessageDownloadingEpisode": "Epizodas atsisiunčiamas",
   "MessageEpisodesQueuedForDownload": "{0} epizodai laukia atsisiuntimo",
   "MessageFeedURLWillBe": "Srauto URL bus {0}",
@@ -159,14 +141,6 @@
   "MessageFollowTheProjectOnGithub": "Follow the project on GitHub",
   "MessageLoading": "Kraunama...",
   "MessageMarkAsFinished": "Pažymėti kaip užbaigtą",
-<<<<<<< HEAD
-  "MessageMediaLinkedToADifferentServer": "Media is linked to an AudibleTales Server on a different address ({0}). Progress will be synced when connected to this server address.",
-  "MessageMediaLinkedToADifferentUser": "Media is linked to this server but was downloaded by a different user. Progress will only be synced to the user that downloaded it.",
-  "MessageMediaLinkedToServer": "Linked to server {0}",
-  "MessageMediaLinkedToThisServer": "Downloaded media is linked to this server",
-  "MessageMediaNotLinkedToServer": "Media is not linked to an AudibleTales Server. No progress will be synced.",
-=======
->>>>>>> bcc202ff3b76989eb24d4bbe738d1d79ad85622e
   "MessageNoBookmarks": "Nėra žymų",
   "MessageNoChapters": "Nėra skyrių",
   "MessageNoItems": "Nėra elementų",
