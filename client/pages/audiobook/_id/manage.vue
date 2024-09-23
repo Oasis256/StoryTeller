@@ -10,14 +10,12 @@
         </div>
       </div>
     </div>
-
     <div class="flex justify-center mb-2">
       <div class="w-full max-w-2xl">
         <p class="text-xl">{{ $strings.HeaderMetadataToEmbed }}</p>
       </div>
       <div class="w-full max-w-2xl"></div>
     </div>
-
     <div class="flex justify-center flex-wrap">
       <div class="w-full max-w-2xl border border-white border-opacity-10 bg-bg mx-2">
         <div class="flex py-2 px-4">
@@ -57,9 +55,7 @@
         </div>
       </div>
     </div>
-
     <div class="w-full h-px bg-white bg-opacity-10 my-8" />
-
     <div class="w-full max-w-4xl mx-auto">
       <!-- queued alert -->
       <widgets-alert v-if="isMetadataEmbedQueued" type="warning" class="mb-4">
@@ -68,9 +64,7 @@
       <!-- metadata embed action buttons -->
       <div v-else-if="isEmbedTool" class="w-full flex justify-end items-center mb-4">
         <ui-checkbox v-if="!isTaskFinished" v-model="shouldBackupAudioFiles" :disabled="processing" label="Backup audio files" medium checkbox-bg="bg" label-class="pl-2 text-base md:text-lg" @input="toggleBackupAudioFiles" />
-
         <div class="flex-grow" />
-
         <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" :progress="progress" @click.stop="embedClick">{{ $strings.ButtonStartMetadataEmbed }}</ui-btn>
         <p v-else-if="taskFailed" class="text-error text-lg font-semibold">{{ $strings.MessageEmbedFailed }} {{ taskError }}</p>
         <p v-else class="text-success text-lg font-semibold">{{ $strings.MessageEmbedFinished }}</p>
@@ -80,15 +74,12 @@
         <button :disabled="processing" class="text-sm uppercase text-gray-200 flex items-center pt-px pl-1 pr-2 hover:bg-white/5 rounded-md" @click="showEncodeOptions = !showEncodeOptions">
           <span class="material-symbols text-xl">{{ showEncodeOptions || usingCustomEncodeOptions ? 'check_box' : 'check_box_outline_blank' }}</span> <span class="pl-1">Use Advanced Options</span>
         </button>
-
         <div class="flex-grow" />
-
         <ui-btn v-if="!isTaskFinished && processing" color="error" :loading="isCancelingEncode" class="mr-2" @click.stop="cancelEncodeClick">{{ $strings.ButtonCancelEncode }}</ui-btn>
         <ui-btn v-if="!isTaskFinished" color="primary" :loading="processing" :progress="progress" @click.stop="encodeM4bClick">{{ $strings.ButtonStartM4BEncode }}</ui-btn>
         <p v-else-if="taskFailed" class="text-error text-lg font-semibold">{{ $strings.MessageM4BFailed }} {{ taskError }}</p>
         <p v-else class="text-success text-lg font-semibold">{{ $strings.MessageM4BFinished }}</p>
       </div>
-
       <!-- advanced encoding options -->
       <div v-if="isM4BTool" class="overflow-hidden">
         <transition name="slide">
@@ -102,7 +93,6 @@
           </div>
         </transition>
       </div>
-
       <div class="mb-4">
         <div v-if="isEmbedTool" class="flex items-start mb-2">
           <span class="material-symbols text-base text-warning pt-1">star</span>
@@ -114,7 +104,6 @@
             Finished M4B will be put into your audiobook folder at <span class="rounded-md bg-neutral-600 text-sm text-white py-0.5 px-1 font-mono">.../{{ libraryItemRelPath }}/</span>.
           </p>
         </div>
-
         <div v-if="shouldBackupAudioFiles || isM4BTool" class="flex items-start mb-2">
           <span class="material-symbols text-base text-warning pt-1">star</span>
           <p class="text-gray-200 ml-2">
@@ -139,7 +128,6 @@
         </div>
       </div>
     </div>
-
     <div class="w-full max-w-4xl mx-auto">
       <p class="mb-2 font-semibold">{{ $strings.HeaderAudioTracks }}</p>
       <div class="w-full mx-auto border border-white border-opacity-10 bg-bg">
@@ -172,7 +160,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   async asyncData({ store, params, app, redirect, route }) {
@@ -198,7 +185,6 @@ export default {
       cnosole.error('No audio files')
       return redirect('/?error=no audio files')
     }
-
     return {
       libraryItem
     }
@@ -345,7 +331,6 @@ export default {
       if (this.$refs.bitrateInput) this.$refs.bitrateInput.blur()
       if (this.$refs.channelsInput) this.$refs.channelsInput.blur()
       if (this.$refs.codecInput) this.$refs.codecInput.blur()
-
       let queryStr = ''
       if (this.showEncodeOptions) {
         const options = []
@@ -405,9 +390,7 @@ export default {
           this.selectedToolUpdated()
         }
       }
-
       if (this.task) this.taskUpdated(this.task)
-
       const shouldBackupAudioFiles = localStorage.getItem('embedMetadataShouldBackup')
       this.shouldBackupAudioFiles = shouldBackupAudioFiles != 0
 

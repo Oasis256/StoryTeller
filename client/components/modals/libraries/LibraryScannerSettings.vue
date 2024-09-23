@@ -4,7 +4,6 @@
       <h2 class="text-base md:text-lg text-gray-200">{{ $strings.HeaderMetadataOrderOfPrecedence }}</h2>
       <ui-btn small @click="resetToDefault">{{ $strings.ButtonResetToDefault }}</ui-btn>
     </div>
-
     <div class="flex items-center justify-between md:justify-start mb-4">
       <p class="text-sm text-gray-300 pr-2">{{ $strings.LabelMetadataOrderOfPrecedenceDescription }}</p>
       <ui-tooltip :text="$strings.LabelClickForMoreInfo" class="inline-flex">
@@ -13,7 +12,6 @@
         </a>
       </ui-tooltip>
     </div>
-
     <draggable v-model="metadataSourceMapped" v-bind="dragOptions" class="list-group" draggable=".item" handle=".drag-handle" tag="ul" @start="drag = true" @end="drag = false" @update="draggableUpdate">
       <transition-group type="transition" :name="!drag ? 'flip-list' : null">
         <li v-for="(source, index) in metadataSourceMapped" :key="source.id" :class="source.include ? 'item' : 'opacity-50'" class="w-full px-2 flex items-center relative border border-white/10">
@@ -32,10 +30,8 @@
     </draggable>
   </div>
 </template>
-
 <script>
 import draggable from 'vuedraggable'
-
 export default {
   components: {
     draggable
@@ -83,7 +79,7 @@ export default {
         },
         absMetadata: {
           id: 'absMetadata',
-          name: 'Audiobookshelf metadata file',
+          name: 'AudbleTales metadata file',
           include: true
         }
       },
@@ -118,7 +114,6 @@ export default {
         this.metadataSourceMapped.push({ ...this.metadataSourceData[key] })
       }
       this.metadataSourceMapped.reverse()
-
       this.$emit('update', this.getLibraryData())
     },
     getLibraryData() {
@@ -142,14 +137,12 @@ export default {
     init() {
       const metadataPrecedence = this.librarySettings.metadataPrecedence || []
       this.metadataSourceMapped = metadataPrecedence.map((source) => this.metadataSourceData[source]).filter((s) => s)
-
       for (const sourceKey in this.metadataSourceData) {
         if (!metadataPrecedence.includes(sourceKey)) {
           const unusedSourceData = { ...this.metadataSourceData[sourceKey], include: false }
           this.metadataSourceMapped.unshift(unusedSourceData)
         }
       }
-
       this.metadataSourceMapped.reverse()
     }
   },

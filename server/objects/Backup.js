@@ -69,7 +69,7 @@ class Backup {
 
     this.backupDirPath = backupDirPath
 
-    this.filename = this.id + '.audiobookshelf'
+    this.filename = this.id + '.shelf'
     this.path = Path.join('backups', this.filename)
     this.fullPath = Path.join(this.backupDirPath, this.filename)
 

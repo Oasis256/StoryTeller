@@ -1,6 +1,6 @@
 ---
 
-name: Build and Push Docker Image
+name: Build and Push Image to DockerHub
 
 on:
   # Allows you to run workflow manually from Actions tab
@@ -11,7 +11,7 @@ on:
         required: true
         default: 'latest'
   push:
-    branches: [main,master]
+    branches: [AudioTales]
     tags:
       - 'v*.*.*'
     # Only build when files in these directories have been changed
@@ -34,7 +34,8 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: advplyr/audiobookshelf,ghcr.io/${{ github.repository_owner }}/audiobookshelf
+          # images: advplyr/audiobookshelf,ghcr.io/${{ github.repository_owner }}/audiobookshelf
+          image: oasis256/storytales
           tags: |
             type=edge,branch=master
             type=semver,pattern={{version}}
@@ -59,12 +60,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Login to ghcr
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PASSWORD }}
+      # - name: Login to ghcr
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.repository_owner }}
+      #     password: ${{ secrets.GHCR_PASSWORD }}
 
       - name: Build image
         uses: docker/build-push-action@v3

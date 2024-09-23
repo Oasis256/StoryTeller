@@ -152,15 +152,15 @@ export default {
     matchingExistingOptions() {
       return [
         {
-          text: 'Do not match',
+          text: 'Do not Match',
           value: null
         },
         {
-          text: 'Match by email',
+          text: 'Match by Email',
           value: 'email'
         },
         {
-          text: 'Match by username',
+          text: 'Match by Username',
           value: 'username'
         }
       ]

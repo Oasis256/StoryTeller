@@ -3,11 +3,9 @@
     <div class="w-full relative mb-1">
       <div class="absolute -top-10 lg:top-0 right-0 lg:right-2 flex items-center h-full">
         <!-- <span class="material-symbols text-2xl cursor-pointer" @click="toggleFullscreen(true)">expand_less</span> -->
-
         <ui-tooltip direction="top" :text="$strings.LabelVolume">
           <controls-volume-control ref="volumeControl" v-model="volume" @input="setVolume" class="mx-2 hidden sm:block" />
         </ui-tooltip>
-
         <ui-tooltip v-if="!hideSleepTimer" direction="top" :text="$strings.LabelSleepTimer">
           <button :aria-label="$strings.LabelSleepTimer" class="text-gray-300 hover:text-white mx-1 lg:mx-2" @mousedown.prevent @mouseup.prevent @click.stop="$emit('showSleepTimer')">
             <span v-if="!sleepTimerSet" class="material-symbols text-2xl">snooze</span>
@@ -17,25 +15,21 @@
             </div>
           </button>
         </ui-tooltip>
-
         <ui-tooltip v-if="!isPodcast && !hideBookmarks" direction="top" :text="$strings.LabelViewBookmarks">
           <button :aria-label="$strings.LabelViewBookmarks" class="text-gray-300 hover:text-white mx-1 lg:mx-2" @mousedown.prevent @mouseup.prevent @click.stop="$emit('showBookmarks')">
             <span class="material-symbols text-2xl">{{ bookmarks.length ? 'bookmarks' : 'bookmark_border' }}</span>
           </button>
         </ui-tooltip>
-
         <ui-tooltip v-if="chapters.length" direction="top" :text="$strings.LabelViewChapters">
           <button :aria-label="$strings.LabelViewChapters" class="text-gray-300 hover:text-white mx-1 lg:mx-2" @mousedown.prevent @mouseup.prevent @click.stop="showChapters">
             <span class="material-symbols text-2xl">format_list_bulleted</span>
           </button>
         </ui-tooltip>
-
         <ui-tooltip v-if="playerQueueItems.length" direction="top" :text="$strings.LabelViewQueue">
           <button :aria-label="$strings.LabelViewQueue" class="outline-none text-gray-300 mx-1 lg:mx-2 hover:text-white" @mousedown.prevent @mouseup.prevent @click.stop="$emit('showPlayerQueueItems')">
             <span class="material-symbols text-2.5xl sm:text-3xl">playlist_play</span>
           </button>
         </ui-tooltip>
-
         <ui-tooltip direction="top" :text="$strings.LabelViewPlayerSettings">
           <button :aria-label="$strings.LabelViewPlayerSettings" class="outline-none text-gray-300 mx-1 lg:mx-2 hover:text-white" @mousedown.prevent @mouseup.prevent @click.stop="$emit('showPlayerSettings')">
             <span class="material-symbols text-2xl sm:text-2.5xl">settings_slow_motion</span>
@@ -45,9 +39,7 @@
 
       <player-playback-controls :loading="loading" :seek-loading="seekLoading" :playback-rate.sync="playbackRate" :paused="paused" :hasNextChapter="hasNextChapter" :hasNextItemInQueue="hasNextItemInQueue" @prevChapter="prevChapter" @next="goToNext" @jumpForward="jumpForward" @jumpBackward="jumpBackward" @setPlaybackRate="setPlaybackRate" @playPause="playPause" />
     </div>
-
     <player-track-bar ref="trackbar" :loading="loading" :chapters="chapters" :duration="duration" :current-chapter="currentChapter" :playback-rate="playbackRate" @seek="seek" />
-
     <div class="flex">
       <p ref="currentTimestamp" class="font-mono text-xxs sm:text-sm text-gray-100 pointer-events-auto">00:00:00</p>
       <p class="font-mono text-sm hidden sm:block text-gray-100 pointer-events-auto">&nbsp;/&nbsp;{{ progressPercent }}%</p>
@@ -58,11 +50,9 @@
       <div class="flex-grow" />
       <p class="font-mono text-xxs sm:text-sm text-gray-100 pointer-events-auto">{{ timeRemainingPretty }}</p>
     </div>
-
     <modals-chapters-modal v-model="showChaptersModal" :current-chapter="currentChapter" :playback-rate="playbackRate" :chapters="chapters" @select="selectChapter" />
   </div>
 </template>
-
 <script>
 export default {
   props: {
@@ -141,7 +131,6 @@ export default {
     progressPercent() {
       const duration = this.useChapterTrack ? this.currentChapterDuration : this.duration
       const time = this.useChapterTrack ? Math.max(this.currentTime - this.currentChapterStart) : this.currentTime
-
       if (!duration) return 0
       return Math.round((100 * time) / duration)
     },
@@ -178,6 +167,24 @@ export default {
   methods: {
     toggleFullscreen(isFullscreen) {
       this.$store.commit('setPlayerIsFullscreen', isFullscreen)
+<<<<<<< HEAD
+      var videoPlayerEl = document.getElementById('video-player')
+      if (videoPlayerEl) {
+        if (isFullscreen) {
+          videoPlayerEl.style.width = '100vw'
+          videoPlayerEl.style.height = '100vh'
+          videoPlayerEl.style.top = '0px'
+          videoPlayerEl.style.left = '0px'
+        } else {
+          videoPlayerEl.style.width = '384px'
+          videoPlayerEl.style.height = '216px'
+          videoPlayerEl.style.top = 'unset'
+          videoPlayerEl.style.bottom = '80px'
+          videoPlayerEl.style.left = '16px'
+        }
+      }
+=======
+>>>>>>> 0344a63b480ac9385c5ee019c25eea86c2ed6802
     },
     setDuration(duration) {
       this.duration = duration
@@ -234,7 +241,6 @@ export default {
     setUseChapterTrack() {
       this.useChapterTrack = !this.useChapterTrack
       if (this.$refs.trackbar) this.$refs.trackbar.setUseChapterTrack(this.useChapterTrack)
-
       this.$store.dispatch('user/updateUserSettings', { useChapterTrack: this.useChapterTrack })
       this.updateTimestamp()
     },
@@ -307,7 +313,6 @@ export default {
     },
     init() {
       this.playbackRate = this.$store.getters['user/getUserSetting']('playbackRate') || 1
-
       if (this.$refs.trackbar) this.$refs.trackbar.setUseChapterTrack(this.useChapterTrack)
       this.setPlaybackRate(this.playbackRate)
     },
@@ -321,7 +326,6 @@ export default {
         this.toggleFullscreen(false)
         return
       }
-
       if (this.loading) return
       this.$emit('close')
     },
@@ -341,7 +345,6 @@ export default {
   mounted() {
     this.$eventBus.$on('player-hotkey', this.hotkey)
     this.$eventBus.$on('user-settings', this.settingsUpdated)
-
     this.init()
   },
   beforeDestroy() {
@@ -350,7 +353,6 @@ export default {
   }
 }
 </script>
-
 <style>
 .loadingTrack {
   animation-name: loadingTrack;

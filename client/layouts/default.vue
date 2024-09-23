@@ -604,11 +604,13 @@ export default {
 #app-content {
   width: 100%;
 }
+
 #app-content.has-siderail {
   width: calc(100% - 80px);
   max-width: calc(100% - 80px);
   margin-left: 80px;
 }
+
 @media (max-width: 768px) {
   #app-content.has-siderail {
     width: 100%;

@@ -19,7 +19,6 @@
           </div>
           <div v-else class="text-xs sm:text-base cursor-pointer pl-1 sm:pl-1.5">{{ $strings.LabelUnknown }}</div>
         </div>
-
         <div class="text-gray-400 flex items-center">
           <span class="material-symbols text-xs">schedule</span>
           <p class="font-mono text-xs sm:text-sm pl-1 sm:pl-1.5 pb-px">{{ totalDurationPretty }}</p>
@@ -55,9 +54,7 @@
       @showPlayerQueueItems="showPlayerQueueItemsModal = true"
       @showPlayerSettings="showPlayerSettingsModal = true"
     />
-
     <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime" :library-item-id="libraryItemId" @select="selectBookmark" />
-
     <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-type="sleepTimerType" :remaining="sleepTimerRemaining" :has-chapters="!!chapters.length" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer" @decrement="decrementSleepTimer" />
 
     <modals-player-queue-items-modal v-model="showPlayerQueueItemsModal" />
@@ -65,10 +62,8 @@
     <modals-player-settings-modal v-model="showPlayerSettingsModal" />
   </div>
 </template>
-
 <script>
 import PlayerHandler from '@/players/PlayerHandler'
-
 export default {
   data() {
     return {
@@ -219,7 +214,6 @@ export default {
     setSleepTimer(time) {
       this.sleepTimerSet = true
       this.showSleepTimerModal = false
-
       this.sleepTimerType = time.timerType
       if (this.sleepTimerType === this.$constants.SleepTimerTypes.COUNTDOWN) {
         this.runSleepTimer(time)
@@ -227,14 +221,12 @@ export default {
     },
     runSleepTimer(time) {
       this.sleepTimerRemaining = time.seconds
-
       var lastTick = Date.now()
       clearInterval(this.sleepTimer)
       this.sleepTimer = setInterval(() => {
         var elapsed = Date.now() - lastTick
         lastTick = Date.now()
         this.sleepTimerRemaining -= elapsed / 1000
-
         if (this.sleepTimerRemaining <= 0) {
           this.sleepTimerEnd()
         }
@@ -303,7 +295,6 @@ export default {
       if (this.$refs.audioPlayer) {
         this.$refs.audioPlayer.setCurrentTime(time)
       }
-
       if (this.sleepTimerType === this.$constants.SleepTimerTypes.CHAPTER && this.sleepTimerSet) {
         this.checkChapterEnd(time)
       }
@@ -377,7 +368,6 @@ export default {
         console.error('setMediaSession: No library item set')
         return
       }
-
       if ('mediaSession' in navigator) {
         var coverImageSrc = this.$store.getters['globals/getLibraryItemCoverSrc'](this.streamLibraryItem, '/Logo.png', true)
         const artwork = [
@@ -385,7 +375,6 @@ export default {
             src: coverImageSrc
           }
         ]
-
         navigator.mediaSession.metadata = new MediaMetadata({
           title: this.title,
           artist: this.playerHandler.displayAuthor || this.mediaMetadata.authorName || 'Unknown',
@@ -393,7 +382,6 @@ export default {
           artwork
         })
         console.log('Set media session metadata', navigator.mediaSession.metadata)
-
         navigator.mediaSession.setActionHandler('play', this.mediaSessionPlay)
         navigator.mediaSession.setActionHandler('pause', this.mediaSessionPause)
         navigator.mediaSession.setActionHandler('stop', this.mediaSessionStop)
@@ -490,7 +478,6 @@ export default {
     async playLibraryItem(payload) {
       const libraryItemId = payload.libraryItemId
       const episodeId = payload.episodeId || null
-
       if (this.playerHandler.libraryItemId == libraryItemId && this.playerHandler.episodeId == episodeId) {
         if (payload.startTime !== null && !isNaN(payload.startTime)) {
           this.seek(payload.startTime)
@@ -499,13 +486,11 @@ export default {
         }
         return
       }
-
       const libraryItem = await this.$axios.$get(`/api/items/${libraryItemId}?expanded=1`).catch((error) => {
         console.error('Failed to fetch full item', error)
         return null
       })
       if (!libraryItem) return
-
       this.$store.commit('setMediaPlaying', {
         libraryItem,
         episodeId,
@@ -513,11 +498,9 @@ export default {
       })
       // Set cover aspect ratio for this item's library since the library may change
       this.coverAspectRatio = this.$store.getters['libraries/getBookCoverAspectRatio']
-
       this.$nextTick(() => {
         if (this.$refs.audioPlayer) this.$refs.audioPlayer.checkUpdateChapterTrack()
       })
-
       this.playerHandler.load(libraryItem, episodeId, true, this.currentPlaybackRate, payload.startTime)
     },
     pauseItem() {
@@ -553,7 +536,6 @@ export default {
   }
 }
 </script>
-
 <style>
 #mediaPlayerContainer {
   box-shadow: 0px -6px 8px #1111113f;
