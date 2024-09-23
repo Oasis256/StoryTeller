@@ -1,7 +1,9 @@
 {
   "name": "audbletales",
-  "version": "0.9.76",
-  "author": "Oasis Innocent",
+  "version": "2.13.2",
+  "buildNumber": 1,
+  "description": "Self-hosted audiobook and podcast server",
+  "main": "index.js",
   "scripts": {
     "dev": "nuxt --hostname 0.0.0.0 --port 1337",
     "build": "nuxt build",
