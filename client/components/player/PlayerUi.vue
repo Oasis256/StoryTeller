@@ -36,7 +36,6 @@
           </button>
         </ui-tooltip>
       </div>
-
       <player-playback-controls :loading="loading" :seek-loading="seekLoading" :playback-rate.sync="playbackRate" :paused="paused" :hasNextChapter="hasNextChapter" :hasNextItemInQueue="hasNextItemInQueue" @prevChapter="prevChapter" @next="goToNext" @jumpForward="jumpForward" @jumpBackward="jumpBackward" @setPlaybackRate="setPlaybackRate" @playPause="playPause" />
     </div>
     <player-track-bar ref="trackbar" :loading="loading" :chapters="chapters" :duration="duration" :current-chapter="currentChapter" :playback-rate="playbackRate" @seek="seek" />
@@ -167,24 +166,6 @@ export default {
   methods: {
     toggleFullscreen(isFullscreen) {
       this.$store.commit('setPlayerIsFullscreen', isFullscreen)
-<<<<<<< HEAD
-      var videoPlayerEl = document.getElementById('video-player')
-      if (videoPlayerEl) {
-        if (isFullscreen) {
-          videoPlayerEl.style.width = '100vw'
-          videoPlayerEl.style.height = '100vh'
-          videoPlayerEl.style.top = '0px'
-          videoPlayerEl.style.left = '0px'
-        } else {
-          videoPlayerEl.style.width = '384px'
-          videoPlayerEl.style.height = '216px'
-          videoPlayerEl.style.top = 'unset'
-          videoPlayerEl.style.bottom = '80px'
-          videoPlayerEl.style.left = '16px'
-        }
-      }
-=======
->>>>>>> 0344a63b480ac9385c5ee019c25eea86c2ed6802
     },
     setDuration(duration) {
       this.duration = duration
