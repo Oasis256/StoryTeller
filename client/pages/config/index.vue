@@ -267,7 +267,7 @@ export default {
         })
         .catch((error) => {
           console.error('Failed to update prefixes', error)
-          this.$toast.error(this.$strings.ToastSortingPrefixesUpdateFailed)
+          this.$toast.error(this.$strings.ToastFailedToUpdate)
         })
         .finally(() => {
           this.savingPrefixes = false
@@ -314,7 +314,7 @@ export default {
         .catch((error) => {
           console.error('Failed to update server settings', error)
           this.updatingServerSettings = false
-          this.$toast.error(this.$strings.ToastServerSettingsUpdateFailed)
+          this.$toast.error(this.$strings.ToastFailedToUpdate)
         })
     },
     initServerSettings() {
