@@ -1,4 +1,5 @@
 const pkg = require('./package.json')
+
 module.exports = {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -9,6 +10,7 @@ module.exports = {
     chromecastReceiver: 'FD1F76C5'
   },
   telemetry: false,
+
   publicRuntimeConfig: {
     version: pkg.version,
     routerBasePath: process.env.ROUTER_BASE_PATH || ''
@@ -74,12 +76,12 @@ module.exports = {
     ],
     // },
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: (process.env.ROUTER_BASE_PATH || '') + '/favicon.ico' },
-      { rel: 'apple-touch-icon', href: (process.env.ROUTER_BASE_PATH || '') + '/ios_icon.png' }
+      { rel: 'icon', type: 'image/x-icon', href: routerBasePath + '/favicon.ico' },
+      { rel: 'apple-touch-icon', href: routerBasePath + '/ios_icon.png' }
     ]
   },
   router: {
-    base: process.env.ROUTER_BASE_PATH || ''
+    base: routerBasePath
   },
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: ['@/assets/tailwind.css', '@/assets/app.css'],
@@ -95,23 +97,24 @@ module.exports = {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: ['nuxt-socket-io', '@nuxtjs/axios', '@nuxtjs/proxy'],
   proxy: {
-    '/api/': { target: process.env.NODE_ENV !== 'production' ? 'http://localhost:3333' : '/' },
-    '/dev/': { target: 'http://localhost:3333', pathRewrite: { '^/dev/': '' } }
+    [`${routerBasePath}/api/`]: { target: process.env.NODE_ENV !== 'production' ? serverHostUrl : '/' },
+    [`${routerBasePath}/public/`]: { target: process.env.NODE_ENV !== 'production' ? serverHostUrl : '/' },
+    [`${routerBasePath}/hls/`]: { target: process.env.NODE_ENV !== 'production' ? serverHostUrl : '/' }
   },
   io: {
-    sockets: [
-      {
-        name: 'dev',
-        url: 'http://localhost:3333'
-      },
-      {
-        name: 'prod'
-      }
-    ]
+
+    sockets: [{
+      name: 'dev',
+      url: serverHostUrl
+    },
+    {
+      name: 'prod'
+    }]
+
   },
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    baseURL: process.env.ROUTER_BASE_PATH || ''
+    baseURL: routerBasePath
   },
   // nuxt/pwa https://pwa.nuxtjs.org
   pwa: {
@@ -130,11 +133,11 @@ module.exports = {
       background_color: '#232323',
       icons: [
         {
-          src: (process.env.ROUTER_BASE_PATH || '') + '/icon.svg',
+          src: routerBasePath + '/icon.svg',
           sizes: 'any'
         },
         {
-          src: (process.env.ROUTER_BASE_PATH || '') + '/icon192.png',
+          src: routerBasePath + '/icon192.png',
           type: 'image/png',
           sizes: 'any'
         }
