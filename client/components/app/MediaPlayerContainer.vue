@@ -162,7 +162,7 @@ export default {
     },
     podcastAuthor() {
       if (!this.isPodcast) return null
-      return this.mediaMetadata.author || 'Unknown'
+      return this.mediaMetadata.author || this.$strings.LabelUnknown
     },
     hasNextItemInQueue() {
       return this.currentPlayerQueueIndex < this.playerQueueItems.length - 1
@@ -243,7 +243,7 @@ export default {
     sleepTimerEnd() {
       this.clearSleepTimer()
       this.playerHandler.pause()
-      this.$toast.info('Sleep Timer Done.. zZzzZz')
+      this.$toast.info(this.$strings.ToastSleepTimerDone)
     },
     cancelSleepTimer() {
       this.showSleepTimerModal = false
@@ -508,7 +508,7 @@ export default {
     },
     showFailedProgressSyncs() {
       if (!isNaN(this.syncFailedToast)) this.$toast.dismiss(this.syncFailedToast)
-      this.syncFailedToast = this.$toast('Progress is not being synced. Restart playback', { timeout: false, type: 'error' })
+      this.syncFailedToast = this.$toast(this.$strings.ToastProgressIsNotBeingSynced, { timeout: false, type: 'error' })
     },
     sessionClosedEvent(sessionId) {
       if (this.playerHandler.currentSessionId === sessionId) {
