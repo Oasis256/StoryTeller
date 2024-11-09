@@ -75,7 +75,7 @@ server {
       proxy_pass                          http://<URL_to_forward_to>;
       proxy_redirect                      http:// https://;
 
-      # Prevent 413 Request Entity Too Large error 
+      # Prevent 413 Request Entity Too Large error
       # by increasing the maximum allowed size of the client request body
       # For example, set it to 10 GiB
       client_max_body_size                10240M;
@@ -211,7 +211,9 @@ Health checking is enabled by default. `Http check method` of `OPTIONS` is not s
 # Contributing
 This application is built using [NodeJs](https://nodejs.org/).
 ### Localization
-Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see Audiobookshelf in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/horizontal-auto.svg" alt="Translation status" /> </a>
+
+Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see Audiobookshelf in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-web-client/horizontal-auto.svg" alt="Translation status" /> </a>
+
 ### Dev Container Setup
 The easiest way to begin developing this project is to use a dev container. An introduction to dev containers in VSCode can be found [here](https://code.visualstudio.com/docs/devcontainers/containers).
 Required Software:
