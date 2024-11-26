@@ -31,8 +31,18 @@ AudbleTales is a self-hosted audiobook and podcast server.
   - Epub, pdf, cbr, cbz
   - Send ebook to device (i.e. Kindle)
 - Open RSS feeds for podcasts and audiobooks
+
 Is there a feature you are looking for? [Suggest it](https://github.com/Oasis256/StoryTellerssues/new/choose)
-Join us on [Discord](https://discord.gg/HQgCbd6E75) or [Matrix](https://matrix.to/#/#audiobookshelf:matrix.org)
+Join us on [Discord](https://discord.gg/HQgCbd6E75)
+
+### Demo
+
+Check out the web client demo: https://audiobooks.dev/ (thanks for hosting [@Vito0912](https://github.com/Vito0912)!)
+
+Username/password: `demo`/`demo` (user account)
+
+
+>>>>>>> 950993f652869a7a3b68765d7f6537e151f5ab11
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
 ### iOS App (beta)
