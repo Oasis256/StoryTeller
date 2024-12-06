@@ -42,7 +42,6 @@ Check out the web client demo: https://audiobooks.dev/ (thanks for hosting [@Vit
 Username/password: `demo`/`demo` (user account)
 
 
->>>>>>> 950993f652869a7a3b68765d7f6537e151f5ab11
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
 ### iOS App (beta)
