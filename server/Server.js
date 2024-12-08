@@ -53,7 +53,6 @@ class Server {
     global.RouterBasePath = ROUTER_BASE_PATH
     global.XAccel = process.env.USE_X_ACCEL
     global.AllowCors = process.env.ALLOW_CORS === '1'
-    global.AllowIframe = process.env.ALLOW_IFRAME === '1'
     global.DisableSsrfRequestFilter = process.env.DISABLE_SSRF_REQUEST_FILTER === '1'
 
     if (!fs.pathExistsSync(global.ConfigPath)) {
@@ -195,7 +194,7 @@ class Server {
     const app = express()
 
     app.use((req, res, next) => {
-      if (!global.AllowIframe) {
+      if (!global.ServerSettings.allowIframe) {
         // Prevent clickjacking by disallowing iframes
         res.setHeader('Content-Security-Policy', "frame-ancestors 'self'")
       }
@@ -251,14 +250,17 @@ class Server {
 
     const router = express.Router()
     // if RouterBasePath is set, modify all requests to include the base path
-    if (global.RouterBasePath) {
-      app.use((req, res, next) => {
-        if (!req.url.startsWith(global.RouterBasePath)) {
-          req.url = `${global.RouterBasePath}${req.url}`
-        }
-        next()
-      })
-    }
+    app.use((req, res, next) => {
+      const urlStartsWithRouterBasePath = req.url.startsWith(global.RouterBasePath)
+      const host = req.get('host')
+      const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
+      const prefix = urlStartsWithRouterBasePath ? global.RouterBasePath : ''
+      req.originalHostPrefix = `${protocol}://${host}${prefix}`
+      if (!urlStartsWithRouterBasePath) {
+        req.url = `${global.RouterBasePath}${req.url}`
+      }
+      next()
+    })
     app.use(global.RouterBasePath, router)
     app.disable('x-powered-by')
 

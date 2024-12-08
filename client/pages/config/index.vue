@@ -39,10 +39,12 @@
               <ui-btn v-if="hasPrefixesChanged" color="success" :loading="savingPrefixes" small @click="updateSortingPrefixes">Save</ui-btn>
             </div>
           </div>
+
           <div class="flex items-center py-2 mb-2">
             <ui-toggle-switch labeledBy="settings-chromecast-support" v-model="newServerSettings.chromecastEnabled" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('chromecastEnabled', val)" />
             <p class="pl-4" id="settings-chromecast-support">{{ $strings.LabelSettingsChromecastSupport }}</p>
           </div>
+
           <div class="pt-4">
             <h2 class="font-semibold">{{ $strings.HeaderSettingsScanner }}</h2>
           </div>
@@ -85,6 +87,20 @@
                 <span class="material-symbols icon-text">info</span>
               </p>
             </ui-tooltip>
+          </div>
+
+          <div class="pt-4">
+            <h2 class="font-semibold">{{ $strings.HeaderSettingsWebClient }}</h2>
+          </div>
+
+          <div class="flex items-center py-2">
+            <ui-toggle-switch labeledBy="settings-chromecast-support" v-model="newServerSettings.chromecastEnabled" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('chromecastEnabled', val)" />
+            <p class="pl-4" id="settings-chromecast-support">{{ $strings.LabelSettingsChromecastSupport }}</p>
+          </div>
+
+          <div class="flex items-center py-2 mb-2">
+            <ui-toggle-switch labeledBy="settings-allow-iframe" v-model="newServerSettings.allowIframe" :disabled="updatingServerSettings" @input="(val) => updateSettingsKey('allowIframe', val)" />
+            <p class="pl-4" id="settings-allow-iframe">{{ $strings.LabelSettingsAllowIframe }}</p>
           </div>
         </div>
         <div class="flex-1">
@@ -301,6 +317,7 @@ export default {
     },
     updateServerSettings(payload) {
       this.updatingServerSettings = true
+<<<<<<< HEAD
       this.$store
         .dispatch('updateServerSettings', payload)
         .then(() => {
@@ -315,6 +332,23 @@ export default {
           this.updatingServerSettings = false
           this.$toast.error(this.$strings.ToastFailedToUpdate)
         })
+=======
+      this.$store.dispatch('updateServerSettings', payload).then((response) => {
+        this.updatingServerSettings = false
+
+        if (response.error) {
+          console.error('Failed to update server settins', response.error)
+          this.$toast.error(response.error)
+          this.initServerSettings()
+          return
+        }
+
+        if (payload.language) {
+          // Updating language after save allows for re-rendering
+          this.$setLanguageCode(payload.language)
+        }
+      })
+>>>>>>> 190a1000d9b5909b5bcd953f32f39fa8f261ecb9
     },
     initServerSettings() {
       this.newServerSettings = this.serverSettings ? { ...this.serverSettings } : {}
