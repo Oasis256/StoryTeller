@@ -317,22 +317,7 @@ export default {
     },
     updateServerSettings(payload) {
       this.updatingServerSettings = true
-<<<<<<< HEAD
-      this.$store
-        .dispatch('updateServerSettings', payload)
-        .then(() => {
-          this.updatingServerSettings = false
-          if (payload.language) {
-            // Updating language after save allows for re-rendering
-            this.$setLanguageCode(payload.language)
-          }
-        })
-        .catch((error) => {
-          console.error('Failed to update server settings', error)
-          this.updatingServerSettings = false
-          this.$toast.error(this.$strings.ToastFailedToUpdate)
-        })
-=======
+
       this.$store.dispatch('updateServerSettings', payload).then((response) => {
         this.updatingServerSettings = false
 
@@ -348,7 +333,7 @@ export default {
           this.$setLanguageCode(payload.language)
         }
       })
->>>>>>> 190a1000d9b5909b5bcd953f32f39fa8f261ecb9
+
     },
     initServerSettings() {
       this.newServerSettings = this.serverSettings ? { ...this.serverSettings } : {}

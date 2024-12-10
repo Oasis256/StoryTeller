@@ -1,11 +1,7 @@
 {
-<<<<<<< HEAD
   "Title1": "Audble",
   "Title2": "Tales",
-  "ButtonAdd": "增加",
-=======
   "ButtonAdd": "添加",
->>>>>>> 2a62992c751c104e8b294bbbcf898f171e46e356
   "ButtonAddChapters": "新增章節",
   "ButtonAddDevice": "新增設備",
   "ButtonAddLibrary": "新增庫",
