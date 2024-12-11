@@ -596,6 +596,8 @@
   "LabelSize": "Size",
   "LabelSleepTimer": "Sleep timer",
   "LabelSlug": "Slug",
+  "LabelSortAscending": "Ascending",
+  "LabelSortDescending": "Descending",
   "LabelStart": "Start",
   "LabelStartTime": "Start Time",
   "LabelStarted": "Started",
