@@ -193,24 +193,6 @@ class Podcast {
   checkHasEpisode(episodeId) {
     return this.episodes.some((ep) => ep.id === episodeId)
   }
-  checkHasEpisodeByFeedEpisode(feedEpisode) {
-    const guid = feedEpisode.guid
-    const url = feedEpisode.enclosure.url
-    return this.episodes.some((ep) => (ep.guid && ep.guid === guid) || ep.checkEqualsEnclosureUrl(url))
-  }
-
-  // Only checks container format
-  checkCanDirectPlay(payload, episodeId) {
-    var episode = this.episodes.find((ep) => ep.id === episodeId)
-    if (!episode) return false
-    return episode.checkCanDirectPlay(payload)
-  }
-
-  getDirectPlayTracklist(episodeId) {
-    var episode = this.episodes.find((ep) => ep.id === episodeId)
-    if (!episode) return false
-    return episode.getDirectPlayTracklist()
-  }
 
   addPodcastEpisode(podcastEpisode) {
     this.episodes.push(podcastEpisode)
@@ -224,22 +206,6 @@ class Podcast {
     return episode
   }
 
-  getPlaybackTitle(episodeId) {
-    var episode = this.episodes.find((ep) => ep.id == episodeId)
-    if (!episode) return this.metadata.title
-    return episode.title
-  }
-
-  getPlaybackAuthor() {
-    return this.metadata.author
-  }
-
-  getEpisodeDuration(episodeId) {
-    var episode = this.episodes.find((ep) => ep.id == episodeId)
-    if (!episode) return 0
-    return episode.duration
-  }
-
   getEpisode(episodeId) {
     if (!episodeId) return null
 
@@ -247,10 +213,6 @@ class Podcast {
     if (episodeId.startsWith('ep_')) return this.episodes.find((ep) => ep.oldEpisodeId == episodeId)
 
     return this.episodes.find((ep) => ep.id == episodeId)
-  }
-
-  getChapters(episodeId) {
-    return this.getEpisode(episodeId)?.chapters?.map((ch) => ({ ...ch })) || []
   }
 }
 module.exports = Podcast

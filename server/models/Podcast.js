@@ -259,6 +259,10 @@ class Podcast extends Model {
       this.autoDownloadSchedule = payload.autoDownloadSchedule
       hasUpdates = true
     }
+    if (typeof payload.lastEpisodeCheck === 'number' && payload.lastEpisodeCheck !== this.lastEpisodeCheck?.valueOf()) {
+      this.lastEpisodeCheck = payload.lastEpisodeCheck
+      hasUpdates = true
+    }
 
     const numberKeys = ['maxEpisodesToKeep', 'maxNewEpisodesToDownload']
     numberKeys.forEach((key) => {
@@ -274,6 +278,103 @@ class Podcast extends Model {
     }
 
     return hasUpdates
+  }
+
+  checkCanDirectPlay(supportedMimeTypes, episodeId) {
+    if (!Array.isArray(supportedMimeTypes)) {
+      Logger.error(`[Podcast] checkCanDirectPlay: supportedMimeTypes is not an array`, supportedMimeTypes)
+      return false
+    }
+    const episode = this.podcastEpisodes.find((ep) => ep.id === episodeId)
+    if (!episode) {
+      Logger.error(`[Podcast] checkCanDirectPlay: episode not found`, episodeId)
+      return false
+    }
+    return supportedMimeTypes.includes(episode.audioFile.mimeType)
+  }
+
+  /**
+   * Get the track list to be used in client audio players
+   * AudioTrack is the AudioFile with startOffset and contentUrl
+   * Podcast episodes only have one track
+   *
+   * @param {string} libraryItemId
+   * @param {string} episodeId
+   * @returns {import('./Book').AudioTrack[]}
+   */
+  getTracklist(libraryItemId, episodeId) {
+    const episode = this.podcastEpisodes.find((ep) => ep.id === episodeId)
+    if (!episode) {
+      Logger.error(`[Podcast] getTracklist: episode not found`, episodeId)
+      return []
+    }
+
+    const audioTrack = episode.getAudioTrack(libraryItemId)
+    return [audioTrack]
+  }
+
+  /**
+   *
+   * @param {string} episodeId
+   * @returns {import('./PodcastEpisode').ChapterObject[]}
+   */
+  getChapters(episodeId) {
+    const episode = this.podcastEpisodes.find((ep) => ep.id === episodeId)
+    if (!episode) {
+      Logger.error(`[Podcast] getChapters: episode not found`, episodeId)
+      return []
+    }
+
+    return structuredClone(episode.chapters) || []
+  }
+
+  getPlaybackTitle(episodeId) {
+    const episode = this.podcastEpisodes.find((ep) => ep.id === episodeId)
+    if (!episode) {
+      Logger.error(`[Podcast] getPlaybackTitle: episode not found`, episodeId)
+      return ''
+    }
+
+    return episode.title
+  }
+
+  getPlaybackAuthor() {
+    return this.author
+  }
+
+  getPlaybackDuration(episodeId) {
+    const episode = this.podcastEpisodes.find((ep) => ep.id === episodeId)
+    if (!episode) {
+      Logger.error(`[Podcast] getPlaybackDuration: episode not found`, episodeId)
+      return 0
+    }
+
+    return episode.duration
+  }
+
+  /**
+   *
+   * @returns {number} - Unix timestamp
+   */
+  getLatestEpisodePublishedAt() {
+    return this.podcastEpisodes.reduce((latest, episode) => {
+      if (episode.publishedAt?.valueOf() > latest) {
+        return episode.publishedAt.valueOf()
+      }
+      return latest
+    }, 0)
+  }
+
+  /**
+   * Used for checking if an rss feed episode is already in the podcast
+   *
+   * @param {Object} feedEpisode - object from rss feed
+   * @returns {boolean}
+   */
+  checkHasEpisodeByFeedEpisode(feedEpisode) {
+    const guid = feedEpisode.guid
+    const url = feedEpisode.enclosure.url
+    return this.podcastEpisodes.some((ep) => ep.checkMatchesGuidOrEnclosureUrl(guid, url))
   }
 
   /**

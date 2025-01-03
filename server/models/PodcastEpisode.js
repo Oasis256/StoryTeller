@@ -135,21 +135,43 @@ class PodcastEpisode extends Model {
     PodcastEpisode.belongsTo(podcast)
   }
 
+  get size() {
+    return this.audioFile?.metadata.size || 0
+  }
+
+  get duration() {
+    return this.audioFile?.duration || 0
+  }
+
   /**
-   * AudioTrack object used in old model
+   * Used for matching the episode with an episode in the RSS feed
    *
-   * @returns {import('./Book').AudioFileObject|null}
+   * @param {string} guid
+   * @param {string} enclosureURL
+   * @returns {boolean}
    */
-  get track() {
-    if (!this.audioFile) return null
+  checkMatchesGuidOrEnclosureUrl(guid, enclosureURL) {
+    if (this.extraData?.guid && this.extraData.guid === guid) {
+      return true
+    }
+    if (this.enclosureURL && this.enclosureURL === enclosureURL) {
+      return true
+    }
+    return false
+  }
+
+  /**
+   * Used in client players
+   *
+   * @param {string} libraryItemId
+   * @returns {import('./Book').AudioTrack}
+   */
+  getAudioTrack(libraryItemId) {
     const track = structuredClone(this.audioFile)
     track.startOffset = 0
     track.title = this.audioFile.metadata.title
+    track.contentUrl = `${global.RouterBasePath}/api/items/${libraryItemId}/file/${track.ino}`
     return track
-  }
-
-  get size() {
-    return this.audioFile?.metadata.size || 0
   }
 
   /**
@@ -228,9 +250,9 @@ class PodcastEpisode extends Model {
   toOldJSONExpanded(libraryItemId) {
     const json = this.toOldJSON(libraryItemId)
 
-    json.audioTrack = this.track
+    json.audioTrack = this.getAudioTrack(libraryItemId)
     json.size = this.size
-    json.duration = this.audioFile?.duration || 0
+    json.duration = this.duration
 
     return json
   }
