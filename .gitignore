@@ -91,3 +91,4 @@ sw.*
 
 /resources/
 /android/app/release/
+.codegpt
