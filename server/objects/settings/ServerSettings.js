@@ -3,65 +3,51 @@ const packageJson = require('../../../package.json')
 const { BookshelfView } = require('../../utils/constants')
 const Logger = require('../../Logger')
 const User = require('../../models/User')
-
 class ServerSettings {
   constructor(settings) {
     this.id = 'server-settings'
     this.tokenSecret = null
-
     // Scanner
     this.scannerParseSubtitle = false
     this.scannerFindCovers = false
     this.scannerCoverProvider = 'google'
     this.scannerPreferMatchedMetadata = false
     this.scannerDisableWatcher = false
-
     // Metadata - choose to store inside users library item folder
     this.storeCoverWithItem = false
     this.storeMetadataWithItem = false
     this.metadataFileFormat = 'json'
-
     // Security/Rate limits
     this.rateLimitLoginRequests = 10
     this.rateLimitLoginWindow = 10 * 60 * 1000 // 10 Minutes
     this.allowIframe = false
-
     // Backups
     this.backupPath = Path.join(global.MetadataPath, 'backups')
     this.backupSchedule = false // If false then auto-backups are disabled
     this.backupsToKeep = 2
     this.maxBackupSize = 1
-
     // Logger
     this.loggerDailyLogsToKeep = 7
     this.loggerScannerLogsToKeep = 2
-
     // Bookshelf Display
     this.homeBookshelfView = BookshelfView.DETAIL
     this.bookshelfView = BookshelfView.DETAIL
-
     // Podcasts
     this.podcastEpisodeSchedule = '0 * * * *' // Every hour
-
     // Sorting
     this.sortingIgnorePrefix = false
     this.sortingPrefixes = ['the', 'a']
-
     // Misc Flags
     this.chromecastEnabled = false
     this.dateFormat = 'MM/dd/yyyy'
     this.timeFormat = 'HH:mm'
     this.language = 'en-us'
-
     this.logLevel = Logger.logLevel
-
     this.version = packageJson.version
     this.buildNumber = packageJson.buildNumber
-
     // Auth settings
     this.authLoginCustomMessage = null
     this.authActiveAuthMethods = ['local']
-
     // openid settings
     this.authOpenIDIssuerURL = null
     this.authOpenIDAuthorizationURL = null
@@ -76,16 +62,14 @@ class ServerSettings {
     this.authOpenIDAutoLaunch = false
     this.authOpenIDAutoRegister = false
     this.authOpenIDMatchExistingBy = null
-    this.authOpenIDMobileRedirectURIs = ['audiobookshelf://oauth']
+    this.authOpenIDMobileRedirectURIs = ['audbleshelf://oauth']
     this.authOpenIDGroupClaim = ''
     this.authOpenIDAdvancedPermsClaim = ''
     this.authOpenIDSubfolderForRedirectURLs = undefined
-
     if (settings) {
       this.construct(settings)
     }
   }
-
   construct(settings) {
     this.tokenSecret = settings.tokenSecret
     this.scannerFindCovers = !!settings.scannerFindCovers
@@ -93,26 +77,20 @@ class ServerSettings {
     this.scannerParseSubtitle = settings.scannerParseSubtitle
     this.scannerPreferMatchedMetadata = !!settings.scannerPreferMatchedMetadata
     this.scannerDisableWatcher = !!settings.scannerDisableWatcher
-
     this.storeCoverWithItem = !!settings.storeCoverWithItem
     this.storeMetadataWithItem = !!settings.storeMetadataWithItem
     this.metadataFileFormat = settings.metadataFileFormat || 'json'
-
     this.rateLimitLoginRequests = !isNaN(settings.rateLimitLoginRequests) ? Number(settings.rateLimitLoginRequests) : 10
     this.rateLimitLoginWindow = !isNaN(settings.rateLimitLoginWindow) ? Number(settings.rateLimitLoginWindow) : 10 * 60 * 1000 // 10 Minutes
     this.allowIframe = !!settings.allowIframe
-
     this.backupPath = settings.backupPath || Path.join(global.MetadataPath, 'backups')
     this.backupSchedule = settings.backupSchedule || false
     this.backupsToKeep = settings.backupsToKeep || 2
     this.maxBackupSize = settings.maxBackupSize === 0 ? 0 : settings.maxBackupSize || 1
-
     this.loggerDailyLogsToKeep = settings.loggerDailyLogsToKeep || 7
     this.loggerScannerLogsToKeep = settings.loggerScannerLogsToKeep || 2
-
     this.homeBookshelfView = settings.homeBookshelfView || BookshelfView.STANDARD
     this.bookshelfView = settings.bookshelfView || BookshelfView.STANDARD
-
     this.sortingIgnorePrefix = !!settings.sortingIgnorePrefix
     this.sortingPrefixes = settings.sortingPrefixes || ['the']
     this.chromecastEnabled = !!settings.chromecastEnabled
@@ -122,10 +100,8 @@ class ServerSettings {
     this.logLevel = settings.logLevel || Logger.logLevel
     this.version = settings.version || null
     this.buildNumber = settings.buildNumber || 0 // Added v2.4.5
-
     this.authLoginCustomMessage = settings.authLoginCustomMessage || null // Added v2.8.0
     this.authActiveAuthMethods = settings.authActiveAuthMethods || ['local']
-
     this.authOpenIDIssuerURL = settings.authOpenIDIssuerURL || null
     this.authOpenIDAuthorizationURL = settings.authOpenIDAuthorizationURL || null
     this.authOpenIDTokenURL = settings.authOpenIDTokenURL || null
@@ -139,26 +115,22 @@ class ServerSettings {
     this.authOpenIDAutoLaunch = !!settings.authOpenIDAutoLaunch
     this.authOpenIDAutoRegister = !!settings.authOpenIDAutoRegister
     this.authOpenIDMatchExistingBy = settings.authOpenIDMatchExistingBy || null
-    this.authOpenIDMobileRedirectURIs = settings.authOpenIDMobileRedirectURIs || ['audiobookshelf://oauth']
+    this.authOpenIDMobileRedirectURIs = settings.authOpenIDMobileRedirectURIs || ['audbleshelf://oauth']
     this.authOpenIDGroupClaim = settings.authOpenIDGroupClaim || ''
     this.authOpenIDAdvancedPermsClaim = settings.authOpenIDAdvancedPermsClaim || ''
     this.authOpenIDSubfolderForRedirectURLs = settings.authOpenIDSubfolderForRedirectURLs
-
     if (!Array.isArray(this.authActiveAuthMethods)) {
       this.authActiveAuthMethods = ['local']
     }
-
     // remove uninitialized methods
     // OpenID
     if (this.authActiveAuthMethods.includes('openid') && !this.isOpenIDAuthSettingsValid) {
       this.authActiveAuthMethods.splice(this.authActiveAuthMethods.indexOf('openid', 0), 1)
     }
-
     // fallback to local
     if (!Array.isArray(this.authActiveAuthMethods) || this.authActiveAuthMethods.length == 0) {
       this.authActiveAuthMethods = ['local']
     }
-
     // Migrations
     if (settings.storeCoverWithBook != undefined) {
       // storeCoverWithBook was renamed to storeCoverWithItem in 2.0.0
@@ -177,28 +149,23 @@ class ServerSettings {
       // All users using old settings will stay abs until changed
       this.metadataFileFormat = 'abs'
     }
-
     // As of v2.4.5 only json is supported
     if (this.metadataFileFormat !== 'json') {
       Logger.warn(`[ServerSettings] Invalid metadataFileFormat ${this.metadataFileFormat} (as of v2.4.5 only json is supported)`)
       this.metadataFileFormat = 'json'
     }
-
     if (this.logLevel !== Logger.logLevel) {
       Logger.setLogLevel(this.logLevel)
     }
-
     if (process.env.BACKUP_PATH && this.backupPath !== process.env.BACKUP_PATH) {
       Logger.info(`[ServerSettings] Using backup path from environment variable ${process.env.BACKUP_PATH}`)
       this.backupPath = process.env.BACKUP_PATH
     }
-
     if (process.env.ALLOW_IFRAME === '1' && !this.allowIframe) {
       Logger.info(`[ServerSettings] Using allowIframe from environment variable`)
       this.allowIframe = true
     }
   }
-
   toJSON() {
     // Use toJSONForBrowser if sending to client
     return {
@@ -254,7 +221,6 @@ class ServerSettings {
       authOpenIDSubfolderForRedirectURLs: this.authOpenIDSubfolderForRedirectURLs
     }
   }
-
   toJSONForBrowser() {
     const json = this.toJSON()
     delete json.tokenSecret
@@ -265,18 +231,15 @@ class ServerSettings {
     delete json.authOpenIDAdvancedPermsClaim
     return json
   }
-
   get supportedAuthMethods() {
     return ['local', 'openid']
   }
-
   /**
    * Auth settings required for openid to be valid
    */
   get isOpenIDAuthSettingsValid() {
     return this.authOpenIDIssuerURL && this.authOpenIDAuthorizationURL && this.authOpenIDTokenURL && this.authOpenIDUserInfoURL && this.authOpenIDJwksURL && this.authOpenIDClientID && this.authOpenIDClientSecret && this.authOpenIDTokenSigningAlgorithm
   }
-
   get authenticationSettings() {
     return {
       authLoginCustomMessage: this.authLoginCustomMessage,
@@ -298,11 +261,9 @@ class ServerSettings {
       authOpenIDGroupClaim: this.authOpenIDGroupClaim, // Do not return to client
       authOpenIDAdvancedPermsClaim: this.authOpenIDAdvancedPermsClaim, // Do not return to client
       authOpenIDSubfolderForRedirectURLs: this.authOpenIDSubfolderForRedirectURLs,
-
       authOpenIDSamplePermissions: User.getSampleAbsPermissions()
     }
   }
-
   get authFormData() {
     const clientFormData = {
       authLoginCustomMessage: this.authLoginCustomMessage
@@ -313,7 +274,6 @@ class ServerSettings {
     }
     return clientFormData
   }
-
   /**
    * Update server settings
    *
