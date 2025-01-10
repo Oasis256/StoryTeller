@@ -17,16 +17,12 @@ RUN apk update && \
   g++ \
   tini \
   unzip
-
 COPY --from=build /client/dist /client/dist
 COPY index.js package* /
 COPY server server
-
 ARG TARGETPLATFORM
-
 ENV NUSQLITE3_DIR="/usr/local/lib/nusqlite3"
 ENV NUSQLITE3_PATH="${NUSQLITE3_DIR}/libnusqlite3.so"
-
 RUN case "$TARGETPLATFORM" in \
   "linux/amd64") \
   curl -L -o /tmp/library.zip "https://github.com/mikiher/nunicode-sqlite/releases/download/v1.2/libnusqlite3-linux-musl-x64.zip" ;; \
@@ -36,9 +32,12 @@ RUN case "$TARGETPLATFORM" in \
   esac && \
   unzip /tmp/library.zip -d $NUSQLITE3_DIR && \
   rm /tmp/library.zip
-
 RUN npm ci --only=production
 RUN apk del make python3 g++
 EXPOSE 80
+ENV PORT=80
+ENV CONFIG_PATH="/config"
+ENV METADATA_PATH="/metadata"
+ENV SOURCE="docker"
 ENTRYPOINT ["tini", "--"]
 CMD ["node", "index.js"]
