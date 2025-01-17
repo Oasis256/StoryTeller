@@ -53,9 +53,8 @@
       @showSleepTimer="showSleepTimerModal = true"
       @showPlayerQueueItems="showPlayerQueueItemsModal = true"
     />
-    <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime" :library-item-id="libraryItemId" @select="selectBookmark" />
+    <modals-bookmarks-modal v-model="showBookmarksModal" :bookmarks="bookmarks" :current-time="bookmarkCurrentTime" :playback-rate="currentPlaybackRate" :library-item-id="libraryItemId" @select="selectBookmark" />
     <modals-sleep-timer-modal v-model="showSleepTimerModal" :timer-set="sleepTimerSet" :timer-type="sleepTimerType" :remaining="sleepTimerRemaining" :has-chapters="!!chapters.length" @set="setSleepTimer" @cancel="cancelSleepTimer" @increment="incrementSleepTimer" @decrement="decrementSleepTimer" />
-
     <modals-player-queue-items-modal v-model="showPlayerQueueItemsModal" />
   </div>
 </template>
@@ -364,7 +363,6 @@ export default {
         console.error('setMediaSession: No library item set')
         return
       }
-
       // https://developer.mozilla.org/en-US/docs/Web/API/Media_Session_API
       if ('mediaSession' in navigator) {
         const chapterInfo = []
@@ -376,7 +374,6 @@ export default {
             })
           })
         }
-
         navigator.mediaSession.metadata = new MediaMetadata({
           title: this.title,
           artist: this.playerHandler.displayAuthor || this.mediaMetadata.authorName || 'Unknown',

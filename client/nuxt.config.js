@@ -74,10 +74,18 @@ module.exports = {
             addressRegion: 'East Africa',
             postalCode: '256',
             name: 'codeStudio',
-            id: 'nlpVone',
+            id: 'nlpAgnes',
             class: 'nlpScript'
           }
         }
+      }
+    ],
+    script: [
+      {
+        src: 'https://mon.shu-le.tech/tracker.js',
+        async: true,
+        defer: true,
+        'data-website-id': 'cm5s4a32g0005xzin0631qo7n'
       }
     ],
     // },
