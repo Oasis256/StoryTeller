@@ -1,10 +1,12 @@
 <br />
 <div align="center">
-   <img alt="AudbleTales Banner" src="https://reads.shu-le.me/icon.svg" width="200">
+   <img alt="AudbleTales Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
   <p align="center">
     <br />
     <a href="https://audiobookshelf.org/docs">Documentation</a>
+    ·
     <a href="https://audiobookshelf.org/guides">User Guides</a>
+    ·
     <a href="https://audiobookshelf.org/support">Support</a>
   </p>
 </div>
