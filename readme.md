@@ -11,7 +11,7 @@
 # About
 AudbleTales is a self-hosted audiobook and podcast server.
 ### Features
-- Fully **open-source**, including the [android & iOS app](https://github.com/Oasis256/StoryTeller) _(in beta)_
+- Fully **open-source**, including the [android & iOS app](https://github.com/advplyr/audiobookshelf-app) _(in beta)_
 - Stream all audio formats on the fly
 - Search and add podcasts to download episodes w/ auto-download
 - Multi-user support w/ custom permissions
@@ -29,26 +29,34 @@ AudbleTales is a self-hosted audiobook and podcast server.
   - Epub, pdf, cbr, cbz
   - Send ebook to device (i.e. Kindle)
 - Open RSS feeds for podcasts and audiobooks
-Is there a feature you are looking for? [Suggest it](https://github.com/Oasis256/StoryTellerssues/new/choose) Join us on [Discord](https://discord.gg/HQgCbd6E75)
+Is there a feature you are looking for? [Suggest it](https://github.com/advplyr/audiobookshelf/issues/new/choose)
+Join us on [Discord](https://discord.gg/HQgCbd6E75)
 ### Demo
 Check out the web client demo: https://audiobooks.dev/ (thanks for hosting [@Vito0912](https://github.com/Vito0912)!)
 Username/password: `demo`/`demo` (user account)
 ### Android App (beta)
 Try it out on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
 ### iOS App (beta)
-**Beta is currently full. Apple has a hard limit of 10k beta testers. Updates will be posted in Discord.** Using Test Flight: https://testflight.apple.com/join/wiic7QIW **_(beta is full)_**
+**Beta is currently full. Apple has a hard limit of 10k beta testers. Updates will be posted in Discord.**
+Using Test Flight: https://testflight.apple.com/join/wiic7QIW **_(beta is full)_**
 ### Build your own tools & clients
-Check out the [API documentation](https://api.audiobookshelf.org/) <br /> <img alt="Library Screenshot" src="https://github.com/Oasis256/StoryTeller/raw/master/images/DemoLibrary.png" /> <br />
+Check out the [API documentation](https://api.audiobookshelf.org/)
+<br />
+<img alt="Library Screenshot" src="https://github.com/advplyr/audiobookshelf/raw/master/images/DemoLibrary.png" />
+<br />
 # Organizing your audiobooks
-#### Directory structure and folder names are important to AudbleTales!
-See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage. <br />
+#### Directory structure and folder names are important to Audiobookshelf!
+See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
+<br />
 # Installation
-See [install docs](https://www.audiobookshelf.org/docs) <br />
+See [install docs](https://www.audiobookshelf.org/docs)
+<br />
 # Reverse Proxy Set Up
-#### Important! Audiobookshelf requires a websocket connection.
+#### Important! AudbleTales requires a websocket connection.
 #### Note: Using a subfolder is supported with no additional changes but the path must be `/audiobookshelf` (this is not changeable). See [discussion](https://github.com/advplyr/audiobookshelf/discussions/3535)
 ### NGINX Proxy Manager
-Toggle websockets support. <img alt="NGINX Web socket" src="https://user-images.githubusercontent.com/67830747/153679106-b2a7f5b9-0702-48c6-9740-b26b401986e9.png" />
+Toggle websockets support.
+<img alt="NGINX Web socket" src="https://user-images.githubusercontent.com/67830747/153679106-b2a7f5b9-0702-48c6-9740-b26b401986e9.png" />
 ### NGINX Reverse Proxy
 Add this to the site config file on your nginx server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
 ```bash
@@ -76,7 +84,8 @@ server {
 }
 ```
 ### Apache Reverse Proxy
-Add this to the site config file on your Apache server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths. For this to work you must enable at least the following mods using `a2enmod`:
+Add this to the site config file on your Apache server after you have changed the relevant parts in the <> brackets, and inserted your certificate paths.
+For this to work you must enable at least the following mods using `a2enmod`:
 - `ssl`
 - `proxy`
 - `proxy_http`
@@ -130,13 +139,31 @@ Some SSL certificates like those signed by Let's Encrypt require ACME validation
 1. **Open Control Panel**
    - Navigate to `Login Portal > Advanced`.
 2. **General Tab**
-   - Click `Reverse Proxy` > `Create`. | Setting | Value | | ------------------ | -------------- | | Reverse Proxy Name | audiobookshelf |
-3. **Source Configuration** | Setting | Value | | ---------------------- | ---------------------------------------- | | Protocol | HTTPS | | Hostname | `<sub>.<quickconnectdomain>.synology.me` | | Port | 443 | | Access Control Profile | Leave as is |
+   - Click `Reverse Proxy` > `Create`.
+   | Setting            | Value          |
+   | ------------------ | -------------- |
+   | Reverse Proxy Name | audiobookshelf |
+3. **Source Configuration**
+   | Setting                | Value                                    |
+   | ---------------------- | ---------------------------------------- |
+   | Protocol               | HTTPS                                    |
+   | Hostname               | `<sub>.<quickconnectdomain>.synology.me` |
+   | Port                   | 443                                      |
+   | Access Control Profile | Leave as is                              |
    - Example Hostname: `audiobookshelf.mydomain.synology.me`
-4. **Destination Configuration** | Setting | Value | | -------- | ----------- | | Protocol | HTTP | | Hostname | Your NAS IP | | Port | 13378 |
+4. **Destination Configuration**
+   | Setting  | Value       |
+   | -------- | ----------- |
+   | Protocol | HTTP        |
+   | Hostname | Your NAS IP |
+   | Port     | 13378       |
 5. **Custom Header Tab**
    - Go to `Create > Websocket`.
-   - Configure Headers (leave as is): | Header Name | Value | | ----------- | --------------------- | | Upgrade | `$http_upgrade` | | Connection | `$connection_upgrade` |
+   - Configure Headers (leave as is):
+   | Header Name | Value                 |
+   | ----------- | --------------------- |
+   | Upgrade     | `$http_upgrade`       |
+   | Connection  | `$connection_upgrade` |
 6. **Advanced Settings Tab**
    - Leave as is.
 ### [Traefik Reverse Proxy](https://doc.traefik.io/traefik/)
@@ -212,11 +239,13 @@ Health checking is enabled by default. `Http check method` of `OPTIONS` is not s
 # Contributing
 This application is built using [NodeJs](https://nodejs.org/).
 ### Localization
-Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see Audiobookshelf in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-web-client/horizontal-auto.svg" alt="Translation status" /> </a>
+Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see AudbleTales in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-web-client/horizontal-auto.svg" alt="Translation status" /> </a>
 ### Dev Container Setup
-The easiest way to begin developing this project is to use a dev container. An introduction to dev containers in VSCode can be found [here](https://code.visualstudio.com/docs/devcontainers/containers). Required Software:
+The easiest way to begin developing this project is to use a dev container. An introduction to dev containers in VSCode can be found [here](https://code.visualstudio.com/docs/devcontainers/containers).
+Required Software:
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [VSCode](https://code.visualstudio.com/download) _Note, it is possible to use other container software than Docker and IDEs other than VSCode. However, this setup is more complicated and not covered here._
+- [VSCode](https://code.visualstudio.com/download)
+_Note, it is possible to use other container software than Docker and IDEs other than VSCode. However, this setup is more complicated and not covered here._
 <div>
 <details>
 <summary>Install the required software on Windows with <a href=(https://docs.microsoft.com/en-us/windows/package-manager/winget/#production-recommended)>winget</a></summary>

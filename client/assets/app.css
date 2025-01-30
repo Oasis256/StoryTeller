@@ -74,7 +74,7 @@
   margin: 0;
 }
 /* Firefox */
-input[type=number] {
+input[type='number'] {
   -moz-appearance: textfield;
 }
 .tracksTable {
@@ -141,10 +141,10 @@ input[type=number] {
 .box-shadow-book {
   box-shadow: 4px 1px 8px #11111166, -4px 1px 8px #11111166, 1px -4px 8px #11111166;
 }
+.box-shadow-progressbar {
 .shadow-height {
   height: calc(100% - 4px);
 }
-.box-shadow-book3d {
   box-shadow: 4px 1px 8px #11111166, 1px -4px 8px #11111166;
 }
 .box-shadow-side {
@@ -166,10 +166,7 @@ Bookshelf Label
 .cover-bg {
   width: calc(100% + 40px);
   height: calc(100% + 40px);
-  top: -20px;
-  left: -20px;
   background-size: 100% 100%;
-  background-position: center;
   opacity: 1;
   filter: blur(20px);
 }
