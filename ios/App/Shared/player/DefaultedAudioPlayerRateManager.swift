@@ -1,6 +1,6 @@
 //
 //  DefaultedAudioPlayerRateManager.swift
-//  Audiobookshelf
+//  AudbleTales
 //
 //  Created by Marke Hallowell on 4/14/24.
 //
@@ -11,9 +11,9 @@ import AVFoundation
 @available(iOS 16.0, *)
 class DefaultedAudioPlayerRateManager: NSObject, AudioPlayerRateManager {
     internal let logger = AppLogger(category: "DefaultedAudioPlayerRateManager")
-    
+
     internal var audioPlayer: AVPlayer
-    
+
     // MARK: - AudioPlayerRateManager
     public private(set) var defaultRate: Float
     public private(set) var rate: Float
@@ -29,26 +29,26 @@ class DefaultedAudioPlayerRateManager: NSObject, AudioPlayerRateManager {
         self.audioPlayer.defaultRate = defaultRate
 
         super.init()
-        
+
         NotificationCenter.default.addObserver(self, selector: #selector(handleObservedRateChange), name: AVPlayer.rateDidChangeNotification, object: self.audioPlayer)
     }
-    
+
     public func setPlaybackRate(_ rate: Float) {
         self.handlePlaybackRateChange(rate, observed: false)
     }
-    
+
     // No-op (player automatically resumes at last-known defaultRate)
     public func handlePlayEvent() { }
-    
+
     // MARK: - Destructor
     public func destroy() {
         NotificationCenter.default.removeObserver(self, name: AVPlayer.rateDidChangeNotification, object: self.audioPlayer)
     }
-    
+
     // MARK: - Internal
     internal func handlePlaybackRateChange(_ rate: Float, observed: Bool = false) {
         let playbackSpeedChanged = rate > 0.0 && rate != self.defaultRate
-        
+
         if playbackSpeedChanged {
             self.defaultRate = rate
             self.audioPlayer.defaultRate = rate
@@ -67,7 +67,7 @@ class DefaultedAudioPlayerRateManager: NSObject, AudioPlayerRateManager {
             self.rateChangedCompletion()
         }
     }
-    
+
     // MARK: - iOS rate change notification handler
     @objc internal func handleObservedRateChange(notification: Notification) {
         // TODO: Consider handling cases individually (e.g. overall session impact?)
@@ -75,7 +75,7 @@ class DefaultedAudioPlayerRateManager: NSObject, AudioPlayerRateManager {
         guard let reason = notification.userInfo?[AVPlayer.rateDidChangeReasonKey] as? AVPlayer.RateDidChangeReason else {
             return
         }
-         
+
         switch reason {
         case .appBackgrounded:
             // App transitioned to the background.

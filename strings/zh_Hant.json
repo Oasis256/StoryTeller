@@ -1,4 +1,6 @@
 {
+  "ForTheLove": "For The ",
+  "OfMariam": " Of Mariam",
   "ButtonAdd": "添加",
   "ButtonAddNewServer": "添加新服務器",
   "ButtonAuthors": "作者",
@@ -251,7 +253,7 @@
   "MessageAndroid10Downloads": "Android 10 及以下版本將使用內部應用程序存儲進行下載。",
   "MessageAttemptingServerConnection": "正在嘗試連接服務器...",
   "MessageAudiobookshelfServerNotConnected": "AudioBookShelf 服務器未連接",
-  "MessageAudiobookshelfServerRequired": "<strong>重要！</strong>此應用程式需搭配您或您認識的人所架設的 Audiobookshelf 伺服器使用。本應用程式不提供任何內容。",
+  "MessageAudiobookshelfServerRequired": "<strong>重要！</strong>此應用程式需搭配您或您認識的人所架設的 AudbleTales 伺服器使用。本應用程式不提供任何內容。",
   "MessageBookshelfEmpty": "書架是空的",
   "MessageConfirmDeleteLocalEpisode": "從您的設備中移除本地劇集「{0}」嗎？伺服器上的文件將不受影響。",
   "MessageConfirmDeleteLocalFiles": "要從您的設備中移除此項目的本地文件嗎？伺服器上的文件和您的進度將不受影響。",

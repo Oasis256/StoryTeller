@@ -1,10 +1,10 @@
-# Audiobookshelf Mobile App
+# AudbleTales Mobile App
 
-Audiobookshelf is a self-hosted audiobook and podcast server.
+AudbleTales is a self-hosted audiobook and podcast server.
 
 ### Android (beta)
 
-Get the Android app on the [Google Play Store](https://play.google.com/store/apps/details?id=com.audiobookshelf.app)
+Get the Android app on the [Google Play Store](https://play.google.com/store/apps/details?id=com.buks.app)
 
 ### iOS (early beta)
 
@@ -18,9 +18,9 @@ Using Test Flight: https://testflight.apple.com/join/wiic7QIW **_(beta is full)_
 
 Join us on [discord](https://discord.gg/pJsjuNCKRq)
 
-**Requires an Audiobookshelf server to connect with**
+**Requires an AudbleTales server to connect with**
 
-<img alt="Screenshot" src="https://github.com/advplyr/audiobookshelf-app/raw/master/screenshots/DeviceDemoScreens.png" />
+<img alt="Screenshot" src="https://github.com/advplyr/audbletales-app/raw/master/screenshots/DeviceDemoScreens.png" />
 
 ## Contributing
 
@@ -28,7 +28,7 @@ This application is built using [NuxtJS](https://nuxtjs.org/) and [Capacitor](ht
 
 ### Localization
 
-Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see Audiobookshelf in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-mobile-app/horizontal-auto.svg" alt="Translation status" /> </a>
+Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see AudbleTales in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-mobile-app/horizontal-auto.svg" alt="Translation status" /> </a>
 
 ### Windows Environment Setup for Android
 

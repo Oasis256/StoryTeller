@@ -34,6 +34,9 @@
     <div v-else-if="!shelves.length && isLoading && !attemptingConnection" class="absolute top-0 left-0 z-50 w-full h-full flex items-center justify-center">
       <ui-loading-indicator :text="$strings.MessageLoading" />
     </div>
+    <div class="flex items-center justify-center pt-4 fixed bottom-4 left-0 right-0">
+      <a href="https://github.com/Oasis256/StoryTeller" target="_blank" class="text-sm pr-2">{{ $strings.ForTheLove }}❤️{{ $strings.OfMariam }}.</a>
+    </div>
   </div>
 </template>
 

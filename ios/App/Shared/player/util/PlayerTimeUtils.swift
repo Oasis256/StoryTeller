@@ -1,6 +1,6 @@
 //
 //  PlayerTimeUtils.swift
-//  Audiobookshelf
+//  AudbleTales
 //
 //  Created by Ron Heft on 9/20/22.
 //
@@ -8,22 +8,22 @@
 import Foundation
 
 class PlayerTimeUtils {
-    
+
     private init() {}
-    
+
     static func calcSeekBackTime(currentTime: TimeInterval, lastPlayedMs: Double?) -> TimeInterval {
         let sinceLastPlayed = timeSinceLastPlayed(lastPlayedMs)
         let timeToSeekBack = timeToSeekBackForSinceLastPlayed(sinceLastPlayed)
         let currentTimeAfterSeekBack = currentTime.advanced(by: -timeToSeekBack)
         return max(currentTimeAfterSeekBack, 0)
     }
-    
+
     static internal func timeSinceLastPlayed(_ lastPlayedMs: Double?) -> TimeInterval? {
         guard let lastPlayedMs = lastPlayedMs else { return nil }
         let lastPlayed = Date(timeIntervalSince1970: lastPlayedMs / 1000)
         return lastPlayed.timeIntervalSinceNow
     }
-    
+
     static internal func timeToSeekBackForSinceLastPlayed(_ sinceLastPlayed: TimeInterval?) -> TimeInterval {
         if let sinceLastPlayed = sinceLastPlayed {
             if sinceLastPlayed < 6 {
@@ -43,5 +43,5 @@ class PlayerTimeUtils {
             return 5
         }
     }
-    
+
 }

@@ -6,17 +6,17 @@
 //
 
 import XCTest
-@testable import Audiobookshelf
+@testable import AudbleTales
 
 final class PlayerTimeUtilsTests: XCTestCase {
-    
+
     func testCalcSeekBackTime() {
         let currentTime: Double = 1000
         let threeSecondsAgo = Date(timeIntervalSinceNow: -3)
         let lastPlayedMs = threeSecondsAgo.timeIntervalSince1970 * 1000
         XCTAssertEqual(PlayerTimeUtils.calcSeekBackTime(currentTime: currentTime, lastPlayedMs: lastPlayedMs), 998)
     }
-    
+
     func testCalcSeekBackTimeWithZeroCurrentTime() {
         let currentTime: Double = 0
         let threeHundredSecondsAgo = Date(timeIntervalSinceNow: -300)
@@ -30,7 +30,7 @@ final class PlayerTimeUtilsTests: XCTestCase {
         XCTAssertEqual(PlayerTimeUtils.timeSinceLastPlayed(lastPlayedMs)!, -5, accuracy: 1.0)
         XCTAssertNil(PlayerTimeUtils.timeSinceLastPlayed(nil))
     }
-    
+
     func testTimeToSeekBackForSinceLastPlayed() throws {
         XCTAssertEqual(PlayerTimeUtils.timeToSeekBackForSinceLastPlayed(nil), 5, "Seeks back 5 seconds for nil")
         XCTAssertEqual(PlayerTimeUtils.timeToSeekBackForSinceLastPlayed(5), 2, "Seeks back 2 seconds for less than 6 seconds")

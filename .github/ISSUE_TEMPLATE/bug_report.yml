@@ -1,5 +1,5 @@
 name: 🐞 ABS App Bug Report
-description: File a bug/issue and help us improve the Audiobookshelf mobile apps.
+description: File a bug/issue and help us improve the AudbleTales mobile apps.
 title: '[Bug]: '
 labels: ['bug', 'triage']
 body:
@@ -58,7 +58,7 @@ body:
   - type: dropdown
     id: app-version
     attributes:
-      label: Audiobookshelf App Version
+      label: AudbleTales App Version
       description: Please ensure your app is up to date. *If you are using a 3rd-party app, please reach out to them directly.*
       multiple: true
       options:

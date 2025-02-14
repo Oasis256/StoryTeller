@@ -6,7 +6,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.audiobookshelf.app</string>
+			<string>com.buks.app</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>audiobookshelf</string>
@@ -16,7 +16,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Audiobookshelf</string>
+	<string>AudbleTales</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

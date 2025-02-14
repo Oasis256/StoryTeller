@@ -270,7 +270,7 @@ export default {
       this.oauth.verifier = verifier
       this.oauth.challenge = challenge
 
-      let backendEndpoint = `${url}/auth/openid?code_challenge=${challenge}&code_challenge_method=S256&redirect_uri=${encodeURIComponent('audiobookshelf://oauth')}&client_id=${encodeURIComponent('Audiobookshelf-App')}&response_type=code`
+      let backendEndpoint = `${url}/auth/openid?code_challenge=${challenge}&code_challenge_method=S256&redirect_uri=${encodeURIComponent('audiobookshelf://oauth')}&client_id=${encodeURIComponent('AudbleTales-App')}&response_type=code`
       // Backwards compatability with 2.6.0
       if (this.serverConfig.version === '2.6.0') {
         backendEndpoint += '&isRest=true'
@@ -651,7 +651,7 @@ export default {
     },
     /** Validates the login form response from the server.
      *
-     * Ensure the request has not been redirected to an unexpected hostname and check if it is Audiobookshelf
+     * Ensure the request has not been redirected to an unexpected hostname and check if it is AudbleTales
      *
      * @param {object} statusData - The data received from the server's response, including data and url.
      * @param {string} initialAddressWithProtocol - The initial server address including the protocol used for the request.
@@ -682,12 +682,12 @@ export default {
         console.error('[ServerConnectForm] Received empty response')
         return false
       } else if (!('isInit' in statusData.data) || !('language' in statusData.data)) {
-        this.error = 'This does not seem to be a Audiobookshelf server'
+        this.error = 'This does not seem to be a AudbleTales server'
         console.error('[ServerConnectForm] Received as response from Server:\n', statusData)
         return false
         //    TODO: delete the if above and comment the ones below out, as soon as the backend is ready to introduce a version check
         //    } else if (!('app' in statusData.data) || statusData.data.app.toLowerCase() !== 'audiobookshelf') {
-        //      this.error = 'This does not seem to be a Audiobookshelf server'
+        //      this.error = 'This does not seem to be a AudbleTales server'
         //      console.error('[ServerConnectForm] Received as response from Server:\n', statusData)
         //      return false
         //    } else if (!this.isValidVersion(statusData.data.serverVersion, requiredServerVersion)) {
@@ -718,7 +718,7 @@ export default {
       console.error('[ServerConnectForm] Received invalid status', error)
 
       if (error.code === 404) {
-        this.error = `This does not seem to be an Audiobookshelf server. (Error: 404 querying /status)`
+        this.error = `This does not seem to be an AudbleTales server. (Error: 404 querying /status)`
       } else if (typeof error.code === 'number') {
         // Error with HTTP Code
         this.error = `Failed to retrieve status of server: ${error.code}`
