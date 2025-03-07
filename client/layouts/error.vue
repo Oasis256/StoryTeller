@@ -3,14 +3,13 @@
     <div class="absolute z-0 top-0 left-0 px-6 py-3">
       <div class="flex items-center">
         <nuxt-link to="/">
-          <img src="~static/icon.svg" alt="Audiobookshelf Logo" class="w-10 min-w-10 h-10" />
+          <img src="~static/icon.svg" alt="AudbleTales Logo" class="w-10 min-w-10 h-10" />
         </nuxt-link>
         <nuxt-link to="/">
-          <h1 class="text-xl ml-4 hover:underline">audiobookshelf</h1>
+          <h1 class="text-xl ml-4 hover:underline">AudbleTales</h1>
         </nuxt-link>
       </div>
     </div>
-
     <div class="w-full h-full flex items-center justify-center">
       <div class="w-full p-2 sm:p-4 md:p-8">
         <div class="w-full p-4">
@@ -23,7 +22,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   layout: 'blank',

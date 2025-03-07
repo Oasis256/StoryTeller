@@ -47,6 +47,15 @@
       </nuxt-link>
     </div>
     <div id="toolbar" role="toolbar" aria-label="Library Toolbar" class="absolute top-10 md:top-0 left-0 w-full h-10 md:h-full z-40 flex items-center justify-end md:justify-start px-2 md:px-8">
+      <h1 class="Mariam">
+        <nlp class="center">
+          <non class="non tales">
+            {{ $strings.ForTheLove }}
+            <heart>❤️</heart>
+            {{ $strings.OfMariam }}
+          </non>
+        </nlp>
+      </h1>
       <!-- Series books page -->
       <template v-if="selectedSeries">
         <p class="pl-2 text-base md:text-lg">

@@ -19,7 +19,7 @@ module.exports.notificationData = {
         libraryName: 'Podcasts',
         mediaTags: 'TestTag1, TestTag2',
         podcastTitle: 'Abs Test Podcast',
-        podcastAuthor: 'Audiobookshelf',
+        podcastAuthor: 'AudbleTales',
         podcastDescription: 'Description of the Abs Test Podcast belongs here.',
         podcastGenres: 'TestGenre1, TestGenre2',
         episodeId: 'ep_notification_test',

@@ -5,43 +5,51 @@
         <nuxt-link to="/">
           <img src="~static/icon.svg" :alt="$strings.ButtonHome" class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
         </nuxt-link>
-
+        <!--
         <nuxt-link to="/">
           <h1 class="text-xl mr-6 hidden lg:block hover:underline">audiobookshelf</h1>
         </nuxt-link>
+        -->
 
+        <h1 class="text-2xl font-book mr-6 hidden lg:block center">
+          <nuxt-link to="/">
+            <nlp class="above"></nlp>
+            <nlp class="text">
+              <non class="non tales"> The </non>
+              <aud>
+                {{ $strings.Title1 }}
+              </aud>
+              <tales class="tales">
+                {{ $strings.Title2 }}
+              </tales>
+            </nlp>
+          </nuxt-link>
+        </h1>
         <ui-libraries-dropdown class="mr-2" />
-
         <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
         <div class="flex-grow" />
-
         <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom" text="Casting requires a secure connection" class="flex items-center">
           <span class="material-symbols text-2xl text-warning text-opacity-50"> cast </span>
         </ui-tooltip>
         <div v-if="isChromecastInitialized" class="w-6 min-w-6 h-6 ml-2 mr-1 sm:mx-2 cursor-pointer">
           <google-cast-launcher></google-cast-launcher>
         </div>
-
         <widgets-notification-widget class="hidden md:block" />
-
         <nuxt-link v-if="currentLibrary" to="/config/stats" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderYourStats" direction="bottom" class="flex items-center">
             <span class="material-symbols text-2xl" aria-label="User Stats" role="button">&#xe01d;</span>
           </ui-tooltip>
         </nuxt-link>
-
         <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.ButtonUpload" direction="bottom" class="flex items-center">
             <span class="material-symbols text-2xl" aria-label="Upload Media" role="button">&#xf09b;</span>
           </ui-tooltip>
         </nuxt-link>
-
         <nuxt-link v-if="userIsAdminOrUp" to="/config" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderSettings" direction="bottom" class="flex items-center">
             <span class="material-symbols text-2xl" aria-label="System Settings" role="button">&#xe8b8;</span>
           </ui-tooltip>
         </nuxt-link>
-
         <nuxt-link to="/account" class="relative w-9 h-9 md:w-32 bg-fg border border-gray-500 rounded shadow-sm ml-1.5 sm:ml-3 md:ml-5 md:pl-3 md:pr-10 py-2 text-left sm:text-sm cursor-pointer hover:bg-bg hover:bg-opacity-40" aria-haspopup="listbox" aria-expanded="true">
           <span class="items-center hidden md:flex">
             <span class="block truncate">{{ username }}</span>
@@ -72,9 +80,7 @@
         <ui-tooltip v-if="userCanDelete" :text="$strings.ButtonRemove" direction="bottom">
           <ui-icon-btn :disabled="processingBatch" icon="delete" bg-color="error" class="mx-1.5" @click="batchDeleteClick" />
         </ui-tooltip>
-
         <ui-context-menu-dropdown v-if="contextMenuItems.length && !processingBatch" :items="contextMenuItems" class="ml-1" @action="contextMenuAction" />
-
         <ui-tooltip :text="$strings.LabelDeselectAll" direction="bottom" class="flex items-center">
           <span class="material-symbols text-3xl px-4 hover:text-gray-100 cursor-pointer" :class="processingBatch ? 'text-gray-400' : ''" @click="cancelSelectionMode">close</span>
         </ui-tooltip>
@@ -82,7 +88,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -160,26 +165,22 @@ export default {
     },
     contextMenuItems() {
       if (!this.userIsAdminOrUp) return []
-
       const options = [
         {
           text: this.$strings.ButtonQuickMatch,
           action: 'quick-match'
         }
       ]
-
       if (!this.isPodcastLibrary && this.selectedMediaItemsArePlayable) {
         options.push({
           text: this.$strings.ButtonQuickEmbedMetadata,
           action: 'quick-embed'
         })
       }
-
       options.push({
         text: this.$strings.ButtonReScan,
         action: 'rescan'
       })
-
       return options
     }
   },
@@ -243,7 +244,6 @@ export default {
     },
     async playSelectedItems() {
       this.$store.commit('setProcessingBatch', true)
-
       const libraryItemIds = this.selectedMediaItems.map((i) => i.id)
       const libraryItems = await this.$axios
         .$post(`/api/items/batch/get`, { libraryItemIds })
@@ -254,12 +254,10 @@ export default {
           this.$toast.error(errorMsg)
           return []
         })
-
       if (!libraryItems.length) {
         this.$store.commit('setProcessingBatch', false)
         return
       }
-
       const queueItems = []
       libraryItems.forEach((item) => {
         let subtitle = ''
@@ -275,7 +273,6 @@ export default {
           coverPath: item.media.coverPath || null
         })
       })
-
       this.$eventBus.$emit('play-item', {
         libraryItemId: queueItems[0].libraryItemId,
         queueItems
@@ -323,9 +320,7 @@ export default {
         callback: (confirmed, hardDelete) => {
           if (confirmed) {
             localStorage.setItem('softDeleteDefault', hardDelete ? 0 : 1)
-
             this.$store.commit('setProcessingBatch', true)
-
             this.$axios
               .$post(`/api/items/batch/delete?hard=${hardDelete ? 1 : 0}`, {
                 libraryItemIds: this.selectedMediaItems.map((i) => i.id)
@@ -369,7 +364,6 @@ export default {
   }
 }
 </script>
-
 <style>
 #appbar {
   box-shadow: 0px 5px 5px #11111155;

@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-   <img alt="Audiobookshelf Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
+   <img alt="AudbleTales Banner" src="https://github.com/advplyr/audiobookshelf/raw/master/images/banner.svg" width="600">
 
   <p align="center">
     <br />
@@ -14,7 +14,7 @@
 
 # About
 
-Audiobookshelf is a self-hosted audiobook and podcast server.
+AudbleTales is a self-hosted audiobook and podcast server.
 
 ### Features
 
@@ -69,7 +69,7 @@ Check out the [API documentation](https://api.audiobookshelf.org/)
 
 # Organizing your audiobooks
 
-#### Directory structure and folder names are important to Audiobookshelf!
+#### Directory structure and folder names are important to AudbleTales!
 
 See [documentation](https://audiobookshelf.org/docs#book-directory-structure) for supported directory structure, folder naming conventions, and audio file metadata usage.
 
@@ -83,7 +83,7 @@ See [install docs](https://www.audiobookshelf.org/docs)
 
 # Reverse Proxy Set Up
 
-#### Important! Audiobookshelf requires a websocket connection.
+#### Important! AudbleTales requires a websocket connection.
 
 #### Note: Using a subfolder is supported with no additional changes but the path must be `/audiobookshelf` (this is not changeable). See [discussion](https://github.com/advplyr/audiobookshelf/discussions/3535)
 
@@ -342,7 +342,7 @@ The `Name` needs to match the `Parameters` above `audiobookshelf`.
 
 ##### Health checking:
 
-Health checking is enabled by default. `Http check method` of `OPTIONS` is not supported on Audiobookshelf. If Health check fails, data will not be forwared. Need to do one of following:
+Health checking is enabled by default. `Http check method` of `OPTIONS` is not supported on AudbleTales. If Health check fails, data will not be forwared. Need to do one of following:
 
 - To disable: Change `Health check method` to `none`.
 - To make Health checking function: Change `Http check method` to `HEAD` or `GET`.
@@ -355,7 +355,7 @@ This application is built using [NodeJs](https://nodejs.org/).
 
 ### Localization
 
-Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see Audiobookshelf in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-web-client/horizontal-auto.svg" alt="Translation status" /> </a>
+Thank you to [Weblate](https://hosted.weblate.org/engage/audiobookshelf/) for hosting our localization infrastructure pro-bono. If you want to see AudbleTales in your language, please help us localize. Additional information on helping with the translations [here](https://www.audiobookshelf.org/faq#how-do-i-help-with-translations). <a href="https://hosted.weblate.org/engage/audiobookshelf/"> <img src="https://hosted.weblate.org/widget/audiobookshelf/abs-web-client/horizontal-auto.svg" alt="Translation status" /> </a>
 
 ### Dev Container Setup
 

@@ -48,4 +48,4 @@ jobs:
           sleep 5
 
       - name: test if server is available
-        run: curl -sf http://127.0.0.1:3333 | grep Audiobookshelf
+        run: curl -sf http://127.0.0.1:3333 | grep AudbleTales
