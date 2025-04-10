@@ -600,7 +600,7 @@ class Feed extends Model {
     const rssData = {
       title: this.title,
       description: this.description || '',
-      generator: 'Audiobookshelf',
+      generator: 'AudbleTales',
       feed_url: `${hostPrefix}${this.feedURL}`,
       site_url: `${hostPrefix}${this.siteURL}`,
       image_url: `${hostPrefix}${this.imageURL}`,

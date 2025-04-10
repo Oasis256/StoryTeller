@@ -1,4 +1,8 @@
 {
+  "Title1": "Audble",
+  "Title2": "Tales", 
+  "ForTheLove": "For The ",
+  "OfMariam": " Of Mariam",
   "ButtonAdd": "जोड़ें",
   "ButtonAddChapters": "अध्याय जोड़ें",
   "ButtonAddPodcasts": "पॉडकास्ट जोड़ें",
@@ -6,7 +10,6 @@
   "ButtonApply": "लागू करें",
   "ButtonApplyChapters": "अध्यायों में परिवर्तन लागू करें",
   "ButtonAuthors": "लेखक",
-  "ButtonBack": "पीछे",
   "ButtonBrowseForFolder": "फ़ोल्डर खोजें",
   "ButtonCancel": "रद्द करें",
   "ButtonCancelEncode": "एनकोड रद्द करें",

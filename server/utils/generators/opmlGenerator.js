@@ -3,8 +3,8 @@ const escapeForXML = require('../../libs/xml/escapeForXML')
 
 /**
  * Generate OPML file string for podcasts in a library
- * @param {import('../../models/Podcast')[]} podcasts 
- * @param {boolean} [indent=true] 
+ * @param {import('../../models/Podcast')[]} podcasts
+ * @param {boolean} [indent=true]
  * @returns {string}
  */
 module.exports.generate = (podcasts, indent = true) => {
@@ -44,7 +44,7 @@ module.exports.generate = (podcasts, indent = true) => {
         {
           head: [
             {
-              title: 'Audiobookshelf Podcast Subscriptions'
+              title: 'AudbleTales Podcast Subscriptions'
             }
           ]
         },

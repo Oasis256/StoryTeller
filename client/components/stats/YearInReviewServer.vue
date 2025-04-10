@@ -6,7 +6,6 @@
     <img v-else-if="dataUrl" :src="dataUrl" class="mx-auto" :aria-label="$getString('LabelServerYearReview', [variant + 1])" />
   </div>
 </template>
-
 <script>
 export default {
   props: {
@@ -32,12 +31,10 @@ export default {
   methods: {
     async initCanvas() {
       if (!this.yearStats) return
-
       const canvas = document.createElement('canvas')
       canvas.width = 800
       canvas.height = 800
       const ctx = canvas.getContext('2d')
-
       const createRoundedRect = (x, y, w, h) => {
         const grd1 = ctx.createLinearGradient(x, y, x + w, y + h)
         grd1.addColorStop(0, '#44444455')
@@ -49,12 +46,10 @@ export default {
         ctx.fill()
         ctx.stroke()
       }
-
       const addText = (text, fontSize, fontWeight, color, letterSpacing, x, y, maxWidth = 0) => {
         ctx.fillStyle = color
         ctx.font = `${fontWeight} ${fontSize} Source Sans Pro`
         ctx.letterSpacing = letterSpacing
-
         // If maxWidth is specified then continue to remove chars until under maxWidth and add ellipsis
         if (maxWidth) {
           let txtWidth = ctx.measureText(text).width
@@ -67,17 +62,13 @@ export default {
             console.log(`Checking text "${text}" (width:${txtWidth})`)
           }
         }
-
         ctx.fillText(text, x, y)
       }
-
       // Bg color
       ctx.fillStyle = '#232323'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-
       // Cover image tiles
       let imgsToAdd = {}
-
       if (this.yearStats.booksAddedWithCovers.length) {
         let index = 0
         ctx.globalAlpha = 0.25
@@ -91,7 +82,6 @@ export default {
             const coverIndex = index % this.yearStats.booksAddedWithCovers.length
             let libraryItemId = this.yearStats.booksAddedWithCovers[coverIndex]
             index++
-
             await new Promise((resolve) => {
               const img = new Image()
               img.crossOrigin = 'anonymous'
@@ -122,64 +112,52 @@ export default {
         }
         ctx.restore()
       }
-
       const threeColumnTextWidth = 200
-
       ctx.globalAlpha = 1
       ctx.textBaseline = 'middle'
-
       // Create gradient
       const grd1 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
       grd1.addColorStop(0, '#000000aa')
       grd1.addColorStop(1, '#cd9d49aa')
       ctx.fillStyle = grd1
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-
       // Top Abs icon
       let tanColor = '#ffdb70'
       ctx.fillStyle = tanColor
       ctx.font = '42px absicons'
-      ctx.fillText('\ue900', 15, 36)
-
+      // ctx.fillText('\ue900', 15, 36)
       // Top text
-      addText('audiobookshelf', '28px', 'normal', tanColor, '0px', 65, 28)
+      addText('AudbleTales', '28px', 'normal', tanColor, '0px', 340, 28)
       addText(`${this.year} ${this.$strings.StatsYearInReview}`, '18px', 'bold', 'white', '1px', 65, 51)
-
       // Top left box
       createRoundedRect(40, 100, 230, 100)
       ctx.textAlign = 'center'
       addText(this.yearStats.numBooksAdded, '48px', 'bold', 'white', '0px', 155, 140)
       addText(this.$strings.StatsBooksAdded, '18px', 'normal', tanColor, '0px', 155, 170, threeColumnTextWidth)
-
       // Box top right
       createRoundedRect(285, 100, 230, 100)
       addText(this.yearStats.numAuthorsAdded, '48px', 'bold', 'white', '0px', 400, 140)
       addText(this.$strings.StatsAuthorsAdded, '18px', 'normal', tanColor, '0px', 400, 170, threeColumnTextWidth)
-
       // Box bottom left
       createRoundedRect(530, 100, 230, 100)
       addText(this.yearStats.numListeningSessions, '48px', 'bold', 'white', '0px', 645, 140)
       addText(this.$strings.StatsSessions, '18px', 'normal', tanColor, '1px', 645, 170, threeColumnTextWidth)
-
       // Text stats
       if (this.yearStats.totalBooksAddedSize) {
         addText(this.$strings.StatsCollectionGrewTo, '24px', 'normal', tanColor, '0px', canvas.width / 2, 260)
         addText(this.$bytesPretty(this.yearStats.totalBooksSize), '36px', 'bolder', 'white', '0px', canvas.width / 2, 300)
         addText('+' + this.$bytesPretty(this.yearStats.totalBooksAddedSize), '20px', 'lighter', 'white', '0px', canvas.width / 2, 330)
       }
-
       if (this.yearStats.totalBooksAddedDuration) {
         addText(this.$strings.StatsTotalDuration, '24px', 'normal', tanColor, '0px', canvas.width / 2, 400)
         addText(this.$elapsedPrettyExtended(this.yearStats.totalBooksDuration, true, false), '36px', 'bolder', 'white', '0px', canvas.width / 2, 440)
         addText('+' + this.$elapsedPrettyExtended(this.yearStats.totalBooksAddedDuration, true, false), '20px', 'lighter', 'white', '0px', canvas.width / 2, 470)
       }
-
       if (!this.variant) {
         // Bottom images
         imgsToAdd = Object.values(imgsToAdd)
         if (imgsToAdd.length > 0) {
           addText(this.$strings.StatsBooksAdditional, '24px', 'normal', tanColor, '0px', canvas.width / 2, 540)
-
           for (let i = 0; i < Math.min(5, imgsToAdd.length); i++) {
             let imgToAdd = imgsToAdd[i]
             ctx.drawImage(imgToAdd.img, imgToAdd.sx, imgToAdd.sy, imgToAdd.sw, imgToAdd.sw, 40 + 145 * i, 580, 140, 140)
@@ -194,7 +172,6 @@ export default {
             addText(this.yearStats.topAuthors[i].name, '36px', 'bolder', 'white', '0px', 70, 609 + i * 60, 330)
           }
         }
-
         if (this.yearStats.topNarrators.length) {
           addText(this.$strings.StatsTopNarrators, '24px', 'normal', tanColor, '1px', 430, 549)
           for (let i = 0; i < this.yearStats.topNarrators.length; i++) {
@@ -210,7 +187,6 @@ export default {
             addText(this.yearStats.topAuthors[i].name, '36px', 'bolder', 'white', '0px', 70, 609 + i * 60, 330)
           }
         }
-
         if (this.yearStats.topGenres.length) {
           addText(this.$strings.StatsTopGenres, '24px', 'normal', tanColor, '1px', 430, 549)
           for (let i = 0; i < this.yearStats.topGenres.length; i++) {
@@ -218,7 +194,6 @@ export default {
           }
         }
       }
-
       this.canvas = canvas
       this.dataUrl = canvas.toDataURL('png')
     },

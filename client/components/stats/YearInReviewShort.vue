@@ -6,7 +6,6 @@
     <img v-else-if="dataUrl" :src="dataUrl" />
   </div>
 </template>
-
 <script>
 export default {
   props: {
@@ -23,12 +22,10 @@ export default {
   methods: {
     async initCanvas() {
       if (!this.yearStats) return
-
       const canvas = document.createElement('canvas')
       canvas.width = 600
       canvas.height = 200
       const ctx = canvas.getContext('2d')
-
       const createRoundedRect = (x, y, w, h) => {
         const grd1 = ctx.createLinearGradient(x, y, x + w, y + h)
         grd1.addColorStop(0, '#44444455')
@@ -40,12 +37,10 @@ export default {
         ctx.fill()
         ctx.stroke()
       }
-
       const addText = (text, fontSize, fontWeight, color, letterSpacing, x, y, maxWidth = 0) => {
         ctx.fillStyle = color
         ctx.font = `${fontWeight} ${fontSize} Source Sans Pro`
         ctx.letterSpacing = letterSpacing
-
         // If maxWidth is specified then continue to remove chars until under maxWidth and add ellipsis
         if (maxWidth) {
           let txtWidth = ctx.measureText(text).width
@@ -58,24 +53,19 @@ export default {
             console.log(`Checking text "${text}" (width:${txtWidth})`)
           }
         }
-
         ctx.fillText(text, x, y)
       }
-
       const addIcon = (icon, color, fontSize, x, y) => {
         ctx.fillStyle = color
         ctx.font = `${fontSize} Material Symbols Rounded`
         ctx.fillText(icon, x, y)
       }
-
       // Bg color
       ctx.fillStyle = '#232323'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-
       // Cover image tiles
       const bookCovers = this.yearStats.finishedBooksWithCovers
       bookCovers.push(...this.yearStats.booksWithCovers)
-
       if (bookCovers.length) {
         let index = 0
         ctx.globalAlpha = 0.25
@@ -89,7 +79,6 @@ export default {
             const coverIndex = index % bookCovers.length
             let libraryItemId = bookCovers[coverIndex]
             index++
-
             await new Promise((resolve) => {
               const img = new Image()
               img.crossOrigin = 'anonymous'
@@ -112,29 +101,23 @@ export default {
         }
         ctx.restore()
       }
-
       const twoColumnWidth = 180
-
       ctx.globalAlpha = 1
       ctx.textBaseline = 'middle'
-
       // Create gradient
       const grd1 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
       grd1.addColorStop(0, '#000000aa')
       grd1.addColorStop(1, '#cd9d49aa')
       ctx.fillStyle = grd1
       ctx.fillRect(0, 0, canvas.width, canvas.height)
-
       // Top Abs icon
       let tanColor = '#ffdb70'
       ctx.fillStyle = tanColor
       ctx.font = '42px absicons'
-      ctx.fillText('\ue900', 15, 36)
-
+      // ctx.fillText('\ue900', 15, 36)
       // Top text
-      addText('audiobookshelf', '28px', 'normal', tanColor, '0px', 65, 28)
+      addText('AudbleTales', '28px', 'normal', tanColor, '0px', 240, 28)
       addText(`${this.year} ${this.$strings.StatsYearInReview}`, '18px', 'bold', 'white', '1px', 65, 51)
-
       // Top left box
       createRoundedRect(15, 75, 280, 110)
       addText(this.yearStats.numBooksFinished, '48px', 'bold', 'white', '0px', 105, 120)
@@ -143,12 +126,10 @@ export default {
       readIconPath.addPath(new Path2D('M19 1H5c-1.1 0-1.99.9-1.99 2L3 15.93c0 .69.35 1.3.88 1.66L12 23l8.11-5.41c.53-.36.88-.97.88-1.66L21 3c0-1.1-.9-2-2-2zm-9 15l-5-5 1.41-1.41L10 13.17l7.59-7.59L19 7l-9 9z'), { a: 1.5, d: 1.5, e: 55, f: 115 })
       ctx.fillStyle = '#ffffff'
       ctx.fill(readIconPath)
-
       createRoundedRect(305, 75, 280, 110)
       addText(this.yearStats.numBooksListened, '48px', 'bold', 'white', '0px', 400, 120)
       addText(this.$strings.StatsBooksListenedTo, '20px', 'normal', tanColor, '0px', 400, 155, twoColumnWidth)
       addIcon('local_library', 'white', '42px', 345, 130)
-
       this.canvas = canvas
       this.dataUrl = canvas.toDataURL('png')
     },

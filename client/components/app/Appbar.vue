@@ -6,9 +6,20 @@
           <img src="~static/icon.svg" :alt="$strings.ButtonHome" class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
         </nuxt-link>
 
-        <nuxt-link to="/">
-          <h1 class="text-xl mr-6 hidden lg:block hover:underline">audiobookshelf</h1>
-        </nuxt-link>
+        <h1 class="text-2xl font-book mr-6 hidden lg:block center">
+          <nuxt-link to="/">
+            <nlp class="above"></nlp>
+            <nlp class="text">
+              <non class="non tales"> The </non>
+              <aud>
+                {{ $strings.Title1 }}
+              </aud>
+              <tales class="tales">
+                {{ $strings.Title2 }}
+              </tales>
+            </nlp>
+          </nuxt-link>
+        </h1>
 
         <ui-libraries-dropdown class="mr-2" />
 

@@ -2,8 +2,21 @@
   <div id="page-wrapper" class="w-full h-screen overflow-y-auto">
     <div class="absolute z-0 top-0 left-0 px-6 py-3">
       <div class="flex items-center">
-        <img src="~static/icon.svg" alt="Audiobookshelf Logo" class="w-10 min-w-10 h-10" />
-        <h1 class="text-xl ml-4 hidden lg:block hover:underline">audiobookshelf</h1>
+        <img src="~static/icon.svg" alt="AudbleTales Logo" class="w-10 min-w-10 h-10" />
+        <h1 class="text-2xl font-book mr-6 hidden lg:block center">
+          <nuxt-link to="/">
+            <nlp class="above"></nlp>
+            <nlp class="text">
+              <non class="non tales"> The </non>
+              <aud>
+                {{ $strings.Title1 }}
+              </aud>
+              <tales class="tales">
+                {{ $strings.Title2 }}
+              </tales>
+            </nlp>
+          </nuxt-link>
+        </h1>
       </div>
     </div>
 

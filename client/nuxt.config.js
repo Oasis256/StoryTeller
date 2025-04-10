@@ -1,6 +1,6 @@
 const pkg = require('./package.json')
 
-const routerBasePath = process.env.ROUTER_BASE_PATH ?? '/audiobookshelf'
+const routerBasePath = process.env.ROUTER_BASE_PATH ?? ''
 const serverHostUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3333'
 const serverPaths = ['api/', 'public/', 'hls/', 'auth/', 'feed/', 'status', 'login', 'logout', 'init']
 const proxy = Object.fromEntries(serverPaths.map((path) => [`${routerBasePath}/${path}`, { target: process.env.NODE_ENV !== 'production' ? serverHostUrl : '/' }]))
@@ -23,18 +23,74 @@ module.exports = {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Audiobookshelf',
+    title: 'The AudbleTales',
     htmlAttrs: {
       lang: 'en'
     },
-    meta: [{ charset: 'utf-8' }, { name: 'viewport', content: 'width=device-width, initial-scale=1' }, { hid: 'description', name: 'description', content: '' }, { hid: 'robots', name: 'robots', content: 'noindex' }],
-    script: [],
+    meta: [
+      { charset: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { hid: 'description', name: 'description', content: '' },
+      { property: 'fb:app_id', content: '1607117262915201' },
+      { name: 'description', content: 'The AudbleTales' },
+      { name: 'author', content: 'Oasis Innocent❤️oasis.sybill@shu-le.me❤️' },
+      { name: 'web_author', content: 'The N-line Project codeStudio' },
+      { NAME: 'Copyright', CONTENT: 'The N-line Project' },
+      { NAME: 'Designer', CONTENT: 'Oasis Innocent' },
+      { NAME: 'Publisher', CONTENT: 'Oasis Innocent, codeStudio, The N-line Project' },
+      { NAME: 'distribution', CONTENT: 'Global' },
+      { name: 'contact', content: 'oasis.sybill@gmail.com' },
+      { name: 'robots', content: 'index, follow' },
+      { name: 'revisit-after', content: '3 month' },
+      // { NAME: 'ROBOTS', CONTENT: 'NOYDIR,NOODP' },
+      { name: 'Subject', content: 'Online Education For All' },
+      { NAME: 'city', CONTENT: 'Kampala' },
+      { NAME: 'country', CONTENT: 'Uganda' },
+      { NAME: 'Geography', CONTENT: 'Kansanga, Kampala, Uganda' },
+      { hid: 'robots', name: 'robots', content: 'noindex' }
+    ],
+    // metaInfo: {
+    script: [
+      {
+        type: 'application/ld+json',
+        innerHTML: JSON.stringify({
+          '@context': 'http://schema.org',
+          '@type': 'Organization',
+          '@id': 'reads.shu-le.me',
+          name: 'Self Hosted AudioBook Server and Reader',
+          logo: (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          telephone: '+256 750 994 545',
+          email: 'support@shu-le.me',
+          sameAs: ['https://reads.shu-le.me', 'http://www.reads.shu-le.me', 'http://reads.shu-le.me'],
+          url: 'https://reads.shu-le.me',
+          image: (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          description: "Shule, You don't need to go to school, School will come to you.",
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: 'Kansanga',
+            addressLocality: 'Kampala',
+            addressCountry: 'Uganda',
+            addressRegion: 'East Africa',
+            postalCode: '256',
+            name: 'codeStudio'
+          }
+        })
+      },
+      {
+        src: 'https://mon.shu-le.tech/tracker.js',
+        async: true,
+        defer: true,
+        'data-website-id': 'cm5s4a32g0005xzin0631qo7n',
+        id: 'nlpTianji',
+        class: 'nlpScript'
+      }
+    ],
+    // },
     link: [
       { rel: 'icon', type: 'image/x-icon', href: routerBasePath + '/favicon.ico' },
       { rel: 'apple-touch-icon', href: routerBasePath + '/ios_icon.png' }
     ]
   },
-
   router: {
     base: routerBasePath
   },
@@ -81,14 +137,14 @@ module.exports = {
     icon: false,
     meta: {
       appleStatusBarStyle: 'black',
-      name: 'Audiobookshelf',
+      name: 'AudbleTales',
       theme_color: '#232323',
       mobileAppIOS: true,
       nativeUI: true
     },
     manifest: {
-      name: 'Audiobookshelf',
-      short_name: 'Audiobookshelf',
+      name: 'AudbleTales',
+      short_name: 'AudbleTales',
       display: 'standalone',
       background_color: '#232323',
       icons: [

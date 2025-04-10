@@ -83,7 +83,7 @@ export default {
         },
         absMetadata: {
           id: 'absMetadata',
-          name: 'Audiobookshelf metadata file',
+          name: 'AudbleTales metadata file',
           include: true
         }
       },
