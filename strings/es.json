@@ -1,13 +1,8 @@
 {
-<<<<<<< HEAD
   "ForTheLove": "For The ",
   "OfMariam": " Of Mariam",
-  "ButtonAdd": "Agregar",
-  "ButtonAddNewServer": "Agregar nuevo servidor",
-=======
   "ButtonAdd": "Añadir",
   "ButtonAddNewServer": "Añadir servidor nuevo",
->>>>>>> 9ca160f1dae84bdbc5fdcbca0c7380221d726006
   "ButtonAuthors": "Autores",
   "ButtonBack": "Atrás",
   "ButtonCancel": "Cancelar",
