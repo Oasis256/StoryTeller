@@ -1,6 +1,6 @@
 const pkg = require('./package.json')
 
-const routerBasePath = process.env.ROUTER_BASE_PATH ?? ''
+const routerBasePath = process.env.ROUTER_BASE_PATH ?? '/shelf'
 const serverHostUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3333'
 const serverPaths = ['api/', 'public/', 'hls/', 'auth/', 'feed/', 'status', 'login', 'logout', 'init']
 const proxy = Object.fromEntries(serverPaths.map((path) => [`${routerBasePath}/${path}`, { target: process.env.NODE_ENV !== 'production' ? serverHostUrl : '/' }]))
@@ -58,12 +58,12 @@ module.exports = {
           '@type': 'Organization',
           '@id': 'reads.shu-le.me',
           name: 'Self Hosted AudioBook Server and Reader',
-          logo: (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          logo: (process.env.ROUTER_BASE_PATH || '/shelf') + '/Logo.png',
           telephone: '+256 750 994 545',
           email: 'support@shu-le.me',
           sameAs: ['https://reads.shu-le.me', 'http://www.reads.shu-le.me', 'http://reads.shu-le.me'],
           url: 'https://reads.shu-le.me',
-          image: (process.env.ROUTER_BASE_PATH || '') + '/Logo.png',
+          image: (process.env.ROUTER_BASE_PATH || '/shelf') + '/Logo.png',
           description: "Shule, You don't need to go to school, School will come to you.",
           address: {
             '@type': 'PostalAddress',
