@@ -18,6 +18,7 @@ import com.buks.app.plugins.AbsAudioPlayer
 import com.buks.app.plugins.AbsDatabase
 import com.buks.app.plugins.AbsDownloader
 import com.buks.app.plugins.AbsFileSystem
+import com.buks.app.plugins.AbsLogger
 import com.getcapacitor.BridgeActivity
 
 
@@ -57,6 +58,7 @@ class MainActivity : BridgeActivity() {
     registerPlugin(AbsDownloader::class.java)
     registerPlugin(AbsFileSystem::class.java)
     registerPlugin(AbsDatabase::class.java)
+    registerPlugin(AbsLogger::class.java)
 
     super.onCreate(savedInstanceState)
     Log.d(tag, "onCreate")
