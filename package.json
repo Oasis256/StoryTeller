@@ -1,6 +1,6 @@
 {
   "name": "audbletales-app",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "author": "Oasis Innocent",
   "scripts": {
     "dev": "nuxt --hostname 0.0.0.0 --port 1337",

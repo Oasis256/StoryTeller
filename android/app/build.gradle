@@ -36,8 +36,8 @@ android {
     applicationId "com.buks.app"
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 110
-    versionName "2.19.0"
+    versionCode 111
+    versionName "2.20.0"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     manifestPlaceholders = [
       "appAuthRedirectScheme": "com.buks.app"

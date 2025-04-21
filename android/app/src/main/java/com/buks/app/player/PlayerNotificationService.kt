@@ -25,7 +25,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.utils.MediaConstants
-
 import com.buks.app.BuildConfig
 import com.buks.app.R
 import com.buks.app.data.*
@@ -37,8 +36,8 @@ import com.buks.app.media.MediaManager
 import com.buks.app.media.MediaProgressSyncer
 import com.buks.app.media.getUriToAbsIconDrawable
 import com.buks.app.media.getUriToDrawable
+import com.buks.app.plugins.AbsLogger
 import com.buks.app.server.ApiHandler
-
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -454,7 +453,7 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
             playbackSession
     ) // Save playback session to use when app is closed
 
-    Log.d(tag, "Set CurrentPlaybackSession MediaPlayer ${currentPlaybackSession?.mediaPlayer}")
+    AbsLogger.info("PlayerNotificationService", "preparePlayer: Started playback session for item ${currentPlaybackSession?.mediaItemId}. MediaPlayer ${currentPlaybackSession?.mediaPlayer}")
     // Notify client
     clientEventEmitter?.onPlaybackSession(playbackSession)
 
@@ -471,7 +470,7 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
       val mediaSource: MediaSource
 
       if (playbackSession.isLocal) {
-        Log.d(tag, "Playing Local Item")
+        AbsLogger.info("PlayerNotificationService", "preparePlayer: Playing local item ${currentPlaybackSession?.mediaItemId}.")
         val dataSourceFactory = DefaultDataSource.Factory(ctx)
 
         val extractorsFactory = DefaultExtractorsFactory()
@@ -485,7 +484,7 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
                 ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
                         .createMediaSource(mediaItems[0])
       } else if (!playbackSession.isHLS) {
-        Log.d(tag, "Direct Playing Item")
+        AbsLogger.info("PlayerNotificationService", "preparePlayer: Direct playing item ${currentPlaybackSession?.mediaItemId}.")
         val dataSourceFactory = DefaultHttpDataSource.Factory()
 
         val extractorsFactory = DefaultExtractorsFactory()
@@ -500,7 +499,7 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
                 ProgressiveMediaSource.Factory(dataSourceFactory, extractorsFactory)
                         .createMediaSource(mediaItems[0])
       } else {
-        Log.d(tag, "Playing HLS Item")
+        AbsLogger.info("PlayerNotificationService", "preparePlayer: Playing HLS stream of item ${currentPlaybackSession?.mediaItemId}.")
         val dataSourceFactory = DefaultHttpDataSource.Factory()
         dataSourceFactory.setUserAgent(channelId)
         dataSourceFactory.setDefaultRequestProperties(
