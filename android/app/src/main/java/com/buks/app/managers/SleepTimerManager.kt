@@ -4,17 +4,11 @@ import android.content.Context
 import android.media.MediaPlayer
 import android.os.*
 import android.util.Log
-<<<<<<< HEAD:android/app/src/main/java/com/buks/app/managers/SleepTimerManager.kt
+import com.buks.app.R
 import com.buks.app.device.DeviceManager
 import com.buks.app.player.PlayerNotificationService
 import com.buks.app.player.SLEEP_TIMER_WAKE_UP_EXPIRATION
-=======
-import com.audiobookshelf.app.R
-import com.audiobookshelf.app.device.DeviceManager
-import com.audiobookshelf.app.player.PlayerNotificationService
-import com.audiobookshelf.app.player.SLEEP_TIMER_WAKE_UP_EXPIRATION
-import com.audiobookshelf.app.plugins.AbsLogger
->>>>>>> 0f650c0572e6e6f7ac2cf2801df39f1f7cd1bbfd:android/app/src/main/java/com/audiobookshelf/app/managers/SleepTimerManager.kt
+import com.buks.app.plugins.AbsLogger
 import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.math.roundToInt
