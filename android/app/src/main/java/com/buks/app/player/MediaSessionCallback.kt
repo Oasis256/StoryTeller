@@ -6,9 +6,14 @@ import android.os.*
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
 import android.view.KeyEvent
+<<<<<<< HEAD:android/app/src/main/java/com/buks/app/player/MediaSessionCallback.kt
 import com.buks.app.data.LibraryItemWrapper
 import com.buks.app.data.PodcastEpisode
 import com.buks.app.device.DeviceManager
+=======
+import com.audiobookshelf.app.data.LibraryItemWrapper
+import com.audiobookshelf.app.data.PodcastEpisode
+>>>>>>> 0f650c0572e6e6f7ac2cf2801df39f1f7cd1bbfd:android/app/src/main/java/com/audiobookshelf/app/player/MediaSessionCallback.kt
 import java.util.*
 import kotlin.concurrent.schedule
 

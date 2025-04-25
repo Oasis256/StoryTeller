@@ -4,7 +4,12 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+<<<<<<< HEAD:android/app/src/main/java/com/buks/app/player/ShakeDetector.kt
 import com.buks.app.device.DeviceManager
+=======
+import com.audiobookshelf.app.device.DeviceManager
+import com.audiobookshelf.app.plugins.AbsLogger
+>>>>>>> 0f650c0572e6e6f7ac2cf2801df39f1f7cd1bbfd:android/app/src/main/java/com/audiobookshelf/app/player/ShakeDetector.kt
 import kotlin.math.sqrt
 
 class ShakeDetector : SensorEventListener {
@@ -46,6 +51,7 @@ class ShakeDetector : SensorEventListener {
         if (mShakeTimestamp + SHAKE_COUNT_RESET_TIME_MS < now) {
           mShakeCount = 0
         }
+        AbsLogger.info("ShakeDetector", "Device shake above threshold ($gForce > $shakeThreshold)")
         mShakeTimestamp = now
         mShakeCount++
         mListener!!.onShake(mShakeCount)
