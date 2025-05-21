@@ -860,6 +860,7 @@
   "MessageScheduleLibraryScanNote": "For most users, it is recommended to leave this feature disabled and keep the folder watcher setting enabled. The folder watcher will automatically detect changes in your library folders. The folder watcher doesn't work for every file system (like NFS) so scheduled library scans can be used instead.",
   "MessageSearchResultsFor": "Search results for",
   "MessageSelected": "{0} selected",
+  "MessageSeriesSequenceCannotContainSpaces": "Series sequence cannot contain spaces",
   "MessageServerCouldNotBeReached": "Server could not be reached",
   "MessageSetChaptersFromTracksDescription": "Set chapters using each audio file as a chapter and chapter title as the audio file name",
   "MessageShareExpirationWillBe": "Expiration will be <strong>{0}</strong>",
