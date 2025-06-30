@@ -35,17 +35,17 @@
     <div class="flex justify-between pt-12">
       <div>
         <p class="text-sm text-center">{{ $strings.LabelStatsWeekListening }}</p>
-        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(totalMinutesListeningThisWeek) }}</p>
+        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(totalMinutesListeningThisWeek) }}<spacer class="spacer">/</spacer></p>
         <p class="text-sm text-center">{{ $strings.LabelStatsMinutes }}</p>
       </div>
       <div>
         <p class="text-sm text-center">{{ $strings.LabelStatsDailyAverage }}</p>
-        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(averageMinutesPerDay) }}</p>
+        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(averageMinutesPerDay) }}<spacer class="spacer">/</spacer></p>
         <p class="text-sm text-center">{{ $strings.LabelStatsMinutes }}</p>
       </div>
       <div>
         <p class="text-sm text-center">{{ $strings.LabelStatsBestDay }}</p>
-        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(mostListenedDay) }}</p>
+        <p class="text-5xl font-semibold text-center" style="line-height: 0.85">{{ $formatNumber(mostListenedDay) }}<spacer class="spacer">/</spacer></p>
         <p class="text-sm text-center">{{ $strings.LabelStatsMinutes }}</p>
       </div>
       <div>

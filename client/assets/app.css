@@ -240,4 +240,10 @@ Bookshelf Label
 .w-full.max-w-\[800px\].mx-auto.my-4 > div > img {
   width: 100%;
 }
-/* For The Love Of Editah The Custom CSS */
+.spacer {
+  color: #0ff;
+  /* display: inline;
+  margin-left: 0;
+  margin-right: 0; */
+}
+/* For The Love Of Editah Custom CSS */
