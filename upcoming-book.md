@@ -1,7 +1,6 @@
 # Upcoming Book Feature
 
-This feature provides API and frontend support for displaying the **next unreleased book** in a series for a library item.
-It integrates backend scraping, caching, and frontend display.
+This feature provides API and frontend support for displaying the **next unreleased book** in a series for a library item. It integrates backend scraping, caching, and frontend display.
 
 ---
 
@@ -102,4 +101,6 @@ Locale strings for the feature are added to all language files in `client/string
 
 - Add new locale translations to `client/strings/`.
 - Extend scraping logic in `risingShadowScraper.js` as needed.
-- Improve frontend display in `LibraryItemDetails.vue` and
+- Improve frontend display in `LibraryItemDetails.vue` and `UpcomingCoverPreviewModal.vue`.
+
+---
