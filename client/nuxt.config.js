@@ -33,7 +33,7 @@ module.exports = {
       { hid: 'description', name: 'description', content: '' },
       { property: 'fb:app_id', content: '1607117262915201' },
       { name: 'description', content: 'The AudbleTales' },
-      { name: 'author', content: 'Oasis Innocent❤️oasis.sybill@shu-le.me❤️' },
+      { name: 'author', content: 'Oasis Innocent❤️oasis.sybill@shu-le.tech❤️' },
       { name: 'web_author', content: 'The N-line Project codeStudio' },
       { NAME: 'Copyright', CONTENT: 'The N-line Project' },
       { NAME: 'Designer', CONTENT: 'Oasis Innocent' },
@@ -75,15 +75,15 @@ module.exports = {
             name: 'codeStudio'
           }
         })
-      },
-      {
-        src: 'https://mon.shu-le.tech/tracker.js',
-        async: true,
-        defer: true,
-        'data-website-id': 'cm5s4a32g0005xzin0631qo7n',
-        id: 'nlpTianji',
-        class: 'nlpScript'
       }
+      // {
+      //   src: 'https://mon.shu-le.tech/tracker.js',
+      //   async: true,
+      //   defer: true,
+      //   'data-website-id': 'cm5s4a32g0005xzin0631qo7n',
+      //   id: 'nlpTianji',
+      //   class: 'nlpScript'
+      // }
     ],
     // },
     link: [
