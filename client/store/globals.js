@@ -13,6 +13,7 @@ export const state = () => ({
   showShareModal: false,
   showConfirmPrompt: false,
   showRawCoverPreviewModal: false,
+  showUpcomingCoverPreviewModal: false,
   confirmPromptOptions: null,
   showEditAuthorModal: false,
   rssFeedEntity: null,
@@ -23,6 +24,8 @@ export const state = () => ({
   selectedAuthor: null,
   selectedMediaItems: [],
   selectedRawCoverUrl: null,
+  selectedUpcomingCoverUrl: null,
+  selectedUpcomingBookData: null,
   selectedMediaItemShare: null,
   isCasting: false, // Actively casting
   isChromecastInitialized: false, // Script loadeds
@@ -171,6 +174,22 @@ export const mutations = {
     state.selectedRawCoverUrl = rawCoverUrl
     state.showRawCoverPreviewModal = true
   },
+  // Add these mutations for upcoming cover modal
+  setShowUpcomingCoverPreviewModal(state, val) {
+    state.showUpcomingCoverPreviewModal = val
+  },
+  setSelectedUpcomingCoverUrl(state, val) {
+    state.selectedUpcomingCoverUrl = val
+  },
+  setSelectedUpcomingBookData(state, val) {
+    state.selectedUpcomingBookData = val
+  },
+  setUpcomingCoverPreviewModal(state, { coverUrl, bookData }) {
+    state.selectedUpcomingCoverUrl = coverUrl
+    state.selectedUpcomingBookData = bookData
+    state.showUpcomingCoverPreviewModal = true
+  },
+  // End of upcoming cover modal additions
   setEditCollection(state, collection) {
     state.selectedCollection = collection
     state.showEditCollectionModal = true
