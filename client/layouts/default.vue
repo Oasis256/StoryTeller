@@ -23,7 +23,6 @@
     <modals-share-modal />
     <prompt-confirm />
     <readers-reader />
-    <modals-upcoming-cover-preview-modal />
   </div>
 </template>
 

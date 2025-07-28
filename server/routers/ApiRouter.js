@@ -35,7 +35,6 @@ const MiscController = require('../controllers/MiscController')
 const ShareController = require('../controllers/ShareController')
 const StatsController = require('../controllers/StatsController')
 const ApiKeyController = require('../controllers/ApiKeyController')
-const UpcomingBookController = require('../controllers/UpcomingBookController')
 
 class ApiRouter {
   constructor(Server) {
@@ -127,7 +126,6 @@ class ApiRouter {
     this.router.get('/items/:id/file/:fileid/download', LibraryItemController.middleware.bind(this), LibraryItemController.downloadLibraryFile.bind(this))
     this.router.get('/items/:id/ebook/:fileid?', LibraryItemController.middleware.bind(this), LibraryItemController.getEBookFile.bind(this))
     this.router.patch('/items/:id/ebook/:fileid/status', LibraryItemController.middleware.bind(this), LibraryItemController.updateEbookFileStatus.bind(this))
-    this.router.get('/items/:id/upcoming', UpcomingBookController.getUpcomingBook.bind(this))
 
     //
     // User Routes
@@ -335,20 +333,6 @@ class ApiRouter {
     this.router.post('/api-keys', ApiKeyController.middleware.bind(this), ApiKeyController.create.bind(this))
     this.router.patch('/api-keys/:id', ApiKeyController.middleware.bind(this), ApiKeyController.update.bind(this))
     this.router.delete('/api-keys/:id', ApiKeyController.middleware.bind(this), ApiKeyController.delete.bind(this))
-
-    //
-    // Upcoming Books Routes
-    //
-    this.router.get('/upcoming/cache/stats', UpcomingBookController.getCacheStats.bind(this))
-    this.router.get('/upcoming/cache/list', UpcomingBookController.listCachedBooks.bind(this))
-    this.router.get('/upcoming/cache/structure', UpcomingBookController.getCacheStructure.bind(this))
-    this.router.delete('/upcoming/cache', UpcomingBookController.clearCache.bind(this))
-    this.router.post('/upcoming/cache/maintenance', UpcomingBookController.performMaintenance.bind(this))
-    this.router.post('/upcoming/refresh', UpcomingBookController.refreshBookData.bind(this))
-    this.router.post('/upcoming/batch-process', UpcomingBookController.batchProcessBooks.bind(this))
-    this.router.get('/upcoming/health', UpcomingBookController.healthCheck.bind(this))
-    this.router.get('/upcoming/cover/:seriesName/:authorName', UpcomingBookController.getCover.bind(this))
-    this.router.get('/upcoming/debug-cover/:seriesName/:authorName', UpcomingBookController.debugCover.bind(this))
 
     //
     // Misc Routes
