@@ -118,11 +118,25 @@ class MediaProgress extends Model {
           instance.mediaItem = instance.podcastEpisode
           instance.dataValues.mediaItem = instance.dataValues.podcastEpisode
         }
-        // To prevent mistakes:
-        delete instance.book
+                // Delete dataValues version of book/podcastEpisode
         delete instance.dataValues.book
-        delete instance.podcastEpisode
         delete instance.dataValues.podcastEpisode
+      }
+    })
+
+    // Hook to update reading goals when media progress changes
+    MediaProgress.addHook('afterUpdate', async (instance, options) => {
+      if (instance.changed('isFinished') && instance.isFinished && instance.mediaItemType === 'book') {
+        // Book was just finished, update reading goals
+        try {
+          const ReadingGoal = sequelize.models.readingGoal
+          if (ReadingGoal) {
+            await ReadingGoal.recalculateProgressForUser(instance.userId)
+          }
+        } catch (error) {
+          // Don't fail the main operation if goal update fails
+          console.error('Error updating reading goals after book completion:', error)
+        }
       }
     })
 

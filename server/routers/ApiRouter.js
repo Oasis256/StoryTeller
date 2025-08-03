@@ -36,6 +36,7 @@ const ShareController = require('../controllers/ShareController')
 const StatsController = require('../controllers/StatsController')
 const ApiKeyController = require('../controllers/ApiKeyController')
 const UpcomingBookController = require('../controllers/UpcomingBookController')
+const ReadingGoalsController = require('../controllers/ReadingGoalsController')
 
 class ApiRouter {
   constructor(Server) {
@@ -349,6 +350,19 @@ class ApiRouter {
     this.router.get('/upcoming/health', UpcomingBookController.healthCheck.bind(this))
     this.router.get('/upcoming/cover/:seriesName/:authorName', UpcomingBookController.getCover.bind(this))
     this.router.get('/upcoming/debug-cover/:seriesName/:authorName', UpcomingBookController.debugCover.bind(this))
+
+    //
+    // Reading Goals Routes
+    //
+    this.router.get('/reading-goals/templates', ReadingGoalsController.getTemplates.bind(this))
+    this.router.get('/reading-goals/stats', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getStats.bind(this))
+    this.router.post('/reading-goals/recalculate', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.recalculateProgress.bind(this))
+    this.router.get('/reading-goals', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getGoals.bind(this))
+    this.router.post('/reading-goals', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.createGoal.bind(this))
+    this.router.get('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getGoal.bind(this))
+    this.router.patch('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateGoal.bind(this))
+    this.router.delete('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.deleteGoal.bind(this))
+    this.router.post('/reading-goals/:id/progress', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateProgress.bind(this))
 
     //
     // Misc Routes

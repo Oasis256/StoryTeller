@@ -1,5 +1,6 @@
 const Path = require('path')
 const { Sequelize, Op } = require('sequelize')
+console.log("*** DATABASE.JS LOADED MANUALLY ***")
 
 const packageJson = require('../package.json')
 const fs = require('./libs/fsExtra')
@@ -155,6 +156,11 @@ class Database {
   /** @type {typeof import('./models/MediaItemShare')} */
   get mediaItemShareModel() {
     return this.models.mediaItemShare
+  }
+
+  /** @type {typeof import('./models/ReadingGoal')} */
+  get readingGoalModel() {
+    return this.models.readingGoal
   }
 
   /** @type {typeof import('./models/Device')} */
@@ -345,6 +351,7 @@ class Database {
     require('./models/Setting').init(this.sequelize)
     require('./models/CustomMetadataProvider').init(this.sequelize)
     require('./models/MediaItemShare').init(this.sequelize)
+    require('./models/ReadingGoal').init(this.sequelize)
 
     return this.sequelize.sync({ force, alter: false })
   }
