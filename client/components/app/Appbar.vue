@@ -41,6 +41,12 @@
           </ui-tooltip>
         </nuxt-link>
 
+        <nuxt-link v-if="currentLibrary" to="/achievements" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
+          <ui-tooltip text="Achievements" direction="bottom" class="flex items-center">
+            <span class="material-symbols text-2xl" aria-label="Achievements" role="button">emoji_events</span>
+          </ui-tooltip>
+        </nuxt-link>
+
         <nuxt-link v-if="userCanUpload && currentLibrary" to="/upload" class="hover:text-gray-200 cursor-pointer w-8 h-8 flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.ButtonUpload" direction="bottom" class="flex items-center">
             <span class="material-symbols text-2xl" aria-label="Upload Media" role="button">&#xf09b;</span>

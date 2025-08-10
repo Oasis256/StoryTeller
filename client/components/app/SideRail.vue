@@ -81,6 +81,14 @@
         <div v-show="isReadingGoalsPage" class="h-full w-0.5 bg-yellow-400 absolute top-0 left-0" />
       </nuxt-link>
 
+      <nuxt-link v-if="isBookLibrary" to="/achievements" class="w-full h-20 flex flex-col items-center justify-center text-white text-opacity-80 border-b border-primary border-opacity-70 hover:bg-primary cursor-pointer relative" :class="isAchievementsPage ? 'bg-primary bg-opacity-80' : 'bg-bg bg-opacity-60'">
+        <span class="material-symbols text-2xl">emoji_events</span>
+
+        <p class="pt-1 text-center leading-4" style="font-size: 0.9rem">{{ $strings.ButtonAchievements }}</p>
+
+        <div v-show="isAchievementsPage" class="h-full w-0.5 bg-yellow-400 absolute top-0 left-0" />
+      </nuxt-link>
+
       <nuxt-link v-if="isBookLibrary" :to="`/library/${currentLibraryId}/narrators`" class="w-full h-20 flex flex-col items-center justify-center text-white text-opacity-80 border-b border-primary border-opacity-70 hover:bg-primary cursor-pointer relative" :class="isNarratorsPage ? 'bg-primary bg-opacity-80' : 'bg-bg bg-opacity-60'">
         <span class="material-symbols text-2xl">&#xe91f;</span>
 
@@ -194,6 +202,9 @@ export default {
     },
     isReadingGoalsPage() {
       return this.$route.name === 'reading-goals'
+    },
+    isAchievementsPage() {
+      return this.$route.name === 'achievements'
     },
     isNarratorsPage() {
       return this.$route.name === 'library-library-narrators'

@@ -37,6 +37,7 @@ const StatsController = require('../controllers/StatsController')
 const ApiKeyController = require('../controllers/ApiKeyController')
 const UpcomingBookController = require('../controllers/UpcomingBookController')
 const ReadingGoalsController = require('../controllers/ReadingGoalsController')
+const AchievementController = require('../controllers/AchievementController')
 
 class ApiRouter {
   constructor(Server) {
@@ -363,6 +364,18 @@ class ApiRouter {
     this.router.patch('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateGoal.bind(this))
     this.router.delete('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.deleteGoal.bind(this))
     this.router.post('/reading-goals/:id/progress', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateProgress.bind(this))
+
+    //
+    // Achievement Routes
+    //
+    this.router.get('/achievements', AchievementController.getAllAchievements.bind(this))
+    this.router.get('/achievements/unlocked', AchievementController.getUnlockedAchievements.bind(this))
+    this.router.get('/achievements/stats', AchievementController.getAchievementStats.bind(this))
+    this.router.get('/achievements/categories', AchievementController.getAchievementsByCategory.bind(this))
+    this.router.get('/achievements/recent', AchievementController.getRecentAchievements.bind(this))
+    this.router.get('/achievements/progress', AchievementController.getAchievementProgress.bind(this))
+    this.router.post('/achievements/check', AchievementController.checkAchievements.bind(this))
+    this.router.post('/achievements/test-unlock', AchievementController.testUnlock.bind(this))
 
     //
     // Misc Routes

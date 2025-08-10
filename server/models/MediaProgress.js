@@ -137,6 +137,15 @@ class MediaProgress extends Model {
           // Don't fail the main operation if goal update fails
           console.error('Error updating reading goals after book completion:', error)
         }
+
+        // Update achievements when a book is finished
+        try {
+          const AchievementManager = require('../managers/AchievementManager')
+          await AchievementManager.updateUserAchievements(instance.userId)
+        } catch (error) {
+          // Don't fail the main operation if achievement update fails
+          console.error('Error updating achievements after book completion:', error)
+        }
       }
     })
 
