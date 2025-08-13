@@ -1,4 +1,5 @@
 const Logger = require('../Logger')
+const Database = require('../Database')
 const AchievementManager = require('../managers/AchievementManager')
 const SocketAuthority = require('../SocketAuthority')
 
@@ -165,7 +166,12 @@ class AchievementController {
           ...stats,
           unlockedAchievements: unlockedCount,
           totalAchievements: totalCount,
-          completionPercent
+          completionPercent,
+          // Add UI-expected property names
+          unlockedCount: unlockedCount,
+          completionRate: completionPercent / 100,
+          booksCompleted: stats.finishedBooksCount || 0,
+          totalListeningMinutes: stats.totalListeningTime || 0
         }
       })
     } catch (error) {
