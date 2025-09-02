@@ -25,12 +25,8 @@
   "ButtonChooseAFolder": "Elegir una carpeta",
   "ButtonChooseFiles": "Elegir archivos",
   "ButtonClearFilter": "Quitar filtros",
-<<<<<<< HEAD
-  "ButtonCloseFeed": "Cerrar fuente",
-=======
   "ButtonClose": "Cerrar",
   "ButtonCloseFeed": "Cerrar suministro",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "ButtonCloseSession": "Cerrar la sesión abierta",
   "ButtonCollections": "Colecciones",
   "ButtonConfigureScanner": "Configurar Escáner",
@@ -129,22 +125,14 @@
   "HeaderAccount": "Cuenta",
   "HeaderAddCustomMetadataProvider": "Agregar proveedor de metadatos personalizado",
   "HeaderAdvanced": "Avanzado",
-<<<<<<< HEAD
-  "HeaderAppriseNotificationSettings": "Ajustes de Notificaciones de Apprise",
-=======
   "HeaderApiKeys": "Claves API",
   "HeaderAppriseNotificationSettings": "Configuración de notificaciones de Apprise",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "HeaderAudioTracks": "Pistas de audio",
   "HeaderAudiobookTools": "Herramientas de Gestión de Archivos de Audiolibro",
   "HeaderAuthentication": "Autenticación",
   "HeaderBackups": "Respaldos",
-<<<<<<< HEAD
-  "HeaderChangePassword": "Cambiar Contraseña",
-=======
   "HeaderBulkChapterModal": "Añadir Múltiples Capítulos",
   "HeaderChangePassword": "Cambiar contraseña",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "HeaderChapters": "Capítulos",
   "HeaderChooseAFolder": "Escoger una Carpeta",
   "HeaderCollection": "Colección",
@@ -181,14 +169,9 @@
   "HeaderMatch": "Encontrar",
   "HeaderMetadataOrderOfPrecedence": "Orden de precedencia de metadatos",
   "HeaderMetadataToEmbed": "Metadatos para Insertar",
-<<<<<<< HEAD
-  "HeaderNewAccount": "Nueva Cuenta",
-  "HeaderNewLibrary": "Nueva Biblioteca",
-=======
   "HeaderNewAccount": "Cuenta nueva",
   "HeaderNewApiKey": "Nueva clave API",
   "HeaderNewLibrary": "Biblioteca nueva",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "HeaderNotificationCreate": "Crear notificación",
   "HeaderNotificationUpdate": "Notificación de actualización",
   "HeaderNotifications": "Notificaciones",
@@ -232,18 +215,11 @@
   "HeaderStatsTop5Genres": "Top 5 Géneros",
   "HeaderTableOfContents": "Tabla de contenidos",
   "HeaderTools": "Herramientas",
-<<<<<<< HEAD
-  "HeaderUpdateAccount": "Actualizar Cuenta",
-  "HeaderUpdateAuthor": "Actualizar Autor",
-  "HeaderUpdateDetails": "Actualizar Detalles",
-  "HeaderUpdateLibrary": "Actualizar Biblioteca",
-=======
   "HeaderUpdateAccount": "Actualizar cuenta",
   "HeaderUpdateApiKey": "Actualizar clave API",
   "HeaderUpdateAuthor": "Actualizar autor",
   "HeaderUpdateDetails": "Actualizar detalles",
   "HeaderUpdateLibrary": "Actualizar biblioteca",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "HeaderUsers": "Usuarios",
   "HeaderYearReview": "Revisión del año {0}",
   "HeaderYourStats": "Tus estadísticas",
@@ -483,18 +459,11 @@
   "LabelNarrators": "Narradores",
   "LabelNew": "Nuevo",
   "LabelNewPassword": "Nueva Contraseña",
-<<<<<<< HEAD
-  "LabelNewestAuthors": "Autores más recientes",
-  "LabelNewestEpisodes": "Episodios más recientes",
-  "LabelNextBackupDate": "Fecha del Siguiente Respaldo",
-  "LabelNextScheduledRun": "Próxima Ejecución Programada",
-=======
   "LabelNewestAuthors": "Autores más nuevos",
   "LabelNewestEpisodes": "Episodios más nuevos",
   "LabelNextBackupDate": "Fecha del siguiente respaldo",
   "LabelNextChapters": "Los próximos capítulos serán:",
   "LabelNextScheduledRun": "Próxima ejecución programada",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelNoCustomMetadataProviders": "Sin proveedores de metadatos personalizados",
   "LabelNoEpisodesSelected": "Ningún Episodio Seleccionado",
   "LabelNotFinished": "No terminado",
@@ -509,14 +478,9 @@
   "LabelNotificationsMaxFailedAttemptsHelp": "Las notificaciones se desactivan después de fallar este número de veces",
   "LabelNotificationsMaxQueueSize": "Tamaño máximo de la cola de notificaciones",
   "LabelNotificationsMaxQueueSizeHelp": "Las notificaciones están limitadas a 1 por segundo. Las notificaciones serán ignoradas si llegan al numero máximo de cola para prevenir spam de eventos.",
-<<<<<<< HEAD
-  "LabelNumberOfBooks": "Numero de Libros",
-  "LabelNumberOfEpisodes": "# de Episodios",
-=======
   "LabelNumberOfBooks": "Número de libros",
   "LabelNumberOfChapters": "Número de capítulos:",
   "LabelNumberOfEpisodes": "N.º de episodios",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelOpenIDAdvancedPermsClaimDescription": "Nombre de la notificación de OpenID que contiene permisos avanzados para acciones de usuario dentro de la aplicación que se aplicarán a roles que no sean de administrador (<b>si están configurados</b>). Si el reclamo no aparece en la respuesta, se denegará el acceso a ABS. Si falta una sola opción, se tratará como <code>falsa</code>. Asegúrese de que la notificación del proveedor de identidades coincida con la estructura esperada:",
   "LabelOpenIDClaims": "Deje las siguientes opciones vacías para desactivar la asignación avanzada de grupos y permisos, lo que asignaría de manera automática al grupo «Usuario».",
   "LabelOpenIDGroupClaimDescription": "Nombre de la declaración OpenID que contiene una lista de grupos del usuario. Comúnmente conocidos como <code>grupos</code>. <b>Si se configura</b>, la aplicación asignará automáticamente roles en función de la pertenencia a grupos del usuario, siempre que estos grupos se denominen \"admin\", \"user\" o \"guest\" en la notificación. La solicitud debe contener una lista, y si un usuario pertenece a varios grupos, la aplicación asignará el rol correspondiente al mayor nivel de acceso. Si ningún grupo coincide, se denegará el acceso.",
@@ -769,12 +733,8 @@
   "MessageBookshelfNoRSSFeeds": "Ningún suministro RSS está abierto",
   "MessageBookshelfNoResultsForFilter": "El filtro «{0}: {1}» no produjo ningún resultado",
   "MessageBookshelfNoResultsForQuery": "No hay resultados para la consulta",
-<<<<<<< HEAD
-  "MessageBookshelfNoSeries": "No tienes ninguna serie",
-=======
   "MessageBookshelfNoSeries": "No tiene ninguna serie",
   "MessageBulkChapterPattern": "¿Cuántos capítulos desea añadir con este patrón de numeración?",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "MessageChapterEndIsAfter": "El final del capítulo es después del final de tu audiolibro",
   "MessageChapterErrorFirstNotZero": "El primer capitulo debe iniciar en 0",
   "MessageChapterErrorStartGteDuration": "El tiempo de inicio no es válido: debe ser inferior a la duración del audiolibro",
@@ -1156,9 +1116,6 @@
   "ToastUserPasswordChangeSuccess": "Contraseña modificada correctamente",
   "ToastUserPasswordMismatch": "No coinciden las contraseñas",
   "ToastUserPasswordMustChange": "La nueva contraseña no puede ser igual que la anterior",
-<<<<<<< HEAD
-  "ToastUserRootRequireName": "Debes introducir un nombre de usuario root"
-=======
   "ToastUserRootRequireName": "Debe introducir un nombre de usuario administrativo",
   "TooltipAddChapters": "Añadir capítulo(s)",
   "TooltipAddOneSecond": "Añadir 1 segundo",
@@ -1167,5 +1124,4 @@
   "TooltipSubtractOneSecond": "Restar 1 segundo",
   "TooltipUnlockAllChapters": "Desbloquear todos los capítulos",
   "TooltipUnlockChapter": "Desbloquear capítulo (Mayús+clic para rango)"
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
 }

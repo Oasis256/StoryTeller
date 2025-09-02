@@ -241,10 +241,7 @@
   "LabelAddedDate": "Добавлено {0}",
   "LabelAdminUsersOnly": "Только для пользователей с правами администратора",
   "LabelAll": "Все",
-<<<<<<< HEAD
-=======
   "LabelAllEpisodesDownloaded": "Все выпуски скачаны",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelAllUsers": "Все пользователи",
   "LabelAllUsersExcludingGuests": "Все пользователи, кроме гостей",
   "LabelAllUsersIncludingGuests": "Все пользователи, включая гостей",
@@ -449,13 +446,8 @@
   "LabelListenAgain": "Послушать снова",
   "LabelLogLevelDebug": "Debug",
   "LabelLogLevelInfo": "Info",
-<<<<<<< HEAD
-  "LabelLogLevelWarn": "Warn",
-  "LabelLookForNewEpisodesAfterDate": "Искать новые эпизоды после этой даты",
-=======
   "LabelLogLevelWarn": "Предупреждение",
   "LabelLookForNewEpisodesAfterDate": "Искать новые выпуски после этой даты",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelLowestPriority": "Самый низкий приоритет",
   "LabelMatchConfidence": "Уверенность",
   "LabelMatchExistingUsersBy": "Сопоставление существующих пользователей по",

@@ -292,11 +292,7 @@
   "LabelCoverImageURL": "URL till omslagsbild",
   "LabelCreatedAt": "Skapad",
   "LabelCronExpression": "Schemaläggning med hjälp av Cron (Cron Expression)",
-<<<<<<< HEAD
-  "LabelCurrent": "Nuvarande",
-=======
   "LabelCurrent": "Nuvarande omslag",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelCurrently": "För närvarande:",
   "LabelCustomCronExpression": "Anpassat Cron-uttryck:",
   "LabelDatetime": "Datum och klockslag",
@@ -462,11 +458,7 @@
   "LabelName": "Namn",
   "LabelNarrator": "Uppläsare",
   "LabelNarrators": "Uppläsare",
-<<<<<<< HEAD
-  "LabelNew": "Nytt",
-=======
   "LabelNew": "Nytt omslag",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelNewPassword": "Nytt lösenord",
   "LabelNewestAuthors": "Senaste författarna",
   "LabelNewestEpisodes": "Senaste avsnitten",
@@ -615,11 +607,8 @@
   "LabelSettingsStoreMetadataWithItemHelp": "Som standard lagras metadatafiler i mappen '/metadata/items'. Genom att aktivera detta alternativ kommer metadatafilerna att lagra i din biblioteksmapp",
   "LabelSettingsTimeFormat": "Tidsformat",
   "LabelShare": "Dela",
-<<<<<<< HEAD
-=======
   "LabelShareDownloadableHelp": "Tillåt att användare som fått en delad länk att ladda ner ett komprimerat objekt från biblioteket.",
   "LabelShareOpen": "Delning öppet",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelShareURL": "Dela URL-länk",
   "LabelShowAll": "Visa alla",
   "LabelShowSeconds": "Visa sekunder",
@@ -634,12 +623,8 @@
   "LabelStartTime": "Starttid",
   "LabelStarted": "Startad",
   "LabelStartedAt": "Startades",
-<<<<<<< HEAD
-  "LabelStatsAudioTracks": "Ljudspår",
-=======
   "LabelStartedDate": "Påbörjad {0}",
   "LabelStatsAudioTracks": "Ljudfiler",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelStatsAuthors": "Författare",
   "LabelStatsBestDay": "Bästa dag",
   "LabelStatsDailyAverage": "Dagligt genomsnitt",
@@ -687,21 +672,12 @@
   "LabelToolsSplitM4bDescription": "Skapa MP3-filer från en M4B-fil uppdelad i kapitel med inbäddad metadata, omslagsbild och kapitel.",
   "LabelTotalDuration": "Total varaktighet",
   "LabelTotalTimeListened": "Total tid lyssnad",
-<<<<<<< HEAD
-  "LabelTrackFromFilename": "Spår från filnamn",
-  "LabelTrackFromMetadata": "Spår från metadata",
-  "LabelTracks": "Spår",
-  "LabelTracksMultiTrack": "Flerspårigt",
-  "LabelTracksNone": "Inga spår",
-  "LabelTracksSingleTrack": "Enspårigt",
-=======
   "LabelTrackFromFilename": "Plats från filnamnet",
   "LabelTrackFromMetadata": "Plats från metadata",
   "LabelTracks": "Ljudspår",
   "LabelTracksMultiTrack": "Flera ljudspår",
   "LabelTracksNone": "Inga ljudspår",
   "LabelTracksSingleTrack": "Ett ljudspår",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "LabelTrailer": "Trailer",
   "LabelType": "Typ",
   "LabelUnabridged": "Oavkortad",
@@ -786,13 +762,8 @@
   "MessageConfirmMarkSeriesFinished": "Är du säker på att du vill markera alla böcker i denna serie som avslutade?",
   "MessageConfirmMarkSeriesNotFinished": "Är du säker på att du vill markera alla böcker i denna serie som ej avslutade?",
   "MessageConfirmPurgeCache": "När du rensar cashen kommer katalogen <code>/metadata/cache</code> att raderas. <br /><br />Är du säker på att du vill radera katalogen?",
-<<<<<<< HEAD
-  "MessageConfirmPurgeItemsCache": "När du rensar cashen för föremål kommer katalogen <code>/metadata/cache/items</code> att raderas. <br /><br />Är du säker på att du vill radera katalogen?",
-  "MessageConfirmQuickEmbed": "VARNING! Quick embed kommer inte att säkerhetskopiera dina ljudfiler. Se till att du har en säkerhetskopia av dina ljudfiler. <br><br>Vill du fortsätta?",
-=======
   "MessageConfirmPurgeItemsCache": "När du rensar cashen för objekten kommer katalogen <code>/metadata/cache/items</code> att raderas. <br /><br />Är du säker på att du vill radera katalogen?",
   "MessageConfirmQuickEmbed": "VARNING! När du infogar metadata i dina ljudfiler kommer INGEN SÄKERHETSKOPIA av filerna att göras. Se därför till att först säkerhetskopiera ljudfilerna. <br><br>Vill du fortsätta?",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "MessageConfirmQuickMatchEpisodes": "Snabbmatchning av avsnitt kommer att ersätta befintlig information vid en träff. Endast omatchade avsnitt kommer att uppdateras. Vill du fortsätta?",
   "MessageConfirmReScanLibraryItems": "Är du säker på att du vill göra en ny skanning för {0} objekt?",
   "MessageConfirmRemoveAllChapters": "Är du säker på att du vill ta bort alla kapitel?",
@@ -830,27 +801,16 @@
   "MessageJoinUsOn": "Anslut dig till oss på",
   "MessageLoading": "Laddar...",
   "MessageLoadingFolders": "Laddar mappar...",
-<<<<<<< HEAD
-  "MessageLogsDescription": "Filer med loggar sparas i mappen <code>/metadata/logs</code> som JSON-filer.<br>Filer med information om krascher sparas i <code>/metadata/logs/crash_logs.txt</code>.",
-  "MessageM4BFailed": "M4B misslyckades!",
-  "MessageM4BFinished": "M4B klar!",
-=======
   "MessageLogsDescription": "Filer med loggningsinformation sparas i mappen <code>/metadata/logs</code> som JSON-filer.<br>Filer med information om krascher sparas i <code>/metadata/logs/crash_logs.txt</code>.",
   "MessageM4BFailed": "Skapandet av en M4B-fil misslyckades!",
   "MessageM4BFinished": "Omkodningen till M4B är genomförd!",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "MessageMapChapterTitles": "Kartlägg kapitelrubriker till dina befintliga ljudbokskapitel utan att justera tidstämplar",
   "MessageMarkAllEpisodesFinished": "Markera alla avsnitt som avslutade",
   "MessageMarkAllEpisodesNotFinished": "Markera alla avsnitt som ej avslutade",
   "MessageMarkAsFinished": "Markera som avslutad",
   "MessageMarkAsNotFinished": "Markera som ej avslutad",
-<<<<<<< HEAD
-  "MessageMatchBooksDescription": "kommer att försöka matcha böcker i biblioteket med en bok från den valda källan och fylla i uppgifter som saknas och omslag. Inga befintliga uppgifter kommer att ersättas.",
-  "MessageNoAudioTracks": "Inga ljudspår har hittats",
-=======
   "MessageMatchBooksDescription": "kommer att försöka matcha böcker i biblioteket med en bok från den valda källan och fylla i uppgifter som saknas och omslag som saknas. Inga befintliga uppgifter kommer att ersättas.",
   "MessageNoAudioTracks": "Inga ljudfiler har hittats",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "MessageNoAuthors": "Inga författare",
   "MessageNoBackups": "Inga säkerhetskopior",
   "MessageNoBookmarks": "Inga bokmärken",
@@ -907,12 +867,8 @@
   "MessageSetChaptersFromTracksDescription": "Använd varje ljudfil som ett kapitel och ljudfilens namn som kapitlets rubrik",
   "MessageShareExpirationWillBe": "Giltig till kommer att bli <strong>{0}</strong>",
   "MessageShareExpiresIn": "Upphör om {0}",
-<<<<<<< HEAD
-  "MessageStartPlaybackAtTime": "Starta uppspelning av \"{0}\" vid tidpunkt {1}?",
-=======
   "MessageStartPlaybackAtTime": "Starta uppspelning av \"{0}\" från tidpunkt {1}?",
   "MessageTaskAudioFileNotWritable": "Det går inte att skriva till ljudfilen \"{0}\"",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "MessageTaskCanceledByUser": "Uppgiften avslutades av användaren",
   "MessageTaskDownloadingEpisodeDescription": "Laddar ner avsnitt \"{0}\"",
   "MessageTaskEmbeddingMetadata": "Infogar metadata",
@@ -1002,13 +958,9 @@
   "ToastBackupInvalidMaxSize": "Felaktig storlek på backup har angivits",
   "ToastBackupRestoreFailed": "Det gick inte att återställa säkerhetskopian",
   "ToastBackupUploadFailed": "Det gick inte att ladda upp säkerhetskopian",
-<<<<<<< HEAD
-  "ToastBackupUploadSuccess": "Säkerhetskopian uppladdad",
-=======
   "ToastBackupUploadSuccess": "Säkerhetskopian har laddats upp",
   "ToastBatchApplyDetailsToItemsSuccess": "Informationen har adderats till alla objekt",
   "ToastBatchQuickMatchStarted": "Snabbmatchning av {0} böcker har påbörjats!",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "ToastBatchUpdateFailed": "Batchuppdateringen misslyckades",
   "ToastBatchUpdateSuccess": "Batchuppdateringen lyckades",
   "ToastBookmarkCreateFailed": "Det gick inte att skapa bokmärket",
@@ -1120,12 +1072,8 @@
   "ToastSelectAtLeastOneUser": "Åtminstone en användare måste väljas",
   "ToastSendEbookToDeviceFailed": "Misslyckades med att skicka e-boken till enheten",
   "ToastSendEbookToDeviceSuccess": "E-boken skickad till enheten \"{0}\"",
-<<<<<<< HEAD
-  "ToastSeriesUpdateFailed": "Uppdateringen av serier misslyckades",
-=======
   "ToastSeriesSubmitFailedSameName": "Det är inte möjligt att addera två serier med samma namn",
   "ToastSeriesUpdateFailed": "Misslyckades med att uppdatera serien",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "ToastSeriesUpdateSuccess": "Uppdateringen av serierna lyckades",
   "ToastServerSettingsUpdateSuccess": "Inställningarna för servern har uppdaterats",
   "ToastSessionDeleteFailed": "Misslyckades med att ta bort sessionen",

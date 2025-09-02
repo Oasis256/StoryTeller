@@ -673,8 +673,6 @@
   "NoteUploaderFoldersWithMediaFiles": "Тэчкі з медыяфайламі будуць апрацоўвацца як асобныя элементы бібліятэкі.",
   "NotificationOnEpisodeDownloadedDescription": "Выклікаецца, калі эпізод падкаста аўтаматычна спампоўваецца",
   "ToastAccountUpdateSuccess": "Уліковы запіс абноўлены",
-<<<<<<< HEAD
-=======
   "ToastAuthorImageRemoveSuccess": "Выява аўтара выдалена",
   "ToastAuthorUpdateSuccess": "Аўтар абноўлены",
   "ToastAuthorUpdateSuccessNoImageFound": "Аўтар абноўлены (малюнак не знойдзены)",
@@ -685,7 +683,6 @@
   "ToastDeviceTestEmailFailed": "Не ўдалося адправіць тэставае электроннае пісьмо",
   "ToastEncodeCancelFailed": "Не ўдалося скасаваць кадаванне",
   "ToastEncodeCancelSucces": "Кадаванне скасавана",
->>>>>>> c7c21cc137e7d1b63c304270df4be4c53d2c4753
   "ToastEpisodeDownloadQueueClearFailed": "Не ўдалося ачысціць чаргу",
   "ToastEpisodeDownloadQueueClearSuccess": "Чарга спампоўкі эпізодаў ачышчана",
   "ToastInvalidImageUrl": "Няправільны URL выявы",
