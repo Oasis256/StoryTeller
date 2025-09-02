@@ -103,7 +103,7 @@
       </div>
       <div class="flex items-center space-x-3 max-w-[calc(100vw-10rem)]">
         <!-- Cover Image -->
-        <div v-if="upcomingBook.cover && !upcomingBook.coverError" class="flex-shrink-0">
+        <div v-if="upcomingBookCoverUrl && !upcomingBook.coverError" class="flex-shrink-0">
           <img :src="upcomingBookCoverUrl" :alt="upcomingBook.title" class="w-12 h-16 object-cover rounded shadow-sm hover:shadow-md transition-shadow cursor-pointer" @click="showUpcomingCoverModal" @error="onUpcomingCoverError" />
         </div>
 
@@ -165,8 +165,7 @@ export default {
       isLoadingUpcoming: false,
       isRefreshing: false,
       upcomingBookError: false,
-      coverFallbackAttempted: false,
-      cachedCoverBlobUrl: null
+      pollingInterval: null
     }
   },
   computed: {
@@ -236,8 +235,20 @@ export default {
       return this.mediaMetadata.type
     },
     upcomingBookCoverUrl() {
-      // Return the blob URL if we have one, otherwise the fallback URL
-      return this.cachedCoverBlobUrl || this.upcomingBook?.cover || null
+      // Use cached cover endpoint first, then fallback to original
+      if (this.upcomingBook) {
+        const series = this.mediaMetadata.series?.[0] || this.mediaMetadata.series
+        const author = this.mediaMetadata.authors?.[0] || this.mediaMetadata.authors
+
+        if (series?.name && author?.name) {
+          const seriesName = encodeURIComponent(series.name)
+          const authorName = encodeURIComponent(author.name)
+          return `/api/upcoming/cover/${seriesName}/${authorName}`
+        }
+      }
+
+      // Fallback to original cover URL
+      return this.upcomingBook?.cover || null
     },
     daysUntilRelease() {
       if (!this.upcomingBook?.release) return null
@@ -255,10 +266,12 @@ export default {
     releaseTimeClass() {
       if (this.daysUntilRelease === null) return ''
 
-      if (this.daysUntilRelease < 0) return 'text-red-400'
-      if (this.daysUntilRelease <= 7) return 'text-yellow-400'
-      if (this.daysUntilRelease <= 30) return 'text-blue-400'
-      return 'text-white/60'
+      if (this.daysUntilRelease < 0) return 'text-red-400' // Already released
+      if (this.daysUntilRelease <= 30) return 'text-green-400' // Within a month - all green
+      if (this.daysUntilRelease <= 60) return 'text-blue-400' // Within two months
+      if (this.daysUntilRelease <= 90) return 'text-indigo-400' // Within three months
+      if (this.daysUntilRelease <= 180) return 'text-purple-400' // Within six months
+      return 'text-pink-400' // More than 6 months
     },
     releaseTimeText() {
       if (this.daysUntilRelease === null) return ''
@@ -280,9 +293,12 @@ export default {
     async fetchUpcomingBook() {
       if (this.isPodcast || this.isLoadingUpcoming) return
 
-      this.isLoadingUpcoming = true
       this.upcomingBookError = false
-      this.coverFallbackAttempted = false
+
+      // Add a longer delay before showing loading state to avoid flicker for cache hits
+      const loadingTimeout = setTimeout(() => {
+        this.isLoadingUpcoming = true
+      }, 300) // Only show loading after 300ms
 
       try {
         console.log(`[LibraryItemDetails] Fetching Upcoming Book for item: ${this.libraryItem.id}`)
@@ -290,14 +306,21 @@ export default {
 
         console.log('[LibraryItemDetails] Response received:', response)
 
-        this.upcomingBook = response.book
+        // Clear loading state immediately for fast responses
+        clearTimeout(loadingTimeout)
+        this.isLoadingUpcoming = false
+
+        this.upcomingBook = response.upcoming
 
         if (this.upcomingBook) {
           console.log(`[LibraryItemDetails] Found Upcoming Book: ${this.upcomingBook.title}`)
           console.log('[LibraryItemDetails] Book data:', this.upcomingBook)
 
-          // Try to fetch cached cover with authentication
-          await this.fetchCachedCover()
+          // If we got a "discovering" placeholder, start polling fallback
+          if (this.upcomingBook.isDiscovering) {
+            console.log('[LibraryItemDetails] Got discovery placeholder, starting polling fallback')
+            this.startPolling()
+          }
         } else {
           console.log('[LibraryItemDetails] No Upcoming Book found')
         }
@@ -317,40 +340,8 @@ export default {
           this.$toast.error('Failed to load Upcoming Book information')
         }
       } finally {
+        clearTimeout(loadingTimeout)
         this.isLoadingUpcoming = false
-      }
-    },
-
-    async fetchCachedCover() {
-      // Clean up previous blob URL
-      if (this.cachedCoverBlobUrl) {
-        URL.revokeObjectURL(this.cachedCoverBlobUrl)
-        this.cachedCoverBlobUrl = null
-      }
-
-      try {
-        const series = this.mediaMetadata.series?.[0] || this.mediaMetadata.series
-        const author = this.mediaMetadata.authors?.[0] || this.mediaMetadata.authors
-
-        if (series?.name && author?.name) {
-          const seriesName = encodeURIComponent(series.name)
-          const authorName = encodeURIComponent(author.name)
-          const cachedUrl = `/api/upcoming/cover/${seriesName}/${authorName}`
-
-          console.log(`[LibraryItemDetails] Fetching cached cover: ${cachedUrl}`)
-
-          // Use axios to get the image with authentication
-          const response = await this.$axios.get(cachedUrl, {
-            responseType: 'blob'
-          })
-
-          // Create blob URL for the image
-          this.cachedCoverBlobUrl = URL.createObjectURL(response.data)
-          console.log(`[LibraryItemDetails] Created blob URL for cached cover`)
-        }
-      } catch (error) {
-        console.log(`[LibraryItemDetails] Failed to fetch cached cover, will use original:`, error)
-        // Will fall back to original cover URL automatically
       }
     },
 
@@ -371,11 +362,11 @@ export default {
 
           await this.$axios.$post('/api/upcoming/refresh', {
             seriesName: series.name,
-            authorName: author.name
+            authorName: author.name,
+            libraryItemId: this.libraryItem.id
           })
 
           // Reset fallback flag and refetch the updated data
-          this.coverFallbackAttempted = false
           await this.fetchUpcomingBook()
 
           if (this.$toast) {
@@ -439,23 +430,145 @@ export default {
     },
 
     onUpcomingCoverError() {
-      console.log('[LibraryItemDetails] Cover image failed to load, attempting fallback')
+      console.log('[LibraryItemDetails] Cover image failed to load')
 
-      // If we haven't tried the fallback yet, try the original URL
-      if (!this.coverFallbackAttempted && this.upcomingBook) {
-        this.coverFallbackAttempted = true
-
-        // Force a re-render by updating a reactive property
-        this.$forceUpdate()
-
-        console.log('[LibraryItemDetails] Falling back to original cover URL')
-      } else {
-        // Both cached and original failed, hide the image
-        console.log('[LibraryItemDetails] Both cover sources failed, hiding image')
-        if (this.upcomingBook) {
-          this.$set(this.upcomingBook, 'coverError', true)
-        }
+      // Mark cover as failed to hide the image
+      if (this.upcomingBook) {
+        this.$set(this.upcomingBook, 'coverError', true)
       }
+    },
+
+    setupWebSocketListeners() {
+      if (!this.$socket) {
+        console.warn('[LibraryItemDetails] WebSocket not available, will use polling fallback')
+        return
+      }
+
+      // Listen for upcoming book discovery completion
+      this.$socket.on('upcoming_book_update', this.onUpcomingBookUpdate)
+
+      // Listen for discovery progress updates
+      this.$socket.on('upcoming_book_progress', this.onUpcomingBookProgress)
+
+      // Listen for all events for debugging
+      this.$socket.onAny((eventName, data) => {
+        if (eventName.includes('upcoming_book')) {
+          console.log(`[LibraryItemDetails] Received WebSocket event: ${eventName}`, data)
+        }
+      })
+
+      console.log('[LibraryItemDetails] WebSocket listeners set up')
+    },
+
+    onUpcomingBookUpdate(notification) {
+      try {
+        console.log('[LibraryItemDetails] Received upcoming book update:', notification)
+
+        const { data } = notification
+
+        // Check if this update is for our current book
+        const series = this.mediaMetadata.series?.[0] || this.mediaMetadata.series
+        const author = this.mediaMetadata.authors?.[0] || this.mediaMetadata.authors
+
+        if (series?.name === data.seriesName && author?.name === data.authorName) {
+          console.log('[LibraryItemDetails] Update matches current book, refreshing data')
+
+          // Stop any polling since we got the real-time update
+          this.stopPolling()
+
+          // Update the UI with the discovered book
+          this.upcomingBook = {
+            title: data.book.title,
+            author: data.book.author,
+            release: data.book.releaseDate,
+            cover: data.book.cover,
+            description: data.book.description,
+            series: data.book.series,
+            link: data.book.link || null,
+            discoveredAt: data.discoveredAt
+          }
+
+          this.isLoadingUpcoming = false
+          this.upcomingBookError = false
+
+          console.log('[LibraryItemDetails] UI updated with discovered book:', this.upcomingBook.title)
+        }
+      } catch (error) {
+        console.error('[LibraryItemDetails] Error processing upcoming book update:', error)
+      }
+    },
+
+    onUpcomingBookProgress(notification) {
+      try {
+        console.log('[LibraryItemDetails] Received progress update:', notification)
+
+        const { data } = notification
+
+        // Check if this progress is for our current book
+        const series = this.mediaMetadata.series?.[0] || this.mediaMetadata.series
+        const author = this.mediaMetadata.authors?.[0] || this.mediaMetadata.authors
+
+        if (series?.name === data.seriesName && author?.name === data.authorName) {
+          console.log(`[LibraryItemDetails] Progress: ${data.progress.stage} - ${data.progress.message}`)
+
+          if (data.progress.error && data.progress.stage === 'failed') {
+            this.isLoadingUpcoming = false
+            this.upcomingBookError = true
+            this.upcomingBook = null
+            this.stopPolling()
+          }
+        }
+      } catch (error) {
+        console.error('[LibraryItemDetails] Error processing progress update:', error)
+      }
+    },
+
+    startPolling() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval)
+      }
+
+      console.log('[LibraryItemDetails] Starting polling fallback')
+
+      this.pollingInterval = setInterval(async () => {
+        try {
+          const response = await this.$axios.$get(`/api/items/${this.libraryItem.id}/upcoming/check`)
+
+          if (response.upcoming && !response.upcoming.isDiscovering) {
+            console.log('[LibraryItemDetails] Polling detected completion, updating UI')
+            this.upcomingBook = response.upcoming
+            this.isLoadingUpcoming = false
+            this.upcomingBookError = false
+            this.stopPolling()
+          } else if (response.error) {
+            console.log('[LibraryItemDetails] Polling detected error')
+            this.isLoadingUpcoming = false
+            this.upcomingBookError = true
+            this.upcomingBook = null
+            this.stopPolling()
+          }
+        } catch (error) {
+          console.error('[LibraryItemDetails] Polling error:', error)
+        }
+      }, 3000) // Poll every 3 seconds
+    },
+
+    stopPolling() {
+      if (this.pollingInterval) {
+        clearInterval(this.pollingInterval)
+        this.pollingInterval = null
+        console.log('[LibraryItemDetails] Stopped polling')
+      }
+    },
+
+    cleanupListeners() {
+      if (this.$socket) {
+        this.$socket.off('upcoming_book_update', this.onUpcomingBookUpdate)
+        this.$socket.off('upcoming_book_progress', this.onUpcomingBookProgress)
+        console.log('[LibraryItemDetails] WebSocket listeners cleaned up')
+      }
+
+      this.stopPolling()
     }
   },
   mounted() {
@@ -465,6 +578,9 @@ export default {
     console.log('[LibraryItemDetails] Is podcast:', this.isPodcast)
     console.log('[LibraryItemDetails] Media metadata:', this.mediaMetadata)
 
+    // Set up WebSocket listeners for real-time updates
+    this.setupWebSocketListeners()
+
     this.fetchUpcomingBook()
   },
   watch: {
@@ -472,23 +588,14 @@ export default {
     'libraryItem.id'() {
       console.log('[LibraryItemDetails] Library item changed, refetching Upcoming Book')
       this.upcomingBook = null
-      this.coverFallbackAttempted = false
-
-      // Clean up blob URL
-      if (this.cachedCoverBlobUrl) {
-        URL.revokeObjectURL(this.cachedCoverBlobUrl)
-        this.cachedCoverBlobUrl = null
-      }
-
+      this.stopPolling()
       this.fetchUpcomingBook()
     }
   },
 
   beforeDestroy() {
-    // Clean up blob URL when component is destroyed
-    if (this.cachedCoverBlobUrl) {
-      URL.revokeObjectURL(this.cachedCoverBlobUrl)
-    }
+    // Clean up WebSocket listeners and polling
+    this.cleanupListeners()
   }
 }
 </script>

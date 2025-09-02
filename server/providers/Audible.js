@@ -107,7 +107,25 @@ class Audible {
       })
       .catch((error) => {
         Logger.error('[Audible] ASIN search error', error)
-        return null
+
+        // Extract ASIN from future release date errors
+        let ASINx = null
+        if (error.response && error.response.data && error.response.data.message) {
+          const message = error.response.data.message
+          if (message.includes('Release date is in the future for ASIN:')) {
+            const asinMatch = message.match(/ASIN:\s*([A-Z0-9]{10})/)
+            if (asinMatch) {
+              ASINx = asinMatch[1]
+              console.log(`*** [Audible] EXTRACTED UPCOMING BOOK ASIN: ${ASINx} ***`)
+
+              // Store the ASIN globally so other providers can access it
+              global.upcomingBookASIN = ASINx
+            }
+          }
+        }
+
+        // Re-throw error so Audble provider can extract ASIN from it
+        throw error
       })
   }
 

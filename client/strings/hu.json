@@ -583,16 +583,11 @@
   "LabelSettingsBookshelfViewHelp": "Skeuomorfikus dizájn fa polcokkal",
   "LabelSettingsChromecastSupport": "Chromecast támogatás",
   "LabelSettingsDateFormat": "Dátumformátum",
-<<<<<<< HEAD
   "LabelSettingsDisableWatcher": "Figyelő letiltása",
   "LabelSettingsDisableWatcherForLibrary": "Mappafigyelő letiltása a könyvtárban",
   "LabelSettingsDisableWatcherHelp": "Letiltja az automatikus elem hozzáadás/frissítés funkciót, amikor fájlváltozásokat észlel. *Szerver újraindítása szükséges",
   "LabelSettingsEnableWatcher": "Figyelő engedélyezése",
   "LabelSettingsEnableWatcherForLibrary": "Mappafigyelő engedélyezése a könyvtárban",
-=======
-  "LabelSettingsEnableWatcher": "Változások automatikus vizsgálata a könyvtárakban",
-  "LabelSettingsEnableWatcherForLibrary": "Változások automatikus vizsgálata a könyvtárban",
->>>>>>> 2dc93258f1f1eb8ca1e969be86066eef1b86e6d4
   "LabelSettingsEnableWatcherHelp": "Engedélyezi az automatikus elem hozzáadás/frissítés funkciót, amikor fájlváltozásokat észlel. *Szerver újraindítása szükséges",
   "LabelSettingsEpubsAllowScriptedContent": "Szkriptelt tartalmak engedélyezése epub-okban",
   "LabelSettingsEpubsAllowScriptedContentHelp": "Megengedi, hogy az epub fájlok szkripteket hajtsanak végre. Ezt a beállítást kikapcsolva ajánlott tartani, kivéve, ha megbízik az epub fájlok forrásában.",

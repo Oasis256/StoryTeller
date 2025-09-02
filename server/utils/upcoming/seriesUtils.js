@@ -11,7 +11,7 @@ class SeriesUtils {
    * @returns {Object} - {name: string, seq: number}
    */
   static extractSeriesAndSequence(book) {
-    const s = (Array.isArray(book.media?.series) ? book.media.series[0] : book.media?.series) || book.media?.dataValues?.series?.[0] || book.media?.dataValues?.series
+    const s = (Array.isArray(book.media?.series) ? book.media.series[0] : book.media?.series) || (Array.isArray(book.media?.metadata?.series) ? book.media.metadata.series[0] : book.media?.metadata?.series) || book.media?.dataValues?.series?.[0] || book.media?.dataValues?.series
 
     let name = s?.name || s?.dataValues?.name || null
     let seq = null
@@ -97,24 +97,100 @@ class SeriesUtils {
    * @returns {Object} - {series, authors, seriesName, authorName}
    */
   static extractSeriesAndAuthorInfo(libraryItem) {
-    const metadata = libraryItem.media.metadata || libraryItem.media.dataValues?.metadata
-    let series = metadata?.series || libraryItem.media.series || libraryItem.media.dataValues?.series
-    let authors = metadata?.authors || libraryItem.media.authors || libraryItem.media.dataValues?.authors
+    // Debug: Log the structure of the library item
+    Logger.debug(`[SeriesUtils 4.0] Library item structure:`, {
+      hasMedia: !!libraryItem.media,
+      mediaType: libraryItem.media?.mediaType,
+      hasMetadata: !!libraryItem.media?.metadata,
+      hasDataValues: !!libraryItem.media?.dataValues,
+      hasBookSeries: !!libraryItem.media?.bookSeries,
+      hasBookAuthors: !!libraryItem.media?.bookAuthors,
+      hasSeries: !!libraryItem.media?.series,
+      hasAuthors: !!libraryItem.media?.authors,
+      metadataKeys: libraryItem.media?.metadata ? Object.keys(libraryItem.media.metadata) : [],
+      dataValuesKeys: libraryItem.media?.dataValues ? Object.keys(libraryItem.media.dataValues) : [],
+      mediaKeys: libraryItem.media ? Object.keys(libraryItem.media) : [],
+      // Add more detailed debugging
+      dataValuesSeries: libraryItem.media?.dataValues?.series,
+      dataValuesAuthors: libraryItem.media?.dataValues?.authors,
+      bookSeriesLength: libraryItem.media?.bookSeries?.length || 0,
+      bookAuthorsLength: libraryItem.media?.bookAuthors?.length || 0
+    })
 
-    // If still not found, try to get from dataValues (Sequelize style)
-    if (!series && libraryItem.media.dataValues) {
+    // Handle different data structures
+    let series = null
+    let authors = null
+
+    // Try to get from transformed data first (like in libraryItemsBookFilters)
+    if (libraryItem.media?.series) {
+      series = libraryItem.media.series
+    }
+    if (libraryItem.media?.authors) {
+      authors = libraryItem.media.authors
+    }
+
+    // If not found, try to get from raw Sequelize associations
+    if (!series && libraryItem.media?.bookSeries) {
+      Logger.debug(`[SeriesUtils 4.1.1] Found bookSeries:`, libraryItem.media.bookSeries)
+      series = libraryItem.media.bookSeries.map((bs) => {
+        const seriesObj = bs.series
+        seriesObj.bookSeries = bs
+        return seriesObj
+      })
+    }
+    if (!authors && libraryItem.media?.bookAuthors) {
+      Logger.debug(`[SeriesUtils 4.1.2] Found bookAuthors:`, libraryItem.media.bookAuthors)
+      authors = libraryItem.media.bookAuthors.map((ba) => ba.author)
+    }
+
+    // Fallback to metadata structure
+    if (!series) {
+      const metadata = libraryItem.media?.metadata || libraryItem.media?.dataValues?.metadata
+      series = metadata?.series || libraryItem.media?.dataValues?.series || libraryItem.media?.series
+    }
+    if (!authors) {
+      const metadata = libraryItem.media?.metadata || libraryItem.media?.dataValues?.metadata
+      authors = metadata?.authors || libraryItem.media?.dataValues?.authors || libraryItem.media?.authors
+    }
+
+    // Final fallback: check if dataValues has the data directly
+    if (!series && libraryItem.media?.dataValues?.series) {
+      Logger.debug(`[SeriesUtils 4.1.3] Found series in dataValues:`, libraryItem.media.dataValues.series)
       series = libraryItem.media.dataValues.series
     }
-    if (!authors && libraryItem.media.dataValues) {
+    if (!authors && libraryItem.media?.dataValues?.authors) {
+      Logger.debug(`[SeriesUtils 4.1.4] Found authors in dataValues:`, libraryItem.media.dataValues.authors)
       authors = libraryItem.media.dataValues.authors
     }
+
+    // Additional debugging to see what we actually have
+    Logger.debug(`[SeriesUtils 4.1.5] Final extracted data:`, {
+      series: series,
+      authors: authors,
+      seriesType: typeof series,
+      authorsType: typeof authors,
+      isSeriesArray: Array.isArray(series),
+      isAuthorsArray: Array.isArray(authors),
+      seriesLength: series ? (Array.isArray(series) ? series.length : 1) : 0,
+      authorsLength: authors ? (Array.isArray(authors) ? authors.length : 1) : 0
+    })
+
+    // Debug: Log what we found
+    Logger.debug(`[SeriesUtils 4.1] Extracted data:`, {
+      series: series,
+      authors: authors,
+      seriesType: typeof series,
+      authorsType: typeof authors,
+      isSeriesArray: Array.isArray(series),
+      isAuthorsArray: Array.isArray(authors)
+    })
 
     const seriesObj = Array.isArray(series) ? series[0] : series
     const authorObj = Array.isArray(authors) ? authors[0] : authors
     const seriesName = seriesObj?.name || seriesObj?.dataValues?.name || ''
-    const authorName = authorObj?.name || authorObj?.fullName || authorObj || ''
+    const authorName = authorObj?.name || authorObj?.fullName || authorObj || libraryItem.media?.metadata?.authorName || ''
 
-    // Logger.info(`[SeriesUtils 4.0] Extracted - Series: "${seriesName}", Author: "${authorName}"`)
+    Logger.debug(`[SeriesUtils 4.2] Final extracted - Series: "${seriesName}", Author: "${authorName}"`)
 
     return {
       series: seriesObj,
@@ -163,7 +239,11 @@ class SeriesUtils {
    * @returns {boolean} - True if valid
    */
   static validateSeriesInfo({ series, authors, seriesName, authorName }) {
-    const isValid = !!(series && authors && seriesName && authorName)
+    // For upcoming book discovery, we need at least a series name OR an author name
+    // Series name is preferred, but author-only searches can also work
+    const hasSeriesInfo = !!(series && seriesName)
+    const hasAuthorInfo = !!(authors && authorName)
+    const isValid = hasSeriesInfo || hasAuthorInfo
 
     if (!isValid) {
       Logger.warn('[SeriesUtils 6.0] Missing required series or author information', {
@@ -172,6 +252,10 @@ class SeriesUtils {
         seriesName,
         authorName
       })
+    } else if (!hasSeriesInfo && hasAuthorInfo) {
+      Logger.debug('[SeriesUtils 6.1] Author-only search (no series info)')
+    } else if (hasSeriesInfo && !hasAuthorInfo) {
+      Logger.debug('[SeriesUtils 6.2] Series-only search (no author info)')
     }
 
     return isValid

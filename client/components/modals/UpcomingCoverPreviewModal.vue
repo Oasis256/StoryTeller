@@ -90,10 +90,12 @@ export default {
     releaseTimeClass() {
       if (this.daysUntilRelease === null) return 'text-gray-300'
 
-      if (this.daysUntilRelease < 0) return 'text-red-400'
-      if (this.daysUntilRelease <= 7) return 'text-yellow-400'
-      if (this.daysUntilRelease <= 30) return 'text-blue-400'
-      return 'text-green-400'
+      if (this.daysUntilRelease < 0) return 'text-red-400' // Already released
+      if (this.daysUntilRelease <= 30) return 'text-green-400' // Within a month - all green
+      if (this.daysUntilRelease <= 60) return 'text-blue-400' // Within two months
+      if (this.daysUntilRelease <= 90) return 'text-indigo-400' // Within three months
+      if (this.daysUntilRelease <= 180) return 'text-purple-400' // Within six months
+      return 'text-pink-400' // More than 6 months
     },
     releaseTimeText() {
       if (this.daysUntilRelease === null) return ''

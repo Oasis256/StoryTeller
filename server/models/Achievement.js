@@ -46,74 +46,77 @@ class Achievement extends Model {
     this.updatedAt
   }
 
-    /**
+  /**
    * Initialize Achievement model
-   * @param {import('../Database').sequelize} sequelize 
+   * @param {import('../Database').sequelize} sequelize
    */
   static init(sequelize) {
-    super.init({
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-      },
-      key: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      nameKey: {
-        type: DataTypes.STRING,
-        allowNull: true
-      },
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: false
-      },
-      descKey: {
-        type: DataTypes.STRING,
-        allowNull: true
-      },
-      badgeIcon: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      badgeColor: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      category: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      targetValue: {
-        type: DataTypes.INTEGER,
-        allowNull: false
-      },
-      targetUnit: {
-        type: DataTypes.STRING,
-        allowNull: false
-      },
-      isActive: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true
-      }
-    }, {
-      sequelize,
-      modelName: 'achievement',
-      indexes: [
-        {
-          fields: ['category']
+    super.init(
+      {
+        id: {
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          primaryKey: true
         },
-        {
-          fields: ['isActive']
+        key: {
+          type: DataTypes.STRING,
+          allowNull: false,
+          unique: true
+        },
+        name: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        nameKey: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
+        description: {
+          type: DataTypes.TEXT,
+          allowNull: false
+        },
+        descKey: {
+          type: DataTypes.STRING,
+          allowNull: true
+        },
+        badgeIcon: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        badgeColor: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        category: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        targetValue: {
+          type: DataTypes.INTEGER,
+          allowNull: false
+        },
+        targetUnit: {
+          type: DataTypes.STRING,
+          allowNull: false
+        },
+        isActive: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: true
         }
-      ]
-    })
+      },
+      {
+        sequelize,
+        modelName: 'achievement',
+        indexes: [
+          {
+            fields: ['category']
+          },
+          {
+            fields: ['isActive']
+          }
+        ]
+      }
+    )
 
     // Set up associations after model definition
     // Don't set up associations here since UserAchievement might not be loaded yet
@@ -121,7 +124,7 @@ class Achievement extends Model {
 
   /**
    * Define associations
-   * @param {Object} models 
+   * @param {Object} models
    */
   static associate(models) {
     // An achievement can have many user achievements

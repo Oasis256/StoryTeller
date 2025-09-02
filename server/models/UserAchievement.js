@@ -40,56 +40,59 @@ class UserAchievement extends Model {
     this.user
   }
 
-    /**
+  /**
    * Initialize UserAchievement model
-   * @param {import('../Database').sequelize} sequelize 
+   * @param {import('../Database').sequelize} sequelize
    */
   static init(sequelize) {
-    super.init({
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-      },
-      userId: {
-        type: DataTypes.UUID,
-        allowNull: false
-      },
-      achievementId: {
-        type: DataTypes.UUID,
-        allowNull: false
-      },
-      progress: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
-      },
-      isUnlocked: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-      },
-      unlockedAt: {
-        type: DataTypes.DATE,
-        allowNull: true
-      }
-    }, {
-      sequelize,
-      modelName: 'userAchievement',
-      indexes: [
-        {
-          fields: ['userId']
+    super.init(
+      {
+        id: {
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
+          primaryKey: true
         },
-        {
-          fields: ['achievementId']
+        userId: {
+          type: DataTypes.UUID,
+          allowNull: false
         },
-        {
-          fields: ['isUnlocked']
+        achievementId: {
+          type: DataTypes.UUID,
+          allowNull: false
         },
-        {
-          unique: true,
-          fields: ['userId', 'achievementId']
+        progress: {
+          type: DataTypes.INTEGER,
+          defaultValue: 0
+        },
+        isUnlocked: {
+          type: DataTypes.BOOLEAN,
+          defaultValue: false
+        },
+        unlockedAt: {
+          type: DataTypes.DATE,
+          allowNull: true
         }
-      ]
-    })
+      },
+      {
+        sequelize,
+        modelName: 'userAchievement',
+        indexes: [
+          {
+            fields: ['userId']
+          },
+          {
+            fields: ['achievementId']
+          },
+          {
+            fields: ['isUnlocked']
+          },
+          {
+            unique: true,
+            fields: ['userId', 'achievementId']
+          }
+        ]
+      }
+    )
 
     // Set up associations after model definition
     const { user, achievement } = sequelize.models
@@ -102,14 +105,14 @@ class UserAchievement extends Model {
     if (achievement) {
       // A user achievement belongs to an achievement
       this.belongsTo(achievement)
-      // An achievement has many user achievements  
+      // An achievement has many user achievements
       achievement.hasMany(this)
     }
   }
 
   /**
    * Define associations
-   * @param {Object} models 
+   * @param {Object} models
    */
   static associate(models) {
     // A user achievement belongs to a user
@@ -132,12 +135,12 @@ class UserAchievement extends Model {
 
   /**
    * Update progress towards achievement
-   * @param {number} newProgress 
+   * @param {number} newProgress
    */
   async updateProgress(newProgress) {
     const targetValue = this.achievement?.targetValue || 1
     this.progress = Math.min(newProgress, targetValue)
-    
+
     // Auto-unlock if target reached
     if (!this.isUnlocked && this.progress >= targetValue) {
       await this.unlock()

@@ -118,7 +118,7 @@ class MediaProgress extends Model {
           instance.mediaItem = instance.podcastEpisode
           instance.dataValues.mediaItem = instance.dataValues.podcastEpisode
         }
-                // Delete dataValues version of book/podcastEpisode
+        // Delete dataValues version of book/podcastEpisode
         delete instance.dataValues.book
         delete instance.dataValues.podcastEpisode
       }

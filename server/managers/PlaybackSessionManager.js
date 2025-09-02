@@ -426,7 +426,7 @@ class PlaybackSessionManager {
       await this.saveSession(session)
     }
     Logger.debug(`[PlaybackSessionManager] closeSession "${session.id}"`)
-    
+
     // Check for new achievements after session close
     if (session.timeListening > 0) {
       try {
@@ -435,7 +435,7 @@ class PlaybackSessionManager {
         Logger.error(`[PlaybackSessionManager] Failed to update achievements for user ${session.userId}:`, error)
       }
     }
-    
+
     SocketAuthority.adminEmitter('user_stream_update', user.toJSONForPublic(this.sessions))
     SocketAuthority.clientEmitter(session.userId, 'user_session_closed', session.id)
     return this.removeSession(session.id)

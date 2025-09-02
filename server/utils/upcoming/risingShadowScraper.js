@@ -38,9 +38,10 @@ class RisingShadowScraper {
   /**
    * Scrapes RisingShadow for the next Upcoming Book in the series.
    * @param {string} searchUrl - URL to search
+   * @param {number|null} currentMaxSequence - Current highest book number user owns (optional)
    * @returns {Promise<Object|null>} - Book info or null if not found
    */
-  static async fetchUpcomingBookInfo(searchUrl) {
+  static async fetchUpcomingBookInfo(searchUrl, currentMaxSequence = null) {
     try {
       // Logger.info(`[RisingShadowScraper 1.0] Fetching data from: ${searchUrl}`)
 
@@ -55,17 +56,12 @@ class RisingShadowScraper {
       // }
 
       const $ = cheerio.load(data)
-      const today = new Date()
-      const upcomingBooks = this.parseSearchResults($, today)
+      const nextBook = this.findNextSequentialBook($, currentMaxSequence)
 
-      if (upcomingBooks.length === 0) {
+      if (!nextBook) {
         Logger.info('[RisingShadowScraper 1.2] No upcoming books found')
         return null
       }
-
-      // Sort by soonest release date and return the first one
-      upcomingBooks.sort((a, b) => a.releaseDate - b.releaseDate)
-      const nextBook = upcomingBooks[0]
 
       // Logger.info(`[RisingShadowScraper 1.3] Found Upcoming Book: ${nextBook.title}`)
       return nextBook
@@ -73,6 +69,97 @@ class RisingShadowScraper {
       Logger.error(`[RisingShadowScraper 1.4] Error fetching book info: ${error}`)
       return null
     }
+  }
+
+  /**
+   * Finds the next sequential book in the series by analyzing all books and finding the appropriate next one.
+   * @param {Object} $ - Cheerio instance
+   * @param {number|null} currentMaxSequence - Current highest book number user owns (optional)
+   * @returns {Object|null} - Next book info or null if not found
+   */
+  static findNextSequentialBook($, currentMaxSequence = null) {
+    const today = new Date()
+    const allBooks = []
+    
+    // Parse all books from search results
+    $('.table-row').each((i, el) => {
+      try {
+        const bookData = this.extractBookData($, el)
+        
+        // Extract book number from title or series position
+        let bookNumber = null
+        if (bookData.title) {
+          // Try to extract number from title (e.g., "The Primal Hunter 13")
+          const titleMatch = bookData.title.match(/(\d+)(?:\s|$)/)
+          if (titleMatch) {
+            bookNumber = parseInt(titleMatch[1])
+          }
+        }
+        
+        // If no number in title, try series position (e.g., "#13 / 14")
+        if (!bookNumber && bookData.seriesPos) {
+          const seriesMatch = bookData.seriesPos.match(/#(\d+)/)
+          if (seriesMatch) {
+            bookNumber = parseInt(seriesMatch[1])
+          }
+        }
+        
+        if (bookNumber && bookData.title && bookData.link && bookData.coverUrl && bookData.releaseDate) {
+          allBooks.push({
+            title: `${bookData.title} Book ${bookData.seriesPos}`,
+            release: bookData.release,
+            link: bookData.link,
+            cover: bookData.coverUrl,
+            releaseDate: bookData.releaseDate,
+            bookNumber: bookNumber,
+            originalBookData: bookData
+          })
+        }
+      } catch (error) {
+        Logger.warn(`[RisingShadowScraper 2.0] Error parsing book row: ${error}`)
+      }
+    })
+    
+    if (allBooks.length === 0) {
+      return null
+    }
+    
+    // Sort by book number to find the sequence
+    allBooks.sort((a, b) => a.bookNumber - b.bookNumber)
+    
+    // If we have the user's current max sequence, find the immediate next book
+    if (currentMaxSequence !== null) {
+      const targetBookNumber = currentMaxSequence + 1
+      const targetBook = allBooks.find(book => book.bookNumber === targetBookNumber)
+      
+      if (targetBook) {
+        Logger.info(`[RisingShadowScraper] Found exact next sequential book: ${targetBook.title} (Book #${targetBook.bookNumber})`)
+        return targetBook
+      } else {
+        Logger.info(`[RisingShadowScraper] Target book #${targetBookNumber} not found in search results`)
+        // Fall through to general logic below
+      }
+    }
+    
+    // General logic: Find the next book that should be upcoming
+    // Priority: lowest numbered book that exists, regardless of release date
+    
+    let nextBook = null
+    
+    // First, try to find any book with a future release date (prioritize by book number)
+    const futureBooks = allBooks.filter(book => book.releaseDate > today)
+    if (futureBooks.length > 0) {
+      futureBooks.sort((a, b) => a.bookNumber - b.bookNumber)
+      nextBook = futureBooks[0]
+      Logger.info(`[RisingShadowScraper] Found future book: ${nextBook.title} (Book #${nextBook.bookNumber})`)
+    } else {
+      // If no future books, pick the highest numbered book (most recent release)
+      allBooks.sort((a, b) => b.bookNumber - a.bookNumber)
+      nextBook = allBooks[0]
+      Logger.info(`[RisingShadowScraper] No future books, using highest numbered: ${nextBook.title} (Book #${nextBook.bookNumber})`)
+    }
+    
+    return nextBook
   }
 
   /**

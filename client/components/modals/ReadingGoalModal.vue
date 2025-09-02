@@ -11,27 +11,14 @@
       <div v-if="!isEditing && templates.length" class="space-y-3">
         <label class="block text-sm font-medium">{{ $strings.LabelChooseTemplate }}</label>
         <div class="grid grid-cols-1 gap-2 max-h-32 overflow-y-auto">
-          <button
-            v-for="template in templates"
-            :key="template.title"
-            type="button"
-            @click="applyTemplate(template)"
-            class="text-left p-3 rounded border border-primary hover:border-accent transition-colors"
-            :class="selectedTemplate?.title === template.title ? 'border-accent bg-accent bg-opacity-10' : ''"
-          >
+          <button v-for="template in templates" :key="template.title" type="button" @click="applyTemplate(template)" class="text-left p-3 rounded border border-primary hover:border-accent transition-colors" :class="selectedTemplate?.title === template.title ? 'border-accent bg-accent bg-opacity-10' : ''">
             <div class="font-medium">{{ template.title }}</div>
             <div class="text-sm text-gray-400">{{ template.description }}</div>
-            <div class="text-xs text-accent mt-1">
-              {{ template.targetValue }} {{ getTypeLabel(template.type) }} • {{ template.category }}
-            </div>
+            <div class="text-xs text-accent mt-1">{{ template.targetValue }} {{ getTypeLabel(template.type) }} • {{ template.category }}</div>
           </button>
         </div>
         <div class="border-t border-primary pt-4">
-          <button
-            type="button"
-            @click="clearTemplate"
-            class="text-sm text-accent hover:text-accent-hover"
-          >
+          <button type="button" @click="clearTemplate" class="text-sm text-accent hover:text-accent-hover">
             {{ $strings.ButtonCreateCustomGoal }}
           </button>
         </div>
@@ -42,35 +29,19 @@
         <!-- Title -->
         <div>
           <label class="block text-sm font-medium mb-2">{{ $strings.LabelGoalTitle }} *</label>
-          <input
-            v-model="formData.title"
-            type="text"
-            required
-            class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none"
-            :placeholder="$strings.PlaceholderGoalTitle"
-          >
+          <input v-model="formData.title" type="text" required class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none" :placeholder="$strings.PlaceholderGoalTitle" />
         </div>
 
         <!-- Description -->
         <div>
           <label class="block text-sm font-medium mb-2">{{ $strings.LabelDescription }}</label>
-          <textarea
-            v-model="formData.description"
-            rows="3"
-            class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none resize-none"
-            :placeholder="$strings.PlaceholderGoalDescription"
-          ></textarea>
+          <textarea v-model="formData.description" rows="3" class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none resize-none" :placeholder="$strings.PlaceholderGoalDescription"></textarea>
         </div>
 
         <!-- Goal Type -->
         <div>
           <label class="block text-sm font-medium mb-2">{{ $strings.LabelGoalType }} *</label>
-          <select
-            v-model="formData.type"
-            :key="'goal-type-' + formData.type"
-            required
-            class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none"
-          >
+          <select v-model="formData.type" :key="'goal-type-' + formData.type" required class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none">
             <option value="books">{{ $strings.LabelBooks }}</option>
             <option value="minutes">{{ $strings.LabelListeningMinutes }}</option>
             <option value="pages">{{ $strings.LabelPages }}</option>
@@ -85,35 +56,18 @@
             {{ $strings.LabelTarget }} *
             <span class="text-sm text-gray-400">({{ getTypeLabel(formData.type) }})</span>
           </label>
-          <input
-            v-model.number="formData.targetValue"
-            type="number"
-            min="1"
-            required
-            class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none"
-            :placeholder="getTargetPlaceholder(formData.type)"
-          >
+          <input v-model.number="formData.targetValue" type="number" min="1" required class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none" :placeholder="getTargetPlaceholder(formData.type)" />
         </div>
 
         <!-- Date Range -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-2">{{ $strings.LabelStartDate }} *</label>
-            <input
-              v-model="formData.startDate"
-              type="date"
-              required
-              class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none"
-            >
+            <input v-model="formData.startDate" type="date" required class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none" />
           </div>
           <div>
             <label class="block text-sm font-medium mb-2">{{ $strings.LabelEndDate }} *</label>
-            <input
-              v-model="formData.endDate"
-              type="date"
-              required
-              class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none"
-            >
+            <input v-model="formData.endDate" type="date" required class="w-full px-3 py-2 bg-primary border border-gray-600 rounded-md focus:border-accent focus:outline-none" />
           </div>
         </div>
 
@@ -121,16 +75,7 @@
         <div v-if="formData.type === 'genres'" class="space-y-2">
           <label class="block text-sm font-medium">{{ $strings.LabelTargetGenres }}</label>
           <div class="flex flex-wrap gap-2">
-            <button
-              v-for="genre in availableGenres"
-              :key="genre"
-              type="button"
-              @click="toggleGenre(genre)"
-              class="px-3 py-1 text-sm rounded-full border transition-colors"
-              :class="selectedGenres.includes(genre) 
-                ? 'border-accent bg-accent bg-opacity-20 text-accent' 
-                : 'border-gray-600 text-gray-300 hover:border-gray-500'"
-            >
+            <button v-for="genre in availableGenres" :key="genre" type="button" @click="toggleGenre(genre)" class="px-3 py-1 text-sm rounded-full border transition-colors" :class="selectedGenres.includes(genre) ? 'border-accent bg-accent bg-opacity-20 text-accent' : 'border-gray-600 text-gray-300 hover:border-gray-500'">
               {{ genre }}
             </button>
           </div>
@@ -141,12 +86,7 @@
 
         <!-- Active Toggle -->
         <div class="flex items-center space-x-2">
-          <input
-            v-model="formData.isActive"
-            type="checkbox"
-            id="active-toggle"
-            class="w-4 h-4 text-accent bg-primary border-gray-600 rounded focus:ring-accent focus:ring-2"
-          >
+          <input v-model="formData.isActive" type="checkbox" id="active-toggle" class="w-4 h-4 text-accent bg-primary border-gray-600 rounded focus:ring-accent focus:ring-2" />
           <label for="active-toggle" class="text-sm font-medium">
             {{ $strings.LabelActiveGoal }}
           </label>
@@ -190,12 +130,7 @@ export default {
     return {
       isSaving: false,
       selectedTemplate: null,
-      availableGenres: [
-        'Fiction', 'Non-Fiction', 'Mystery', 'Science Fiction', 'Fantasy', 
-        'Romance', 'Thriller', 'Biography', 'History', 'Self-Help',
-        'Business', 'Health', 'Travel', 'Cooking', 'Art', 'Religion',
-        'Philosophy', 'Science', 'Technology', 'Children'
-      ],
+      availableGenres: ['Fiction', 'Non-Fiction', 'Mystery', 'Science Fiction', 'Fantasy', 'Romance', 'Thriller', 'Biography', 'History', 'Self-Help', 'Business', 'Health', 'Travel', 'Cooking', 'Art', 'Religion', 'Philosophy', 'Science', 'Technology', 'Children'],
       selectedGenres: [],
       formData: {
         title: '',
@@ -263,7 +198,7 @@ export default {
           extraData: {}
         }
       }
-      
+
       // Ensure type is always set to a valid value
       if (!this.formData.type || !['books', 'minutes', 'pages', 'series', 'genres'].includes(this.formData.type)) {
         this.formData.type = 'books'

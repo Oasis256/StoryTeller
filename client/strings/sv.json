@@ -422,12 +422,9 @@
   "LabelLogLevelWarn": "Varningar",
   "LabelLookForNewEpisodesAfterDate": "Sök efter nya avsnitt efter detta datum",
   "LabelLowestPriority": "Lägst prioritet",
-<<<<<<< HEAD
-=======
   "LabelMatchConfidence": "Förtroende",
   "LabelMatchExistingUsersBy": "Matcha befintliga användare med",
   "LabelMatchExistingUsersByDescription": "Används för att koppla existerande användare. När kopplingen sker kommer användaren att matchas med ett unikt ID från SSO-leverantören.",
->>>>>>> 3337b3af18e6f302f9dbae4c314c21674ead96a3
   "LabelMaxEpisodesToDownload": "Maximalt antal avsnitt att ladda ner (0 = obegränsat).",
   "LabelMaxEpisodesToDownloadPerCheck": "Maximalt antal nya avsnitt att ladda ner per tillfälle",
   "LabelMaxEpisodesToKeep": "Maximalt antal avsnitt att behålla",

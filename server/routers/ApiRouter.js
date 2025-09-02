@@ -59,6 +59,9 @@ class ApiRouter {
     this.emailManager = Server.emailManager
     this.apiCacheManager = Server.apiCacheManager
 
+    // Initialize controllers
+    this.upcomingBookController = new UpcomingBookController()
+
     this.router = express()
     this.router.disable('x-powered-by')
     this.init()
@@ -129,7 +132,7 @@ class ApiRouter {
     this.router.get('/items/:id/file/:fileid/download', LibraryItemController.middleware.bind(this), LibraryItemController.downloadLibraryFile.bind(this))
     this.router.get('/items/:id/ebook/:fileid?', LibraryItemController.middleware.bind(this), LibraryItemController.getEBookFile.bind(this))
     this.router.patch('/items/:id/ebook/:fileid/status', LibraryItemController.middleware.bind(this), LibraryItemController.updateEbookFileStatus.bind(this))
-    this.router.get('/items/:id/upcoming', UpcomingBookController.getUpcomingBook.bind(this))
+    this.router.get('/items/:id/upcoming', this.upcomingBookController.getUpcomingBookForItem.bind(this.upcomingBookController))
 
     //
     // User Routes
@@ -341,16 +344,36 @@ class ApiRouter {
     //
     // Upcoming Books Routes
     //
-    this.router.get('/upcoming/cache/stats', UpcomingBookController.getCacheStats.bind(this))
-    this.router.get('/upcoming/cache/list', UpcomingBookController.listCachedBooks.bind(this))
-    this.router.get('/upcoming/cache/structure', UpcomingBookController.getCacheStructure.bind(this))
-    this.router.delete('/upcoming/cache', UpcomingBookController.clearCache.bind(this))
-    this.router.post('/upcoming/cache/maintenance', UpcomingBookController.performMaintenance.bind(this))
-    this.router.post('/upcoming/refresh', UpcomingBookController.refreshBookData.bind(this))
-    this.router.post('/upcoming/batch-process', UpcomingBookController.batchProcessBooks.bind(this))
-    this.router.get('/upcoming/health', UpcomingBookController.healthCheck.bind(this))
-    this.router.get('/upcoming/cover/:seriesName/:authorName', UpcomingBookController.getCover.bind(this))
-    this.router.get('/upcoming/debug-cover/:seriesName/:authorName', UpcomingBookController.debugCover.bind(this))
+    this.router.get('/upcoming/stats', this.upcomingBookController.getStats.bind(this.upcomingBookController))
+    this.router.get('/upcoming/cache/stats', this.upcomingBookController.getCacheStats.bind(this.upcomingBookController))
+    this.router.get('/upcoming/cache/list', this.upcomingBookController.listCachedBooks.bind(this.upcomingBookController))
+    this.router.get('/upcoming/cache/structure', this.upcomingBookController.getCacheStructure.bind(this.upcomingBookController))
+    this.router.delete('/upcoming/cache', this.upcomingBookController.clearCache.bind(this.upcomingBookController))
+    this.router.post('/upcoming/cache/maintenance', this.upcomingBookController.performMaintenance.bind(this.upcomingBookController))
+    this.router.post('/upcoming/refresh', this.upcomingBookController.refreshBookData.bind(this.upcomingBookController))
+    this.router.post('/upcoming/batch-process', this.upcomingBookController.batchProcessBooks.bind(this.upcomingBookController))
+    this.router.get('/upcoming/health', this.upcomingBookController.getHealthStatus.bind(this.upcomingBookController))
+    this.router.get('/upcoming/cover/:seriesName/:authorName', this.upcomingBookController.getCover.bind(this.upcomingBookController))
+    this.router.get('/upcoming/debug-cover/:seriesName/:authorName', this.upcomingBookController.debugCover.bind(this.upcomingBookController))
+    this.router.post('/upcoming/clear-stuck', this.upcomingBookController.clearStuckDiscoveries.bind(this.upcomingBookController))
+    this.router.post('/upcoming/force-restart', this.upcomingBookController.forceRestart.bind(this.upcomingBookController))
+    this.router.get('/upcoming/test-discovery', this.upcomingBookController.testDiscovery.bind(this.upcomingBookController))
+    this.router.get('/upcoming/status', this.upcomingBookController.getDiscoveryStatus.bind(this.upcomingBookController))
+    this.router.delete('/upcoming/cache/:seriesName/:authorName', this.upcomingBookController.clearUpcomingBookCache.bind(this.upcomingBookController))
+    this.router.delete('/upcoming/cache', this.upcomingBookController.clearAllUpcomingCache.bind(this.upcomingBookController))
+
+    //
+    // Upcoming Books Admin Settings Routes
+    //
+    this.router.get('/upcoming/admin/settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminSettings.bind(this.upcomingBookController))
+    this.router.patch('/upcoming/admin/settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.updateAdminSettings.bind(this.upcomingBookController))
+    this.router.post('/upcoming/admin/test-providers', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.testProviders.bind(this.upcomingBookController))
+    this.router.post('/upcoming/admin/reset-settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.resetAdminSettings.bind(this.upcomingBookController))
+    this.router.post('/upcoming/admin/clear-cache', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.clearAllCaches.bind(this.upcomingBookController))
+    this.router.get('/upcoming/admin/stats', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminStats.bind(this.upcomingBookController))
+    this.router.post('/upcoming/admin/maintenance', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.performAdminMaintenance.bind(this.upcomingBookController))
+    this.router.get('/upcoming/admin/health', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminHealth.bind(this.upcomingBookController))
+    this.router.post('/upcoming/admin/reset', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.resetAdminSettings.bind(this.upcomingBookController))
 
     //
     // Reading Goals Routes

@@ -25,3 +25,4 @@ sw.*
 tailwind.compiled.css
 tailwind.config.js
 absdatabase*
+.aider*

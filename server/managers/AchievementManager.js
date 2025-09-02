@@ -224,7 +224,7 @@ class AchievementManager {
     try {
       Logger.error('[AchievementManager] Available models:', Object.keys(Database.sequelize?.models || {}))
       Logger.error('[AchievementManager] achievementModel:', !!Database.achievementModel)
-      
+
       if (!Database.achievementModel) {
         Logger.error('[AchievementManager] Achievement model not found in database')
         return
@@ -247,7 +247,7 @@ class AchievementManager {
 
   /**
    * Check and update user achievements based on their activity
-   * @param {string} userId 
+   * @param {string} userId
    */
   async updateUserAchievements(userId) {
     try {
@@ -265,14 +265,13 @@ class AchievementManager {
 
       // Get user's listening statistics
       const stats = await this.getUserStats(userId)
-      
+
       // Check each achievement type
       await this.checkReadingAchievements(userId, stats)
       await this.checkListeningAchievements(userId, stats)
       await this.checkStreakAchievements(userId, stats)
       await this.checkDiversityAchievements(userId, stats)
       await this.checkMilestoneAchievements(userId, stats)
-
     } catch (error) {
       Logger.error(`[AchievementManager] Failed to update achievements for user ${userId}:`, error)
     }
@@ -280,12 +279,12 @@ class AchievementManager {
 
   /**
    * Check all achievements and return newly unlocked ones
-   * @param {string} userId 
+   * @param {string} userId
    * @returns {Array} Array of newly unlocked achievements
    */
   async checkAllAchievements(userId) {
     const newlyUnlocked = []
-    
+
     try {
       const user = await Database.userModel.findByPk(userId, {
         include: [
@@ -301,11 +300,11 @@ class AchievementManager {
 
       // Get user's listening statistics
       const stats = await this.getUserStats(userId)
-      
+
       // Store the before state to track newly unlocked achievements
       const beforeState = await this.getUserUnlockedAchievements(userId)
-      const beforeUnlockedIds = new Set(beforeState.map(a => a.id))
-      
+      const beforeUnlockedIds = new Set(beforeState.map((a) => a.id))
+
       // Check each achievement type
       await this.checkReadingAchievements(userId, stats)
       await this.checkListeningAchievements(userId, stats)
@@ -315,24 +314,23 @@ class AchievementManager {
 
       // Get the after state and find newly unlocked achievements
       const afterState = await this.getUserUnlockedAchievements(userId)
-      
+
       for (const achievement of afterState) {
         if (!beforeUnlockedIds.has(achievement.id)) {
           newlyUnlocked.push(achievement)
         }
       }
-
     } catch (error) {
       Logger.error(`[AchievementManager] Failed to check all achievements for user ${userId}:`, error)
       throw error
     }
-    
+
     return newlyUnlocked
   }
 
   /**
    * Get comprehensive user statistics
-   * @param {string} userId 
+   * @param {string} userId
    */
   async getUserStats(userId) {
     try {
@@ -346,14 +344,17 @@ class AchievementManager {
       })
 
       // Get total listening time
-      const [listeningTimeResult] = await Database.sequelize.query(`
-        SELECT SUM(timeListening) as totalTime 
-        FROM playbackSessions 
+      const [listeningTimeResult] = await Database.sequelize.query(
+        `
+        SELECT SUM(timeListening) as totalTime
+        FROM playbackSessions
         WHERE userId = :userId
-      `, {
-        replacements: { userId },
-        type: Database.sequelize.QueryTypes.SELECT
-      })
+      `,
+        {
+          replacements: { userId },
+          type: Database.sequelize.QueryTypes.SELECT
+        }
+      )
 
       const totalListeningTime = Math.round(listeningTimeResult?.totalTime || 0)
 
@@ -392,11 +393,7 @@ class AchievementManager {
     })
 
     for (const achievement of achievements) {
-      await this.updateAchievementProgress(
-        userId,
-        achievement.id,
-        stats.finishedBooksCount || 0
-      )
+      await this.updateAchievementProgress(userId, achievement.id, stats.finishedBooksCount || 0)
     }
   }
 
@@ -409,11 +406,7 @@ class AchievementManager {
     })
 
     for (const achievement of achievements) {
-      await this.updateAchievementProgress(
-        userId,
-        achievement.id,
-        stats.totalListeningTime || 0
-      )
+      await this.updateAchievementProgress(userId, achievement.id, stats.totalListeningTime || 0)
     }
   }
 
@@ -426,11 +419,7 @@ class AchievementManager {
     })
 
     for (const achievement of achievements) {
-      await this.updateAchievementProgress(
-        userId,
-        achievement.id,
-        stats.currentStreak || 0
-      )
+      await this.updateAchievementProgress(userId, achievement.id, stats.currentStreak || 0)
     }
   }
 
@@ -464,10 +453,10 @@ class AchievementManager {
 
     for (const achievement of achievements) {
       let progress = 0
-      
+
       if (achievement.key === 'speed_reader') {
         // Check if user completed a book in one day
-        progress = await this.checkSpeedReaderAchievement(userId) ? 1 : 0
+        progress = (await this.checkSpeedReaderAchievement(userId)) ? 1 : 0
       } else if (achievement.key === 'marathon_listener') {
         // Check max listening time in a single day
         progress = Math.max(...Object.values(stats.dailyStats || {}))
@@ -516,20 +505,23 @@ class AchievementManager {
   async calculateListeningStreak(userId) {
     try {
       // SQLite-compatible streak calculation
-      const dailyListening = await Database.sequelize.query(`
-        SELECT 
+      const dailyListening = await Database.sequelize.query(
+        `
+        SELECT
           DATE(createdAt) as listening_date,
           SUM(timeListening) as daily_time
-        FROM playbackSessions 
-        WHERE userId = :userId 
+        FROM playbackSessions
+        WHERE userId = :userId
           AND timeListening > 0
         GROUP BY DATE(createdAt)
         HAVING daily_time > 300
         ORDER BY listening_date DESC
-      `, {
-        replacements: { userId },
-        type: Database.sequelize.QueryTypes.SELECT
-      })
+      `,
+        {
+          replacements: { userId },
+          type: Database.sequelize.QueryTypes.SELECT
+        }
+      )
 
       if (!dailyListening || dailyListening.length === 0) return 0
 
@@ -537,11 +529,11 @@ class AchievementManager {
       let streak = 0
       let currentDate = new Date()
       currentDate.setHours(0, 0, 0, 0)
-      
+
       for (const day of dailyListening) {
         const dayDate = new Date(day.listening_date)
         const diffDays = Math.floor((currentDate - dayDate) / (1000 * 60 * 60 * 24))
-        
+
         if (diffDays === streak) {
           streak++
         } else if (diffDays === streak + 1 && streak === 0) {
@@ -565,8 +557,9 @@ class AchievementManager {
   async getUniqueGenreCount(userId) {
     try {
       // SQLite-compatible genre extraction using JSON functions
-      const genreResults = await Database.sequelize.query(`
-        SELECT DISTINCT 
+      const genreResults = await Database.sequelize.query(
+        `
+        SELECT DISTINCT
           TRIM(json_each.value, '"') as genre
         FROM playbackSessions ps,
              json_each(json_extract(ps.mediaMetadata, '$.genres'))
@@ -575,10 +568,12 @@ class AchievementManager {
           AND json_each.value IS NOT NULL
           AND TRIM(json_each.value, '"') != ''
           AND LOWER(TRIM(json_each.value, '"')) NOT LIKE '%audiobook%'
-      `, {
-        replacements: { userId },
-        type: Database.sequelize.QueryTypes.SELECT
-      })
+      `,
+        {
+          replacements: { userId },
+          type: Database.sequelize.QueryTypes.SELECT
+        }
+      )
 
       return genreResults?.length || 0
     } catch (error) {
@@ -593,8 +588,9 @@ class AchievementManager {
   async getUniqueAuthorCount(userId) {
     try {
       // SQLite-compatible author extraction using JSON functions
-      const authorResults = await Database.sequelize.query(`
-        SELECT DISTINCT 
+      const authorResults = await Database.sequelize.query(
+        `
+        SELECT DISTINCT
           json_extract(json_each.value, '$.name') as author_name
         FROM playbackSessions ps,
              json_each(json_extract(ps.mediaMetadata, '$.authors'))
@@ -602,10 +598,12 @@ class AchievementManager {
           AND json_extract(ps.mediaMetadata, '$.authors') IS NOT NULL
           AND json_extract(json_each.value, '$.name') IS NOT NULL
           AND json_extract(json_each.value, '$.name') != ''
-      `, {
-        replacements: { userId },
-        type: Database.sequelize.QueryTypes.SELECT
-      })
+      `,
+        {
+          replacements: { userId },
+          type: Database.sequelize.QueryTypes.SELECT
+        }
+      )
 
       return authorResults?.length || 0
     } catch (error) {
@@ -620,8 +618,9 @@ class AchievementManager {
   async getDailyListeningStats(userId) {
     try {
       // SQLite-compatible date functions
-      const dailyStats = await Database.sequelize.query(`
-        SELECT 
+      const dailyStats = await Database.sequelize.query(
+        `
+        SELECT
           DATE(createdAt) as date,
           SUM(timeListening) as total_time
         FROM playbackSessions
@@ -629,14 +628,16 @@ class AchievementManager {
           AND createdAt >= datetime('now', '-30 days')
         GROUP BY DATE(createdAt)
         ORDER BY date DESC
-      `, {
-        replacements: { userId },
-        type: Database.sequelize.QueryTypes.SELECT
-      })
+      `,
+        {
+          replacements: { userId },
+          type: Database.sequelize.QueryTypes.SELECT
+        }
+      )
 
       const stats = {}
       if (dailyStats) {
-        dailyStats.forEach(day => {
+        dailyStats.forEach((day) => {
           stats[day.date] = day.total_time
         })
       }
@@ -644,8 +645,7 @@ class AchievementManager {
       return {
         daily: stats,
         totalDays: Object.keys(stats).length,
-        averageTime: Object.keys(stats).length > 0 ? 
-          Object.values(stats).reduce((a, b) => a + b, 0) / Object.keys(stats).length : 0
+        averageTime: Object.keys(stats).length > 0 ? Object.values(stats).reduce((a, b) => a + b, 0) / Object.keys(stats).length : 0
       }
     } catch (error) {
       Logger.error(`[AchievementManager] Failed to get daily listening stats:`, error)
@@ -663,11 +663,7 @@ class AchievementManager {
           userId,
           isFinished: true,
           mediaItemType: 'book',
-          [Op.and]: Database.sequelize.where(
-            Database.sequelize.fn('DATE', Database.sequelize.col('createdAt')),
-            '=',
-            Database.sequelize.fn('DATE', Database.sequelize.col('finishedAt'))
-          )
+          [Op.and]: Database.sequelize.where(Database.sequelize.fn('DATE', Database.sequelize.col('createdAt')), '=', Database.sequelize.fn('DATE', Database.sequelize.col('finishedAt')))
         }
       })
 
@@ -700,17 +696,19 @@ class AchievementManager {
     try {
       const achievements = await Database.achievementModel.findAll({
         where: { isActive: true },
-        include: [{
-          model: Database.userAchievementModel,
-          where: { userId },
-          required: false
-        }]
+        include: [
+          {
+            model: Database.userAchievementModel,
+            where: { userId },
+            required: false
+          }
+        ]
       })
 
-      return achievements.map(achievement => {
+      return achievements.map((achievement) => {
         const userAchievement = achievement.userAchievements?.[0]
         const achievementData = achievement.toJSON()
-        
+
         return {
           ...achievementData,
           userProgress: userAchievement?.progress || 0,
@@ -739,7 +737,7 @@ class AchievementManager {
         order: [['unlockedAt', 'DESC']]
       })
 
-      return unlockedAchievements.map(ua => ua.toJSON())
+      return unlockedAchievements.map((ua) => ua.toJSON())
     } catch (error) {
       Logger.error(`[AchievementManager] Failed to get user unlocked achievements:`, error)
       return []

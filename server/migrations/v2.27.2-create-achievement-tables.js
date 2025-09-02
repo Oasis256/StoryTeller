@@ -5,9 +5,7 @@
 async function up({ context: { queryInterface, logger } }) {
   // Check if Achievement table already exists using SQLite-compatible method
   try {
-    const [achievementResults] = await queryInterface.sequelize.query(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='achievements'"
-    )
+    const [achievementResults] = await queryInterface.sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name='achievements'")
     if (achievementResults.length > 0) {
       console.log('Achievement tables already exist, skipping creation')
       return

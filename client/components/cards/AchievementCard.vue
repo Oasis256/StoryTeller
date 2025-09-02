@@ -29,17 +29,10 @@
         <div class="mb-2">
           <div class="flex items-center justify-between text-xs mb-1">
             <span class="text-gray-400">{{ $strings.LabelAchievementProgress }}</span>
-            <span :class="{ 'text-yellow-400 font-medium': achievement.isUnlocked, 'text-gray-400': !achievement.isUnlocked }">
-              {{ achievement.userProgress || 0 }} / {{ achievement.targetValue }}
-              ({{ achievement.progressPercent || 0 }}%)
-            </span>
+            <span :class="{ 'text-yellow-400 font-medium': achievement.isUnlocked, 'text-gray-400': !achievement.isUnlocked }"> {{ achievement.userProgress || 0 }} / {{ achievement.targetValue }} ({{ achievement.progressPercent || 0 }}%) </span>
           </div>
           <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-            <div 
-              class="h-2 rounded-full transition-all duration-500" 
-              :class="progressBarClass"
-              :style="{ width: Math.min(100, achievement.progressPercent || 0) + '%' }"
-            ></div>
+            <div class="h-2 rounded-full transition-all duration-500" :class="progressBarClass" :style="{ width: Math.min(100, achievement.progressPercent || 0) + '%' }"></div>
           </div>
         </div>
 
@@ -49,11 +42,9 @@
             <span class="px-2 py-1 bg-gray-700 rounded-full text-gray-300 capitalize">
               {{ categoryName }}
             </span>
-            <span class="text-gray-500">
-              {{ achievement.targetValue }} {{ achievement.targetUnit }}
-            </span>
+            <span class="text-gray-500"> {{ achievement.targetValue }} {{ achievement.targetUnit }} </span>
           </div>
-          
+
           <div v-if="achievement.isUnlocked && achievement.unlockedAt" class="text-gray-500">
             {{ formatUnlockedDate(achievement.unlockedAt) }}
           </div>
@@ -121,7 +112,7 @@ export default {
         'hover:border-gray-500': !this.achievement.isUnlocked,
         'achievement-unlocked': this.achievement.isUnlocked,
         'achievement-locked': !this.achievement.isUnlocked,
-        'relative': true
+        relative: true
       }
     },
 
@@ -225,7 +216,8 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
   }
   50% {

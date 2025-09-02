@@ -247,9 +247,19 @@ class MetadataCacheStorageManager {
       // Download cover if URL provided
       if (coverUrl) {
         try {
-          Logger.info(`[MetadataCacheStorage 7.0] Downloading cover: ${coverUrl}`)
-          await this._downloadCover(coverUrl, paths.coverFile)
-          await this.setOwnership(paths.coverFile)
+          // Check if cover already exists
+          let coverExists = false
+          try {
+            await fs.access(paths.coverFile)
+            coverExists = true
+            Logger.info(`[MetadataCacheStorage 7.0] Cover already exists, skipping download: ${path.basename(paths.coverFile)}`)
+          } catch (accessError) {
+            // Cover doesn't exist, proceed with download
+            Logger.info(`[MetadataCacheStorage 7.0] Downloading cover: ${coverUrl}`)
+            await this._downloadCover(coverUrl, paths.coverFile)
+            await this.setOwnership(paths.coverFile)
+            Logger.info(`[MetadataCacheStorage 7.1] Cover downloaded successfully`)
+          }
 
           coverInfo = {
             downloaded: true,
@@ -258,7 +268,6 @@ class MetadataCacheStorageManager {
             originalUrl: coverUrl,
             fileName: path.basename(paths.coverFile)
           }
-          Logger.info(`[MetadataCacheStorage 7.1] Cover downloaded successfully`)
         } catch (error) {
           Logger.error(`[MetadataCacheStorage 7.2] Cover download failed:`, error)
           coverInfo = { downloaded: false, error: error.message }
@@ -387,14 +396,26 @@ class MetadataCacheStorageManager {
   /**
    * Removes cached book data and all associated files.
    */
-  async removeBookData(seriesName, authorName) {
+  async removeBookData(seriesName, authorName, preserveCover = false) {
     const paths = this.getStoragePaths(seriesName, authorName)
 
     try {
-      await fs.rm(paths.directory, { recursive: true, force: true })
-      // Logger.info(`[MetadataCacheStorage 12.1] Removed cached data: ${seriesName} by ${authorName}`)
+      if (preserveCover) {
+        // Remove only the metadata file, keep the cover
+        try {
+          await fs.unlink(paths.dataFile)
+          await fs.unlink(paths.lockFile)
+          Logger.info(`[MetadataCacheStorage 12.1] Removed cached metadata, preserved cover: ${seriesName} by ${authorName}`)
+        } catch (error) {
+          // Files might not exist, that's okay
+        }
+      } else {
+        // Remove entire directory
+        await fs.rm(paths.directory, { recursive: true, force: true })
+        Logger.info(`[MetadataCacheStorage 12.1] Removed cached data: ${seriesName} by ${authorName}`)
+      }
     } catch (error) {
-      // Logger.error(`[MetadataCacheStorage 12.2] Error removing data:`, error)
+      Logger.error(`[MetadataCacheStorage 12.2] Error removing data:`, error)
     }
   }
 

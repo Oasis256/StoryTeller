@@ -13,14 +13,14 @@ class ReadingGoalsController {
       Logger.error('[ReadingGoalsController] User not authenticated')
       return res.sendStatus(401)
     }
-    
+
     // Users can only access their own goals, admins can access any
     const requestedUserId = req.params.userId || req.user.id
     if (requestedUserId !== req.user.id && !req.user.isAdminOrUp) {
       Logger.error(`[ReadingGoalsController] User ${req.user.id} attempted to access goals for user ${requestedUserId}`)
       return res.sendStatus(403)
     }
-    
+
     next()
   }
 
@@ -48,7 +48,7 @@ class ReadingGoalsController {
       }
 
       res.json({
-        goals: goals.map(g => g.toJSON())
+        goals: goals.map((g) => g.toJSON())
       })
     } catch (error) {
       Logger.error('[ReadingGoalsController] Error getting goals:', error)
@@ -98,9 +98,9 @@ class ReadingGoalsController {
       await Database.readingGoalModel.recalculateProgressForUser(userId)
 
       const createdGoal = await Database.readingGoalModel.findByPk(goal.id)
-      
+
       Logger.info(`[ReadingGoalsController] Created goal "${title}" for user ${userId}`)
-      
+
       // Emit socket event
       SocketAuthority.emitter('reading_goal_created', {
         userId,
@@ -198,7 +198,7 @@ class ReadingGoalsController {
       }
 
       Logger.info(`[ReadingGoalsController] Updated goal "${goal.title}" for user ${goal.userId}`)
-      
+
       // Emit socket event
       SocketAuthority.emitter('reading_goal_updated', {
         userId: goal.userId,
@@ -239,7 +239,7 @@ class ReadingGoalsController {
       await goal.destroy()
 
       Logger.info(`[ReadingGoalsController] Deleted goal "${goalData.title}" for user ${goalData.userId}`)
-      
+
       // Emit socket event
       SocketAuthority.emitter('reading_goal_deleted', {
         userId: goalData.userId,
@@ -282,9 +282,9 @@ class ReadingGoalsController {
       }
 
       const updatedGoal = await Database.readingGoalModel.updateProgress(id, progress)
-      
+
       Logger.info(`[ReadingGoalsController] Updated progress for goal "${goal.title}" to ${progress}`)
-      
+
       // Emit socket event
       SocketAuthority.emitter('reading_goal_progress', {
         userId: goal.userId,
@@ -305,22 +305,22 @@ class ReadingGoalsController {
   static async recalculateProgress(req, res) {
     try {
       const userId = req.user.id
-      
+
       await Database.readingGoalModel.recalculateProgressForUser(userId)
-      
+
       const activeGoals = await Database.readingGoalModel.getActiveGoalsForUser(userId)
-      
+
       Logger.info(`[ReadingGoalsController] Recalculated progress for ${activeGoals.length} goals for user ${userId}`)
-      
+
       // Emit socket event
       SocketAuthority.emitter('reading_goals_recalculated', {
         userId,
-        goals: activeGoals.map(g => g.toJSON())
+        goals: activeGoals.map((g) => g.toJSON())
       })
 
       res.json({
         message: 'Progress recalculated',
-        goals: activeGoals.map(g => g.toJSON())
+        goals: activeGoals.map((g) => g.toJSON())
       })
     } catch (error) {
       Logger.error('[ReadingGoalsController] Error recalculating progress:', error)
@@ -335,9 +335,9 @@ class ReadingGoalsController {
   static async getStats(req, res) {
     try {
       const userId = req.params.userId || req.user.id
-      
+
       const stats = await Database.readingGoalModel.getStatsForUser(userId)
-      
+
       res.json(stats)
     } catch (error) {
       Logger.error('[ReadingGoalsController] Error getting stats:', error)

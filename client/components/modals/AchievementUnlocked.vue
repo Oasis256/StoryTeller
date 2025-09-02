@@ -32,10 +32,7 @@
               <div v-if="achievement" class="mb-6">
                 <!-- Badge -->
                 <div class="flex justify-center mb-4">
-                  <div 
-                    class="w-20 h-20 rounded-full flex items-center justify-center text-3xl animate-pulse"
-                    :style="badgeStyle"
-                  >
+                  <div class="w-20 h-20 rounded-full flex items-center justify-center text-3xl animate-pulse" :style="badgeStyle">
                     <span class="material-symbols text-white text-3xl">
                       {{ achievement.achievement?.badgeIcon || 'emoji_events' }}
                     </span>
@@ -53,9 +50,7 @@
                 <!-- Progress -->
                 <div class="bg-gray-700 rounded-lg p-3 mb-4">
                   <div class="text-sm text-gray-400 mb-1">Target Achieved</div>
-                  <div class="text-lg font-semibold text-yellow-400">
-                    {{ achievement.progress }} / {{ achievement.achievement?.targetValue }} {{ achievement.achievement?.targetUnit }}
-                  </div>
+                  <div class="text-lg font-semibold text-yellow-400">{{ achievement.progress }} / {{ achievement.achievement?.targetValue }} {{ achievement.achievement?.targetUnit }}</div>
                 </div>
 
                 <!-- Category Badge -->
@@ -72,9 +67,7 @@
                   </template>
                   Share
                 </ui-btn>
-                <ui-btn color="secondary" class="flex-1" @click="close">
-                  Continue
-                </ui-btn>
+                <ui-btn color="secondary" class="flex-1" @click="close"> Continue </ui-btn>
               </div>
             </div>
           </div>
@@ -155,7 +148,7 @@ export default {
       if (!this.achievement?.achievement) return
 
       const text = `🎉 I just unlocked the "${this.achievement.achievement.name}" achievement! ${this.achievement.achievement.description}`
-      
+
       if (navigator.share) {
         try {
           await navigator.share({
@@ -174,11 +167,14 @@ export default {
     fallbackShare(text) {
       // Copy to clipboard as fallback
       if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(() => {
-          this.$toast.success('Achievement text copied to clipboard!')
-        }).catch(() => {
-          this.$toast.error('Failed to copy achievement text')
-        })
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            this.$toast.success('Achievement text copied to clipboard!')
+          })
+          .catch(() => {
+            this.$toast.error('Failed to copy achievement text')
+          })
       } else {
         this.$toast.info('Share this achievement: ' + text)
       }
@@ -245,7 +241,8 @@ export default {
 
 /* Additional animations */
 @keyframes glow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
   }
   50% {

@@ -36,10 +36,7 @@
           <div v-for="achievement in progressAchievements.slice(0, 3)" :key="achievement.id" class="achievement-progress">
             <div class="flex items-center space-x-3">
               <!-- Mini Badge -->
-              <div 
-                class="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0"
-                :style="getMiniBadgeStyle(achievement)"
-              >
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0" :style="getMiniBadgeStyle(achievement)">
                 <span class="material-symbols text-xs" :class="{ 'text-white': achievement.isUnlocked, 'text-gray-500': !achievement.isUnlocked }">
                   {{ achievement.badgeIcon || 'emoji_events' }}
                 </span>
@@ -51,23 +48,15 @@
                   <span class="text-sm font-medium truncate" :class="{ 'text-white': achievement.isUnlocked, 'text-gray-300': !achievement.isUnlocked }">
                     {{ getAchievementName(achievement) }}
                   </span>
-                  <span class="text-xs text-gray-500 ml-2">
-                    {{ achievement.progressPercent || 0 }}%
-                  </span>
+                  <span class="text-xs text-gray-500 ml-2"> {{ achievement.progressPercent || 0 }}% </span>
                 </div>
-                
+
                 <!-- Mini Progress Bar -->
                 <div class="w-full bg-gray-700 rounded-full h-1.5">
-                  <div 
-                    class="h-1.5 rounded-full transition-all duration-300"
-                    :class="getProgressBarClass(achievement)"
-                    :style="{ width: Math.min(100, achievement.progressPercent || 0) + '%' }"
-                  ></div>
+                  <div class="h-1.5 rounded-full transition-all duration-300" :class="getProgressBarClass(achievement)" :style="{ width: Math.min(100, achievement.progressPercent || 0) + '%' }"></div>
                 </div>
-                
-                <div class="text-xs text-gray-500 mt-1">
-                  {{ achievement.userProgress || 0 }} / {{ achievement.targetValue }} {{ achievement.targetUnit }}
-                </div>
+
+                <div class="text-xs text-gray-500 mt-1">{{ achievement.userProgress || 0 }} / {{ achievement.targetValue }} {{ achievement.targetUnit }}</div>
               </div>
             </div>
           </div>
@@ -79,10 +68,7 @@
         <h4 class="text-sm font-medium text-gray-300">{{ $strings.WidgetAchievementsRecentlyUnlocked }}</h4>
         <div class="space-y-2">
           <div v-for="achievement in recentUnlocks.slice(0, 2)" :key="achievement.id" class="flex items-center space-x-3">
-            <div 
-              class="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ring-2 ring-yellow-400 ring-opacity-50"
-              :style="getMiniBadgeStyle(achievement)"
-            >
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm flex-shrink-0 ring-2 ring-yellow-400 ring-opacity-50" :style="getMiniBadgeStyle(achievement)">
               <span class="material-symbols text-xs text-white">
                 {{ achievement.achievement?.badgeIcon || 'emoji_events' }}
               </span>
@@ -118,7 +104,7 @@ export default {
 
   async mounted() {
     await this.loadData()
-    
+
     // Listen for achievement updates
     if (this.$socket) {
       this.$socket.on('achievement_unlocked', this.onAchievementUnlocked)
@@ -135,11 +121,7 @@ export default {
     async loadData() {
       this.isLoading = true
       try {
-        const [statsResponse, progressResponse, recentResponse] = await Promise.all([
-          this.$axios.$get('/api/achievements/stats').catch(() => ({ stats: {} })),
-          this.$axios.$get('/api/achievements/progress').catch(() => ({ achievements: [] })),
-          this.$axios.$get('/api/achievements/recent').catch(() => ({ achievements: [] }))
-        ])
+        const [statsResponse, progressResponse, recentResponse] = await Promise.all([this.$axios.$get('/api/achievements/stats').catch(() => ({ stats: {} })), this.$axios.$get('/api/achievements/progress').catch(() => ({ achievements: [] })), this.$axios.$get('/api/achievements/recent').catch(() => ({ achievements: [] }))])
 
         this.stats = statsResponse.stats || {}
         this.progressAchievements = progressResponse.achievements || []
@@ -158,12 +140,12 @@ export default {
 
     getAchievementName(achievement) {
       if (!achievement) return ''
-      
+
       // Use localized name if nameKey exists
       if (achievement.nameKey && this.$strings[achievement.nameKey]) {
         return this.$strings[achievement.nameKey]
       }
-      
+
       // Fallback to original name
       return achievement.name || ''
     },

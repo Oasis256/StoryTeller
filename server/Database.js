@@ -1,8 +1,6 @@
 const Path = require('path')
 const { Sequelize, Op } = require('sequelize')
 
-console.log('*** DATABASE.JS FILE LOADED ***')
-
 const packageJson = require('../package.json')
 const fs = require('./libs/fsExtra')
 const Logger = require('./Logger')
@@ -164,21 +162,6 @@ class Database {
     return this.models.device
   }
 
-  /** @type {typeof import('./models/ReadingGoal')} */
-  get readingGoalModel() {
-    return this.models.readingGoal
-  }
-
-  /** @type {typeof import('./models/Achievement')} */
-  get achievementModel() {
-    return this.models.achievement
-  }
-
-  /** @type {typeof import('./models/UserAchievement')} */
-  get userAchievementModel() {
-    return this.models.userAchievement
-  }
-
   /**
    * Check if db file exists
    * @returns {boolean}
@@ -336,9 +319,7 @@ class Database {
     await this.init()
   }
 
-  async buildModels(force = false) {
-    console.log('*** CONSOLE: buildModels method called ***')
-    process.stdout.write('=== BUILDMODELS STARTED ===\n')
+  buildModels(force = false) {
     require('./models/User').init(this.sequelize)
     require('./models/Session').init(this.sequelize)
     require('./models/ApiKey').init(this.sequelize)
@@ -364,79 +345,8 @@ class Database {
     require('./models/Setting').init(this.sequelize)
     require('./models/CustomMetadataProvider').init(this.sequelize)
     require('./models/MediaItemShare').init(this.sequelize)
-    require('./models/ReadingGoal').init(this.sequelize)
 
-    // Initialize Achievement models with error handling
-    try {
-      console.log('*** Starting Achievement model initialization ***')
-      require('./models/Achievement').init(this.sequelize)
-      console.log('*** Achievement model initialized successfully ***')
-      require('./models/UserAchievement').init(this.sequelize)
-      console.log('*** UserAchievement model initialized successfully ***')
-    } catch (error) {
-      console.error('*** Achievement model initialization failed ***', error.message)
-      console.error(error.stack)
-    }
-
-    Logger.info('=== DEBUG: Reached after MediaItemShare ===')
-    Logger.info('=== DEBUG: Reached after MediaItemShare ===')
-    console.log('*** CONSOLE: Reached after MediaItemShare ***')
-
-    console.log('*** CONSOLE: Starting sequelize sync ***')
-    Logger.info('=== DEBUG: Starting sequelize sync ===')
-    
-    let syncResult
-    try {
-      syncResult = await this.sequelize.sync({ force, alter: false })
-      console.log('*** CONSOLE: Sequelize sync completed successfully ***')
-      Logger.info('=== DEBUG: Sequelize sync completed successfully ===')
-    } catch (syncError) {
-      console.error('*** CONSOLE: Sequelize sync failed:', syncError.message)
-      Logger.error('=== DEBUG: Sequelize sync failed ===', syncError)
-      
-      // Try again without alter
-      console.log('*** CONSOLE: Retrying sync without alter ***')
-      try {
-        syncResult = await this.sequelize.sync({ force: false, alter: false })
-        console.log('*** CONSOLE: Retry sync completed ***')
-      } catch (retryError) {
-        console.error('*** CONSOLE: Retry sync also failed:', retryError.message)
-        throw retryError
-      }
-    }
-
-    // After sync, manually create ReadingGoal table if it doesn't exist
-    try {
-      const [results] = await this.sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name='readingGoals'")
-      if (results.length === 0) {
-        console.log('ReadingGoal table does not exist, creating it...')
-        await this.sequelize.models.readingGoal.sync({ force: true })
-        console.log('ReadingGoal table created successfully')
-      }
-    } catch (error) {
-      console.error('Error checking/creating ReadingGoal table:', error.message)
-    }
-
-    // After sync, manually create Achievement tables if they don't exist
-    try {
-      const [achievementResults] = await this.sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name='achievements'")
-      if (achievementResults.length === 0) {
-        console.log('Achievement table does not exist, creating it...')
-        await this.sequelize.models.achievement.sync({ force: true })
-        console.log('Achievement table created successfully')
-      }
-
-      const [userAchievementResults] = await this.sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name='userAchievements'")
-      if (userAchievementResults.length === 0) {
-        console.log('UserAchievement table does not exist, creating it...')
-        await this.sequelize.models.userAchievement.sync({ force: true })
-        console.log('UserAchievement table created successfully')
-      }
-    } catch (error) {
-      console.error('Error checking/creating Achievement tables:', error.message)
-    }
-
-    return syncResult
+    return this.sequelize.sync({ force, alter: false })
   }
 
   /**
@@ -976,7 +886,7 @@ WHERE EXISTS (
     ]
     const authorsSort = `${bookAuthors}.createdAt ASC`
     const columnNames = columns.map((column) => column.name).join(', ')
-    const columnSourcesExpression = columns.map((column) => `GROUP_CONCAT(${column.source}, ', ')`).join(', ')
+    const columnSourcesExpression = columns.map((column) => `GROUP_CONCAT(${column.source}, ', ' ORDER BY ${authorsSort})`).join(', ')
     const authorsJoin = `${authors} JOIN ${bookAuthors} ON ${authors}.id = ${bookAuthors}.authorId`
 
     const addBookAuthorsTriggerIfNotExists = async (action) => {

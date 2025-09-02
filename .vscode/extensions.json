@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "EditorConfig.EditorConfig",
-    "esbenp.prettier-vscode",
-    "octref.vetur"
-  ]
+  "recommendations": ["EditorConfig.EditorConfig", "esbenp.prettier-vscode", "octref.vetur", "mattflower.aider", "hotovo-sk.aider-desk-connector"]
 }

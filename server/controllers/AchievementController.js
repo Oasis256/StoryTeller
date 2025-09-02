@@ -51,12 +51,12 @@ class AchievementController {
   async checkAchievements(req, res) {
     try {
       const userId = req.user.id
-      
+
       const newAchievements = await AchievementManager.checkAllAchievements(userId)
-      
+
       if (newAchievements.length > 0) {
         Logger.info(`[AchievementController] User ${userId} unlocked ${newAchievements.length} new achievements`)
-        
+
         // Emit socket events for each new achievement
         for (const achievement of newAchievements) {
           SocketAuthority.emitter('achievement_unlocked', {
@@ -65,12 +65,10 @@ class AchievementController {
           })
         }
       }
-      
+
       res.json({
         newAchievements: newAchievements,
-        message: newAchievements.length > 0 ? 
-          `Unlocked ${newAchievements.length} new achievement(s)!` : 
-          'No new achievements unlocked'
+        message: newAchievements.length > 0 ? `Unlocked ${newAchievements.length} new achievement(s)!` : 'No new achievements unlocked'
       })
     } catch (error) {
       Logger.error('[AchievementController] Error checking achievements:', error)
@@ -156,8 +154,8 @@ class AchievementController {
     try {
       const stats = await AchievementManager.getUserStats(req.user.id)
       const allAchievements = await AchievementManager.getUserAchievements(req.user.id)
-      
-      const unlockedCount = allAchievements.filter(a => a.isUnlocked).length
+
+      const unlockedCount = allAchievements.filter((a) => a.isUnlocked).length
       const totalCount = allAchievements.length
       const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0
 
@@ -187,7 +185,7 @@ class AchievementController {
   async getAchievementsByCategory(req, res) {
     try {
       const achievements = await AchievementManager.getUserAchievements(req.user.id)
-      
+
       const categorized = achievements.reduce((acc, achievement) => {
         if (!acc[achievement.category]) {
           acc[achievement.category] = []
@@ -197,7 +195,7 @@ class AchievementController {
       }, {})
 
       // Sort achievements within each category by target value
-      Object.keys(categorized).forEach(category => {
+      Object.keys(categorized).forEach((category) => {
         categorized[category].sort((a, b) => a.targetValue - b.targetValue)
       })
 
@@ -220,9 +218,7 @@ class AchievementController {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
       const recentAchievements = await AchievementManager.getUserUnlockedAchievements(req.user.id)
-      const filtered = recentAchievements.filter(ua => 
-        new Date(ua.unlockedAt) >= thirtyDaysAgo
-      )
+      const filtered = recentAchievements.filter((ua) => new Date(ua.unlockedAt) >= thirtyDaysAgo)
 
       res.json({
         achievements: filtered
@@ -240,19 +236,17 @@ class AchievementController {
   async getAchievementProgress(req, res) {
     try {
       const achievements = await AchievementManager.getUserAchievements(req.user.id)
-      
+
       // Filter to show only achievements that are in progress (not unlocked, but have some progress)
-      const inProgress = achievements.filter(a => !a.isUnlocked && a.userProgress > 0)
-      
+      const inProgress = achievements.filter((a) => !a.isUnlocked && a.userProgress > 0)
+
       // Also include next achievements in each category
       const categories = ['reading', 'listening', 'streak', 'diversity', 'milestone']
       const nextAchievements = []
-      
+
       for (const category of categories) {
-        const categoryAchievements = achievements
-          .filter(a => a.category === category && !a.isUnlocked)
-          .sort((a, b) => a.targetValue - b.targetValue)
-        
+        const categoryAchievements = achievements.filter((a) => a.category === category && !a.isUnlocked).sort((a, b) => a.targetValue - b.targetValue)
+
         if (categoryAchievements.length > 0) {
           nextAchievements.push(categoryAchievements[0])
         }
@@ -260,8 +254,8 @@ class AchievementController {
 
       // Combine and deduplicate
       const progressAchievements = [...inProgress]
-      nextAchievements.forEach(next => {
-        if (!progressAchievements.find(p => p.id === next.id)) {
+      nextAchievements.forEach((next) => {
+        if (!progressAchievements.find((p) => p.id === next.id)) {
           progressAchievements.push(next)
         }
       })

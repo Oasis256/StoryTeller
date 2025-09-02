@@ -5,9 +5,7 @@
 async function up({ context: { queryInterface, logger } }) {
   // Check if ReadingGoal table already exists using SQLite-compatible method
   try {
-    const [results] = await queryInterface.sequelize.query(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name='readingGoals'"
-    )
+    const [results] = await queryInterface.sequelize.query("SELECT name FROM sqlite_master WHERE type='table' AND name='readingGoals'")
     if (results.length > 0) {
       return
     }

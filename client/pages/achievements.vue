@@ -3,7 +3,7 @@
     <div class="w-full max-w-6xl mx-auto px-4 py-6">
       <div class="flex items-center justify-between mb-6">
         <h1 class="text-3xl font-bold">{{ $strings.PageAchievementsTitle }}</h1>
-        
+
         <ui-dropdown v-model="selectedCategory" :items="categoryOptions" small />
       </div>
 
@@ -29,20 +29,11 @@
 
       <!-- Action Buttons -->
       <div class="mb-8 space-x-2">
-        <ui-btn 
-          color="bg-primary" 
-          :loading="checking" 
-          @click="checkProgress"
-        >
+        <ui-btn color="bg-primary" :loading="checking" @click="checkProgress">
           {{ $strings.PageAchievementsCheckForNew }}
         </ui-btn>
-        
-        <ui-btn 
-          v-if="userIsAdmin"
-          color="bg-success" 
-          :loading="testingUnlock" 
-          @click="testUnlockAchievement"
-        >
+
+        <ui-btn v-if="userIsAdmin" color="bg-success" :loading="testingUnlock" @click="testUnlockAchievement">
           {{ $strings.PageAchievementsTestUnlock }}
         </ui-btn>
       </div>
@@ -54,12 +45,7 @@
           {{ $strings.PageAchievementsRecentlyUnlocked }}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <achievement-card 
-            v-for="achievement in recentAchievements" 
-            :key="achievement.id" 
-            :achievement="achievement"
-            class="ring-2 ring-yellow-400 ring-opacity-50"
-          />
+          <achievement-card v-for="achievement in recentAchievements" :key="achievement.id" :achievement="achievement" class="ring-2 ring-yellow-400 ring-opacity-50" />
         </div>
       </div>
 
@@ -70,13 +56,9 @@
             <span class="material-symbols mr-2" :class="getCategoryIconClass(category)">{{ getCategoryIcon(category) }}</span>
             {{ getCategoryTitle(category) }}
           </h2>
-          
+
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <achievement-card 
-              v-for="achievement in categoryAchievements" 
-              :key="achievement.id" 
-              :achievement="achievement"
-            />
+            <achievement-card v-for="achievement in categoryAchievements" :key="achievement.id" :achievement="achievement" />
           </div>
         </div>
       </div>
@@ -95,10 +77,7 @@
     </div>
 
     <!-- Achievement Unlock Modal -->
-    <modals-achievement-unlocked 
-      v-model="showUnlockModal"
-      :achievement="unlockedAchievement"
-    />
+    <modals-achievement-unlocked v-model="showUnlockModal" :achievement="unlockedAchievement" />
   </div>
 </template>
 
@@ -106,11 +85,7 @@
 export default {
   async asyncData({ $axios }) {
     try {
-      const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([
-        $axios.$get('/api/achievements'),
-        $axios.$get('/api/achievements/stats'),
-        $axios.$get('/api/achievements/recent')
-      ])
+      const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([$axios.$get('/api/achievements'), $axios.$get('/api/achievements/stats'), $axios.$get('/api/achievements/recent')])
 
       return {
         achievements: achievementsResponse.achievements || [],
@@ -126,7 +101,7 @@ export default {
       }
     }
   },
-  
+
   data() {
     return {
       isLoading: false,
@@ -149,7 +124,7 @@ export default {
 
     achievementsByCategory() {
       const categories = {}
-      this.achievements.forEach(achievement => {
+      this.achievements.forEach((achievement) => {
         if (!categories[achievement.category]) {
           categories[achievement.category] = []
         }
@@ -162,7 +137,7 @@ export default {
       if (this.selectedCategory === 'all') {
         return this.achievementsByCategory
       }
-      
+
       const filtered = {}
       if (this.achievementsByCategory[this.selectedCategory]) {
         filtered[this.selectedCategory] = this.achievementsByCategory[this.selectedCategory]
@@ -201,7 +176,7 @@ export default {
       this.checking = true
       try {
         const response = await this.$axios.$post('/api/achievements/check')
-        
+
         if (response.newAchievements && response.newAchievements.length > 0) {
           this.$toast.success(`Unlocked ${response.newAchievements.length} new achievement(s)!`)
           await this.fetchAchievements()
@@ -223,7 +198,7 @@ export default {
         const response = await this.$axios.$post('/api/achievements/test-unlock', {
           achievementKey: 'first_book'
         })
-        
+
         this.$toast.success(`Test unlocked: ${response.achievement.Achievement.name}`)
         await this.fetchAchievements()
       } catch (error) {
@@ -241,12 +216,8 @@ export default {
     async fetchAchievements() {
       this.isLoading = true
       try {
-        const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([
-          this.$axios.$get('/api/achievements'),
-          this.$axios.$get('/api/achievements/stats'),
-          this.$axios.$get('/api/achievements/recent')
-        ])
-        
+        const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([this.$axios.$get('/api/achievements'), this.$axios.$get('/api/achievements/stats'), this.$axios.$get('/api/achievements/recent')])
+
         this.achievements = achievementsResponse.achievements || []
         this.stats = statsResponse.stats || {}
         this.recentAchievements = recentResponse.achievements || []
@@ -271,7 +242,7 @@ export default {
       const icons = {
         reading: 'menu_book',
         listening: 'headphones',
-        streak: 'local_fire_department', 
+        streak: 'local_fire_department',
         diversity: 'explore',
         milestone: 'emoji_events'
       }
@@ -292,17 +263,17 @@ export default {
     getCategoryTitle(category) {
       const categoryKeys = {
         reading: 'AchievementCategoryReading',
-        listening: 'AchievementCategoryListening', 
+        listening: 'AchievementCategoryListening',
         streak: 'AchievementCategoryStreak',
         diversity: 'AchievementCategoryDiversity',
         milestone: 'AchievementCategoryMilestone'
       }
-      
+
       const key = categoryKeys[category]
       if (key && this.$strings[key]) {
         return this.$strings[key]
       }
-      
+
       // Fallback to capitalized category name
       return category.charAt(0).toUpperCase() + category.slice(1)
     },

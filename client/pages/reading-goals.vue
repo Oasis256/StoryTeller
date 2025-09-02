@@ -43,28 +43,14 @@
             {{ $strings.HeaderActiveGoals }}
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div 
-              v-for="goal in activeGoals" 
-              :key="goal.id" 
-              class="bg-primary bg-opacity-25 rounded-lg p-4 border border-primary"
-            >
+            <div v-for="goal in activeGoals" :key="goal.id" class="bg-primary bg-opacity-25 rounded-lg p-4 border border-primary">
               <h3 class="font-semibold text-lg mb-2">{{ goal.title }}</h3>
               <p class="text-sm text-gray-400 mb-2">{{ goal.description }}</p>
               <p class="text-sm">Type: {{ goal.type }}</p>
               <p class="text-sm">Progress: {{ goal.currentProgress }}/{{ goal.targetValue }}</p>
               <div class="mt-4 flex space-x-2">
-                <button 
-                  @click="editGoal(goal)"
-                  class="px-3 py-1 bg-accent text-sm rounded hover:bg-accent-hover"
-                >
-                  Edit
-                </button>
-                <button 
-                  @click="deleteGoal(goal)"
-                  class="px-3 py-1 bg-red-600 text-sm rounded hover:bg-red-700"
-                >
-                  Delete
-                </button>
+                <button @click="editGoal(goal)" class="px-3 py-1 bg-accent text-sm rounded hover:bg-accent-hover">Edit</button>
+                <button @click="deleteGoal(goal)" class="px-3 py-1 bg-red-600 text-sm rounded hover:bg-red-700">Delete</button>
               </div>
             </div>
           </div>
@@ -84,28 +70,14 @@
             {{ $strings.HeaderCompletedGoals }}
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div 
-              v-for="goal in completedGoals" 
-              :key="goal.id" 
-              class="bg-primary bg-opacity-25 rounded-lg p-4 border border-primary"
-            >
+            <div v-for="goal in completedGoals" :key="goal.id" class="bg-primary bg-opacity-25 rounded-lg p-4 border border-primary">
               <h3 class="font-semibold text-lg mb-2">{{ goal.title }}</h3>
               <p class="text-sm text-gray-400 mb-2">{{ goal.description }}</p>
               <p class="text-sm">Type: {{ goal.type }}</p>
               <p class="text-sm">Progress: {{ goal.currentProgress }}/{{ goal.targetValue }}</p>
               <div class="mt-4 flex space-x-2">
-                <button 
-                  @click="editGoal(goal)"
-                  class="px-3 py-1 bg-accent text-sm rounded hover:bg-accent-hover"
-                >
-                  Edit
-                </button>
-                <button 
-                  @click="deleteGoal(goal)"
-                  class="px-3 py-1 bg-red-600 text-sm rounded hover:bg-red-700"
-                >
-                  Delete
-                </button>
+                <button @click="editGoal(goal)" class="px-3 py-1 bg-accent text-sm rounded hover:bg-accent-hover">Edit</button>
+                <button @click="deleteGoal(goal)" class="px-3 py-1 bg-red-600 text-sm rounded hover:bg-red-700">Delete</button>
               </div>
             </div>
           </div>
@@ -116,7 +88,7 @@
           <div class="text-6xl mb-4">🎯</div>
           <h3 class="text-xl font-semibold mb-2">{{ $strings.MessageNoGoals }}</h3>
           <p class="text-gray-400 mb-6 text-center max-w-md">{{ $strings.MessageNoGoalsDescription }}</p>
-                    <ui-btn @click="showCreateGoalModal = true">
+          <ui-btn @click="showCreateGoalModal = true">
             {{ $strings.ButtonCreateFirstGoal }}
           </ui-btn>
         </div>
@@ -124,13 +96,7 @@
     </div>
 
     <!-- Create/Edit Goal Modal -->
-    <ModalsReadingGoalModal 
-      v-model="showCreateGoalModal"
-      :goal="editingGoal"
-      :templates="goalTemplates"
-      @close="closeGoalModal"
-      @save="saveGoal"
-    />
+    <ModalsReadingGoalModal v-model="showCreateGoalModal" :goal="editingGoal" :templates="goalTemplates" @close="closeGoalModal" @save="saveGoal" />
   </div>
 </template>
 
@@ -156,19 +122,16 @@ export default {
     async loadGoals() {
       this.isLoading = true
       try {
-        const [allActiveResponse, completedResponse] = await Promise.all([
-          this.$axios.$get('/api/reading-goals?active=true'),
-          this.$axios.$get('/api/reading-goals?completed=true')
-        ])
-        
+        const [allActiveResponse, completedResponse] = await Promise.all([this.$axios.$get('/api/reading-goals?active=true'), this.$axios.$get('/api/reading-goals?completed=true')])
+
         const allActiveGoals = allActiveResponse.goals || []
         const allCompletedGoals = completedResponse.goals || []
-        
+
         // Create a Set of completed goal IDs for fast lookup
-        const completedGoalIds = new Set(allCompletedGoals.map(goal => goal.id))
-        
+        const completedGoalIds = new Set(allCompletedGoals.map((goal) => goal.id))
+
         // Filter active goals to exclude those that are also completed
-        this.activeGoals = allActiveGoals.filter(goal => !completedGoalIds.has(goal.id))
+        this.activeGoals = allActiveGoals.filter((goal) => !completedGoalIds.has(goal.id))
         this.completedGoals = allCompletedGoals
       } catch (error) {
         console.error('Failed to load goals:', error)
@@ -204,7 +167,7 @@ export default {
           await this.$axios.$post('/api/reading-goals', goalData)
           this.$toast.success('Goal created successfully')
         }
-        
+
         await this.loadGoals()
         await this.loadStats()
         this.closeGoalModal()
@@ -221,7 +184,7 @@ export default {
 
     async deleteGoal(goal) {
       if (!confirm(`Are you sure you want to delete "${goal.title}"?`)) return
-      
+
       try {
         await this.$axios.$delete(`/api/reading-goals/${goal.id}`)
         this.$toast.success('Goal deleted successfully')
@@ -238,7 +201,7 @@ export default {
         await this.$axios.$post(`/api/reading-goals/${goal.id}/progress`, {
           progress: newProgress
         })
-        
+
         await this.loadGoals()
         await this.loadStats()
       } catch (error) {

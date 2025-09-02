@@ -10,17 +10,15 @@
             <span class="w-2 h-2 rounded-full mr-1" :class="typeColor"></span>
             {{ typeLabel }}
           </span>
-          <span v-if="goal.daysRemaining !== undefined">
-            {{ goal.daysRemaining }} {{ $strings.LabelDaysRemaining }}
-          </span>
+          <span v-if="goal.daysRemaining !== undefined"> {{ goal.daysRemaining }} {{ $strings.LabelDaysRemaining }} </span>
         </div>
       </div>
-      
+
       <!-- Goal Status -->
       <div class="flex items-center space-x-2">
         <span v-if="goal.isCompleted" class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-success bg-opacity-20 text-success">
           <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
           </svg>
           {{ $strings.LabelCompleted }}
         </span>
@@ -36,20 +34,12 @@
     <!-- Progress Bar -->
     <div class="mb-4">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-sm font-medium">
-          {{ formatProgress(goal.currentProgress) }} / {{ formatProgress(goal.targetValue) }}
-        </span>
-        <span class="text-sm text-gray-400">
-          {{ Math.round(goal.progressPercentage) }}%
-        </span>
+        <span class="text-sm font-medium"> {{ formatProgress(goal.currentProgress) }} / {{ formatProgress(goal.targetValue) }} </span>
+        <span class="text-sm text-gray-400"> {{ Math.round(goal.progressPercentage) }}% </span>
       </div>
-      
+
       <div class="w-full bg-gray-700 rounded-full h-2">
-        <div 
-          class="h-2 rounded-full transition-all duration-300"
-          :class="progressBarColor"
-          :style="{ width: `${Math.min(100, goal.progressPercentage)}%` }"
-        ></div>
+        <div class="h-2 rounded-full transition-all duration-300" :class="progressBarColor" :style="{ width: `${Math.min(100, goal.progressPercentage)}%` }"></div>
       </div>
     </div>
 
@@ -65,33 +55,21 @@
     <div class="flex items-center justify-between">
       <div class="flex items-center space-x-2">
         <!-- Manual Progress Update -->
-        <button 
-          v-if="!goal.isCompleted && canManuallyUpdate"
-          @click="showProgressInput = !showProgressInput"
-          class="text-xs px-2 py-1 bg-accent bg-opacity-20 text-accent rounded hover:bg-opacity-30 transition-colors"
-        >
+        <button v-if="!goal.isCompleted && canManuallyUpdate" @click="showProgressInput = !showProgressInput" class="text-xs px-2 py-1 bg-accent bg-opacity-20 text-accent rounded hover:bg-opacity-30 transition-colors">
           {{ $strings.ButtonUpdateProgress }}
         </button>
       </div>
-      
+
       <div class="flex items-center space-x-1">
-        <button 
-          @click="$emit('edit', goal)"
-          class="p-1 text-gray-400 hover:text-accent transition-colors"
-          :title="$strings.ButtonEdit"
-        >
+        <button @click="$emit('edit', goal)" class="p-1 text-gray-400 hover:text-accent transition-colors" :title="$strings.ButtonEdit">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
           </svg>
         </button>
-        
-        <button 
-          @click="$emit('delete', goal)"
-          class="p-1 text-gray-400 hover:text-red-400 transition-colors"
-          :title="$strings.ButtonDelete"
-        >
+
+        <button @click="$emit('delete', goal)" class="p-1 text-gray-400 hover:text-red-400 transition-colors" :title="$strings.ButtonDelete">
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 102 0v-1a1 1 0 10-2 0v1zm4 0a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2h8a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 102 0v-1a1 1 0 10-2 0v1zm4 0a1 1 0 102 0v-1a1 1 0 10-2 0v1z" clip-rule="evenodd" />
           </svg>
         </button>
       </div>
@@ -100,24 +78,11 @@
     <!-- Manual Progress Input -->
     <div v-if="showProgressInput" class="mt-3 p-3 bg-primary bg-opacity-40 rounded">
       <div class="flex items-center space-x-2">
-        <input 
-          v-model.number="manualProgress"
-          type="number" 
-          :min="0"
-          :max="goal.targetValue * 2"
-          class="flex-1 px-2 py-1 text-sm bg-primary border border-gray-600 rounded focus:border-accent focus:outline-none"
-          :placeholder="formatProgress(goal.currentProgress)"
-        >
-        <button 
-          @click="updateProgress"
-          class="px-3 py-1 text-sm bg-accent text-black rounded hover:bg-accent-hover transition-colors"
-        >
+        <input v-model.number="manualProgress" type="number" :min="0" :max="goal.targetValue * 2" class="flex-1 px-2 py-1 text-sm bg-primary border border-gray-600 rounded focus:border-accent focus:outline-none" :placeholder="formatProgress(goal.currentProgress)" />
+        <button @click="updateProgress" class="px-3 py-1 text-sm bg-accent text-black rounded hover:bg-accent-hover transition-colors">
           {{ $strings.ButtonUpdate }}
         </button>
-        <button 
-          @click="showProgressInput = false"
-          class="px-2 py-1 text-sm text-gray-400 hover:text-white transition-colors"
-        >
+        <button @click="showProgressInput = false" class="px-2 py-1 text-sm text-gray-400 hover:text-white transition-colors">
           {{ $strings.ButtonCancel }}
         </button>
       </div>

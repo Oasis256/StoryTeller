@@ -93,7 +93,7 @@ class UpcomingBookService {
 
         // Fetch book data from RisingShadow
         const searchUrl = RisingShadowScraper.buildSearchUrl(seriesName, authorName)
-        const freshBookData = await RisingShadowScraper.fetchUpcomingBookInfo(searchUrl)
+        const freshBookData = await RisingShadowScraper.fetchUpcomingBookInfo(searchUrl, maxSequence)
 
         if (!freshBookData) {
           Logger.info('[UpcomingBookService 2.5] No Upcoming Book found')
@@ -210,7 +210,8 @@ class UpcomingBookService {
 
       // Fetch fresh data from RisingShadow
       const searchUrl = RisingShadowScraper.buildSearchUrl(seriesName, authorName)
-      const freshBookData = await RisingShadowScraper.fetchUpcomingBookInfo(searchUrl)
+      // Note: We don't have maxSequence context in manual refresh, so pass null
+      const freshBookData = await RisingShadowScraper.fetchUpcomingBookInfo(searchUrl, null)
 
       if (!freshBookData) {
         Logger.info('[UpcomingBookService 3.1] No Upcoming Book found during refresh')
