@@ -24,6 +24,14 @@
     <prompt-confirm />
     <readers-reader />
     <modals-upcoming-cover-preview-modal />
+    
+    <!-- Achievement Notifications -->
+    <ui-achievement-notification
+      v-if="achievementNotification.visible"
+      :achievement="achievementNotification.achievement"
+      :visible="achievementNotification.visible"
+      @close="achievementNotification.visible = false"
+    />
   </div>
 </template>
 
@@ -39,7 +47,11 @@ export default {
       socketConnectionToastId: null,
       currentLang: null,
       multiSessionOtherSessionId: null, // Used for multiple sessions open warning toast
-      multiSessionCurrentSessionId: null // Used for multiple sessions open warning toast
+      multiSessionCurrentSessionId: null, // Used for multiple sessions open warning toast
+      achievementNotification: {
+        visible: false,
+        achievement: null
+      }
     }
   },
   watch: {
@@ -378,6 +390,31 @@ export default {
       if (!provider?.id) return
       this.$store.commit('scanners/removeCustomMetadataProvider', provider)
     },
+    achievementUnlocked(data) {
+      if (data && data.achievement) {
+        // Show notification
+        this.achievementNotification = {
+          visible: true,
+          achievement: data.achievement
+        }
+        
+        // Play sound
+        this.playAchievementSound()
+      }
+    },
+    xpUpdated(data) {
+      // No need to do anything here as we'll update when needed on the achievements page
+      console.log('XP updated', data)
+    },
+    playAchievementSound() {
+      try {
+        const audio = new Audio('/sounds/achievement.mp3')
+        audio.volume = 0.5
+        audio.play()
+      } catch (error) {
+        console.error('Failed to play achievement sound:', error)
+      }
+    },
     initializeSocket() {
       if (this.$root.socket) {
         // Can happen in dev due to hot reload
@@ -463,6 +500,10 @@ export default {
       this.socket.on('track_finished', this.trackFinished)
       this.socket.on('track_progress', this.trackProgress)
       this.socket.on('task_progress', this.taskProgress)
+      
+      // Achievement Listeners
+      this.socket.on('achievement_unlocked', this.achievementUnlocked)
+      this.socket.on('xp_updated', this.xpUpdated)
 
       // EReader Device Listeners
       this.socket.on('ereader-devices-updated', this.ereaderDevicesUpdated)

@@ -542,6 +542,18 @@ class User extends Model {
       }
     )
   }
+  
+  /**
+   * Define associations - called after all models are initialized
+   * @param {Object} models - All registered models
+   */
+  static associate(models) {
+    // A user has many user achievements
+    this.hasMany(models.userAchievement, {
+      foreignKey: 'userId',
+      as: 'userAchievements'
+    })
+  }
 
   get isRoot() {
     return this.type === 'root'

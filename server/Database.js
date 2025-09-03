@@ -162,6 +162,16 @@ class Database {
     return this.models.device
   }
 
+  /** @type {typeof import('./models/Achievement')} */
+  get achievementModel() {
+    return this.models.achievement
+  }
+
+  /** @type {typeof import('./models/UserAchievement')} */
+  get userAchievementModel() {
+    return this.models.userAchievement
+  }
+
   /**
    * Check if db file exists
    * @returns {boolean}
@@ -319,7 +329,7 @@ class Database {
     await this.init()
   }
 
-  buildModels(force = false) {
+  async buildModels(force = false) {
     require('./models/User').init(this.sequelize)
     require('./models/Session').init(this.sequelize)
     require('./models/ApiKey').init(this.sequelize)
@@ -345,8 +355,27 @@ class Database {
     require('./models/Setting').init(this.sequelize)
     require('./models/CustomMetadataProvider').init(this.sequelize)
     require('./models/MediaItemShare').init(this.sequelize)
+    require('./models/Achievement').init(this.sequelize)
+    require('./models/UserAchievement').init(this.sequelize)
 
-    return this.sequelize.sync({ force, alter: false })
+    // Set up model associations
+    // This is where Sequelize models define their relationships to other models
+    const models = this.sequelize.models;
+    Object.keys(models).forEach((modelName) => {
+      if (models[modelName].associate) {
+        models[modelName].associate(models);
+        Logger.debug(`[Database] Set up associations for model: ${modelName}`);
+      }
+    });
+
+    // First sync without alter: true to avoid foreign key issues
+    await this.sequelize.sync({ force })
+    
+    // Run achievement migrations
+    const achievementMigration = require('./utils/achievementMigration')
+    await achievementMigration.runAchievementMigrations()
+    
+    return true
   }
 
   /**

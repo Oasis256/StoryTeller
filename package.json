@@ -5,7 +5,8 @@
   "description": "Self-hosted audiobook and podcast server",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch server index.js -- --dev",
+    "predev": "bash scripts/kill-port.sh 3333",
+    "dev": "npm run predev && nodemon --watch server index.js -- --dev",
     "start": "node index.js",
     "start-dev": "node index.js --prod-with-dev-env",
     "client": "cd client && npm ci && npm run generate",

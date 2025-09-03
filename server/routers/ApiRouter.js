@@ -242,7 +242,7 @@ class ApiRouter {
     // TODO: Update these endpoints because they are only for open playback sessions
     this.router.get('/session/:id', SessionController.openSessionMiddleware.bind(this), SessionController.getOpenSession.bind(this))
     this.router.post('/session/:id/sync', SessionController.openSessionMiddleware.bind(this), SessionController.sync.bind(this))
-    this.router.post('/session/:id/close', SessionController.openSessionMiddleware.bind(this), SessionController.close.bind(this))
+    this.router.post('/session/:id/close', SessionController.openSessionMiddleware.bind(this), SessionController.close.bind(this), this.checkAchievements.bind(this))
 
     //
     // Podcast Routes
@@ -391,14 +391,8 @@ class ApiRouter {
     //
     // Achievement Routes
     //
-    this.router.get('/achievements', AchievementController.getAllAchievements.bind(this))
-    this.router.get('/achievements/unlocked', AchievementController.getUnlockedAchievements.bind(this))
-    this.router.get('/achievements/stats', AchievementController.getAchievementStats.bind(this))
-    this.router.get('/achievements/categories', AchievementController.getAchievementsByCategory.bind(this))
-    this.router.get('/achievements/recent', AchievementController.getRecentAchievements.bind(this))
-    this.router.get('/achievements/progress', AchievementController.getAchievementProgress.bind(this))
-    this.router.post('/achievements/check', AchievementController.checkAchievements.bind(this))
-    this.router.post('/achievements/test-unlock', AchievementController.testUnlock.bind(this))
+    const achievementController = new AchievementController()
+    achievementController.registerRoutes(this.router)
 
     //
     // Misc Routes
@@ -590,6 +584,33 @@ class ApiRouter {
     return userSessions.sort((a, b) => b.updatedAt - a.updatedAt)
   }
 
+  /**
+   * Check achievements for a user after a session is completed
+   * @param {express.Request} req - Express request
+   * @param {express.Response} res - Express response
+   * @param {express.NextFunction} next - Express next
+   */
+  async checkAchievements(req, res, next) {
+    try {
+      if (!req.user?.id) return next()
+      
+      // Get the user ID from the request
+      const userId = req.user.id
+      
+      // Check achievements for this user
+      Logger.debug(`[ApiRouter] Checking achievements for user ${userId}`)
+      
+      const AchievementManager = require('../managers/AchievementManager')
+      await AchievementManager.updateUserAchievements(userId)
+      
+      // Continue with the request
+      next()
+    } catch (error) {
+      Logger.error(`[ApiRouter] Error checking achievements:`, error)
+      next()
+    }
+  }
+  
   async getUserListeningStatsHelpers(userId) {
     const today = date.format(new Date(), 'YYYY-MM-DD')
 

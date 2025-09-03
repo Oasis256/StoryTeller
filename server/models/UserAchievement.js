@@ -93,32 +93,29 @@ class UserAchievement extends Model {
         ]
       }
     )
-
-    // Set up associations after model definition
-    const { user, achievement } = sequelize.models
-    if (user) {
-      // A user achievement belongs to a user
-      this.belongsTo(user)
-      // A user has many achievements
-      user.hasMany(this)
-    }
-    if (achievement) {
-      // A user achievement belongs to an achievement
-      this.belongsTo(achievement)
-      // An achievement has many user achievements
-      achievement.hasMany(this)
-    }
   }
 
   /**
-   * Define associations
-   * @param {Object} models
+   * Define associations - called after all models are initialized
+   * @param {Object} models - All registered models
    */
   static associate(models) {
     // A user achievement belongs to a user
-    this.belongsTo(models.user)
+    this.belongsTo(models.user, {
+      foreignKey: 'userId',
+      as: 'user'
+    })
+    
     // A user achievement belongs to an achievement
-    this.belongsTo(models.achievement)
+    this.belongsTo(models.achievement, {
+      foreignKey: 'achievementId',
+      as: 'achievement'
+    })
+
+    // Ensure the association is created properly
+    this.Achievement = this.belongsTo(models.achievement, {
+      foreignKey: 'achievementId'
+    })
   }
 
   /**
@@ -128,24 +125,38 @@ class UserAchievement extends Model {
     if (!this.isUnlocked) {
       this.isUnlocked = true
       this.unlockedAt = new Date()
-      this.progress = this.achievement?.targetValue || this.progress
+      
+      if (this.achievement) {
+        this.progress = this.achievement.targetValue
+      }
+      
       await this.save()
+      return true
     }
+    return false
   }
 
   /**
    * Update progress towards achievement
    * @param {number} newProgress
+   * @returns {Promise<boolean>} True if achievement was unlocked
    */
   async updateProgress(newProgress) {
-    const targetValue = this.achievement?.targetValue || 1
+    let targetValue = 1
+    
+    if (this.achievement) {
+      targetValue = this.achievement.targetValue
+    }
+    
     this.progress = Math.min(newProgress, targetValue)
 
     // Auto-unlock if target reached
     if (!this.isUnlocked && this.progress >= targetValue) {
-      await this.unlock()
+      await this.save()
+      return await this.unlock()
     } else {
       await this.save()
+      return false
     }
   }
 
@@ -161,8 +172,9 @@ class UserAchievement extends Model {
       updatedAt: this.updatedAt?.toISOString() || null
     }
 
+    // Include achievement data if loaded
     if (this.achievement) {
-      json.achievement = this.achievement.toJSON()
+      json.Achievement = this.achievement.toJSON()
     }
 
     return json

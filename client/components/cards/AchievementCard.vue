@@ -5,7 +5,7 @@
       <div class="flex-shrink-0">
         <div class="achievement-badge w-16 h-16 rounded-full flex items-center justify-center text-2xl" :style="badgeStyle">
           <span class="material-symbols" :class="{ 'text-white': achievement.isUnlocked, 'text-gray-500': !achievement.isUnlocked }">
-            {{ achievement.badgeIcon || 'emoji_events' }}
+            {{ getMaterialIcon(achievement.badgeIcon) }}
           </span>
         </div>
       </div>
@@ -185,6 +185,23 @@ export default {
       } else {
         return date.toLocaleDateString()
       }
+    },
+    
+    getMaterialIcon(iconName) {
+      if (!iconName) return 'emoji_events'
+      
+      // Map non-standard icon names to Material Icons
+      const iconMap = {
+        'chart-bar': 'bar_chart',
+        'calendar': 'calendar_month',
+        'crown': 'workspace_premium',
+        'library': 'local_library',
+        'ace-cap': 'school',
+        'open': 'book',
+        'trending': 'trending_up'
+      }
+      
+      return iconMap[iconName.toLowerCase()] || iconName
     }
   }
 }
@@ -228,6 +245,7 @@ export default {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

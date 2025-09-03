@@ -34,7 +34,7 @@
                 <div class="flex justify-center mb-4">
                   <div class="w-20 h-20 rounded-full flex items-center justify-center text-3xl animate-pulse" :style="badgeStyle">
                     <span class="material-symbols text-white text-3xl">
-                      {{ achievement.achievement?.badgeIcon || 'emoji_events' }}
+                      {{ getMaterialIcon(achievement.achievement?.badgeIcon) }}
                     </span>
                   </div>
                 </div>
@@ -178,6 +178,23 @@ export default {
       } else {
         this.$toast.info('Share this achievement: ' + text)
       }
+    },
+    
+    getMaterialIcon(iconName) {
+      if (!iconName) return 'emoji_events'
+      
+      // Map non-standard icon names to Material Icons
+      const iconMap = {
+        'chart-bar': 'bar_chart',
+        'calendar': 'calendar_month',
+        'crown': 'workspace_premium',
+        'library': 'local_library',
+        'ace-cap': 'school',
+        'open': 'book',
+        'trending': 'trending_up'
+      }
+      
+      return iconMap[iconName.toLowerCase()] || iconName
     }
   }
 }

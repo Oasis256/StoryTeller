@@ -1,0 +1,291 @@
+diff --git a/client/components/widgets/AchievementWidget.vue b/client/components/widgets/AchievementWidget.vue
+index a2491ee..5f9c321 100644
+--- a/client/components/widgets/AchievementWidget.vue
++++ b/client/components/widgets/AchievementWidget.vue
+@@ -16,7 +16,7 @@
+               <div class="flex items-center justify-between">
+                 <div class="text-sm text-gray-400">{{$strings.AchievementsCompletion}}</div>
+                 <!-- Fix: Use completionRate instead of completionPercent and multiply by 100 -->
+-                <div class="text-xl font-bold text-blue-400">{{ stats.completionPercent || 0 }}%</div>
++                <div class="text-xl font-bold text-blue-400">{{ Math.round((stats.completionRate || 0) * 100) }}%</div>
+               </div>
+               <div class="w-full bg-gray-700 rounded-full h-1.5 mt-1">
+                 <!-- Fix: Use completionRate instead of completionPercent -->
+@@ -29,7 +29,7 @@
+ 
+ <script>
+ export default {
+-  name: 'AchievementWidget',
++  name: "AchievementWidget",
+   props: {
+     stats: {
+       type: Object,
+@@ -38,6 +38,9 @@ export default {
+         return {}
+       }
+     }
++  },
++  mounted() {
++    console.log('AchievementWidget mounted with stats:', this.stats)
+   }
+ }
+ </script>
+
+diff --git a/client/pages/achievements.vue b/client/pages/achievements.vue
+index b498ce2..72bce32 100644
+--- a/client/pages/achievements.vue
++++ b/client/pages/achievements.vue
+@@ -31,11 +31,18 @@
+     </div>
+     
+     <!-- Debug information -->
++    <div v-if="DEBUG" class="mb-6 bg-red-900/30 p-4 rounded-md text-sm">
++      <h3 class="font-bold mb-2">Debug Stats Info</h3>
++      <pre class="overflow-auto max-h-40">{{ JSON.stringify(stats, null, 2) }}</pre>
++    </div>
+     
+     <!-- Recently Unlocked -->
+     <div v-if="recentAchievements && recentAchievements.length" class="mb-8">
+-      <h2 class="text-xl font-semibold mb-4">{{$strings.PageAchievementsRecentlyUnlocked}}</h2>
++      <h2 class="text-xl font-semibold mb-4 flex items-center">
++        <span class="material-symbols text-yellow-400 mr-2">star</span>
++        {{ $strings.PageAchievementsRecentlyUnlocked }}
++      </h2>
+       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+         <achievement-card 
+           v-for="achievement in recentAchievements" 
+@@ -44,6 +51,12 @@
+           class="ring-2 ring-yellow-400 ring-opacity-50" 
+         />
+       </div>
++      
++      <!-- Debug info -->
++      <div v-if="DEBUG" class="mt-2 p-2 bg-yellow-900/20 text-xs">
++        <p>Recent achievements count: {{ recentAchievements.length }}</p>
++        <p v-if="recentAchievements.length > 0">First recent achievement: {{ recentAchievements[0].name }}</p>
++      </div>
+     </div>
+     
+     <!-- Categories -->
+@@ -77,23 +90,51 @@ export default {
+       categories: [],
+       achievements: [],
+       recentAchievements: [],
+-      stats: {}
++      stats: {},
++      DEBUG: true // Enable debug mode
+     }
+   },
++  methods: {
++    // Process achievement data to ensure consistent structure
++    processAchievementData(achievement) {
++      // Handle both direct achievement objects and nested structures
++      const achievementData = achievement.achievement ? achievement.achievement : achievement
++      
++      return {
++        ...achievementData,
++        id: achievement.id || achievementData.id,
++        isUnlocked: achievement.isUnlocked !== undefined ? achievement.isUnlocked : true,
++        userProgress: parseInt(achievement.userProgress || achievement.progress || 0, 10),
++        progressPercent: parseInt(achievement.progressPercent || 0, 10),
++        unlockedAt: achievement.unlockedAt || new Date().toISOString(),
++        targetValue: parseInt(achievementData.targetValue || 0, 10),
++        badgeIcon: achievementData.badgeIcon || 'emoji_events',
++        badgeColor: achievementData.badgeColor || '#fbbf24',
++      }
++    }
++  },
+   async asyncData({ $axios }) {
++    console.log('Starting asyncData for achievements page')
+     try {
+       const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([
+         $axios.$get('/api/achievements'),
+         $axios.$get('/api/achievements/stats'),
+         $axios.$get('/api/achievements/recent')
+       ])
++      
++      console.log('API responses received')
++      console.log('Stats response:', JSON.stringify(statsResponse))
++      console.log('Recent achievements response:', JSON.stringify(recentResponse))
+ 
+-      // Group achievements by category
++      // Process achievements data and group by category
+       const categories = {}
+-      const achievements = achievementsResponse.achievements || []
++      const achievements = (achievementsResponse.achievements || []).map(achievement => {
++        // Process each achievement
++        return this.processAchievementData(achievement)
++      })
+ 
+       achievements.forEach(achievement => {
+-        const category = achievement.category || 'Uncategorized'
++        const category = achievement.category || 'Other'
+         if (!categories[category]) {
+           categories[category] = []
+         }
+@@ -109,23 +150,43 @@ export default {
+         .sort((a, b) => a.name.localeCompare(b.name))
+ 
+       // Process stats with type conversion
+-      const stats = statsResponse.stats || {}
++      const statsData = statsResponse.stats || {}
++      const stats = {
++        totalAchievements: parseInt(statsData.totalAchievements || 0, 10),
++        unlockedAchievements: parseInt(statsData.unlockedAchievements || 0, 10),
++        completionRate: parseFloat(statsData.completionRate || 0),
++        totalListeningMinutes: parseInt(statsData.totalListeningMinutes || 0, 10),
++        booksCompleted: parseInt(statsData.booksCompleted || 0, 10),
++        currentStreak: parseInt(statsData.currentStreak || 0, 10)
++      }
++      console.log('Processed stats:', stats)
+ 
+       // Process recent achievements
+-      const recentAchievements = recentResponse.achievements || []
++      const recentAchievements = (recentResponse.achievements || []).map(achievement => {
++        return this.processAchievementData(achievement)
++      })
++      console.log('Processed recent achievements:', recentAchievements.length)
+ 
+       return { categories, achievements, stats, recentAchievements }
+     } catch (error) {
+-      console.error(error)
++      console.error('Error in asyncData:', error)
+       return { categories: [], achievements: [], stats: {}, recentAchievements: [] }
+     }
+   },
+   async fetchAchievements() {
+       this.isLoading = true
+       try {
+-        const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([this.$axios.$get('/api/achievements'), this.$axios.$get('/api/achievements/stats'), this.$axios.$get('/api/achievements/recent')])
++        const [achievementsResponse, statsResponse, recentResponse] = await Promise.all([
++          this.$axios.$get('/api/achievements'), 
++          this.$axios.$get('/api/achievements/stats'), 
++          this.$axios.$get('/api/achievements/recent')
++        ])
+ 
+-        this.achievements = achievementsResponse.achievements || []
++        // Process achievements data
++        this.achievements = (achievementsResponse.achievements || []).map(achievement => 
++          this.processAchievementData(achievement)
++        )
++        
+         // Process stats with type conversion and defaults
+         if (statsResponse && statsResponse.stats) {
+           this.stats = {
+@@ -141,7 +202,18 @@ export default {
+           console.warn('Stats missing in response:', statsResponse)
+         }
+         
+-        this.recentAchievements = recentResponse.achievements || []
++        // Process recent achievements with consistent structure
++        if (recentResponse && recentResponse.achievements) {
++          console.log('Recent achievements found:', recentResponse.achievements.length)
++          if (recentResponse.achievements.length > 0) {
++            console.log('Sample recent achievement:', recentResponse.achievements[0])
++          }
++          this.recentAchievements = (recentResponse.achievements || []).map(achievement => 
++            this.processAchievementData(achievement)
++          )
++        } else {
++          console.warn('No recent achievements found in response')
++          this.recentAchievements = []
++        }
+       } catch (error) {
+         console.error('Failed to fetch achievements:', error)
+         this.$toast.error('Failed to load achievements')
+@@ -154,4 +216,4 @@ export default {
+-</style>
+\ No newline at end of file
++</style>
+
+diff --git a/client/pages/user/achievements.vue b/client/pages/user/achievements.vue
+index 05a3a12..fb3b547 100644
+--- a/client/pages/user/achievements.vue
++++ b/client/pages/user/achievements.vue
+@@ -21,13 +21,28 @@
+   async fetchData() {
+     this.isLoading = true
+     try {
+-      const { stats } = await this.$axios.$get('/api/achievements/stats')
+-      this.stats = stats
++      const response = await this.$axios.$get('/api/achievements/stats')
++      
++      // Add debug logging
++      console.log('Achievements stats response:', response)
++      
++      if (response && response.stats) {
++        // Create a new object with explicit type conversion
++        this.stats = {
++          ...response.stats,
++          totalAchievements: parseInt(response.stats.totalAchievements || 0, 10),
++          unlockedAchievements: parseInt(response.stats.unlockedAchievements || 0, 10),
++          completionRate: parseFloat(response.stats.completionRate || 0),
++          totalListeningMinutes: parseInt(response.stats.totalListeningMinutes || 0, 10),
++          booksCompleted: parseInt(response.stats.booksCompleted || 0, 10),
++          currentStreak: parseInt(response.stats.currentStreak || 0, 10)
++        }
++        console.log('Processed stats object:', this.stats)
++      } else {
++        console.warn('Stats missing in API response:', response)
++      }
+     } catch (error) {
+-      console.error(error)
+-      this.stats = {
+-        unlockedAchievements: 0,
+-      }
++      console.error('Error fetching achievement stats:', error)
+     } finally {
+       this.isLoading = false
+     }
+@@ -54,4 +69,4 @@ export default {
+   margin: 0;
+   opacity: 0.7;
+ }
+-</style>
+\ No newline at end of file
++</style>
+
+diff --git a/server/controllers/AchievementController.js b/server/controllers/AchievementController.js
+index 1934abc..27904ff 100644
+--- a/server/controllers/AchievementController.js
++++ b/server/controllers/AchievementController.js
+@@ -79,12 +79,16 @@ class AchievementController {
+   // Get achievement statistics
+   async getAchievementStats(req, res) {
+     try {
++      console.log('Getting achievement stats for user:', req.user.id)
+       const stats = await this.achievementManager.getUserAchievementStats(req.user.id);
++      console.log('Achievement stats found:', stats)
++      
+       res.json({
+         success: true,
+         stats
+       });
+     } catch (error) {
++      console.error('Error getting achievement stats:', error)
+       res.status(500).json({
+         success: false,
+         message: 'Failed to get achievement statistics',
+@@ -92,21 +96,6 @@ class AchievementController {
+       });
+     }
+   }
+-  
+-  // Get achievement statistics
+-  async getAchievementStats(req, res) {
+-    try {
+-      const stats = await this.achievementManager.getUserAchievementStats(req.user.id);
+-      res.json({
+-        success: true,
+-        stats
+-      });
+-    } catch (error) {
+-      res.status(500).json({
+-        success: false,
+-        message: 'Failed to get achievement statistics'
+-      });
+-    }
+-  }
+ }
+ 
+ module.exports = AchievementController;

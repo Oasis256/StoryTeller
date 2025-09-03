@@ -139,25 +139,47 @@ class MeController {
    * @param {RequestWithUser} req
    * @param {Response} res
    */
+  /**
+   * @this import('../routers/ApiRouter')
+   */
   async createUpdateMediaProgress(req, res) {
-    const progressUpdatePayload = {
-      ...req.body,
-      libraryItemId: req.params.libraryItemId,
-      episodeId: req.params.episodeId
-    }
+    // Calls user method to update progress
+    const libraryItemId = req.params.libraryItemId
+    const episodeId = req.params.episodeId
+    const progressUpdatePayload = { ...req.body, libraryItemId, episodeId }
+
     const mediaProgressResponse = await req.user.createUpdateMediaProgressFromPayload(progressUpdatePayload)
     if (mediaProgressResponse.error) {
-      return res.status(mediaProgressResponse.statusCode || 400).send(mediaProgressResponse.error)
+      Logger.error(`[MeController] createUpdateMediaProgress: ${mediaProgressResponse.error}`)
+      return res.status(400).send({ error: mediaProgressResponse.error })
     }
 
-    SocketAuthority.clientEmitter(req.user.id, 'user_updated', req.user.toOldJSONForBrowser())
-    res.sendStatus(200)
+    // Check if the media is finished, and if so, check for achievements
+    if (mediaProgressResponse.isFinished) {
+      try {
+        const userId = req.user.id
+        // Run achievement check asynchronously to avoid blocking the response
+        setTimeout(async () => {
+          try {
+            const AchievementManager = require('../managers/AchievementManager')
+            await AchievementManager.updateUserAchievements(userId)
+          } catch (error) {
+            Logger.error(`[MeController] Error checking achievements:`, error)
+          }
+        }, 100)
+      } catch (error) {
+        Logger.error(`[MeController] Error scheduling achievement check:`, error)
+      }
+    }
+
+    res.json(mediaProgressResponse)
   }
 
   /**
    * PATCH: /api/me/progress/batch/update
    * TODO: Update to use mediaItemId and mediaItemType
-   *
+   * 
+   * @this import('../routers/ApiRouter')
    * @param {RequestWithUser} req
    * @param {Response} res
    */
@@ -168,23 +190,45 @@ class MeController {
     }
 
     let hasUpdated = false
+    let hasFinishedItems = false
+    
     for (const itemProgress of itemProgressPayloads) {
       const mediaProgressResponse = await req.user.createUpdateMediaProgressFromPayload(itemProgress)
       if (mediaProgressResponse.error) {
         Logger.error(`[MeController] batchUpdateMediaProgress: ${mediaProgressResponse.error}`)
-        continue
-      } else {
+      } else if (mediaProgressResponse.updated) {
         hasUpdated = true
+        
+        // Check if any items were finished
+        if (mediaProgressResponse.isFinished) {
+          hasFinishedItems = true
+        }
+      }
+    }
+    
+    // If any items were finished, check achievements
+    if (hasFinishedItems) {
+      try {
+        const userId = req.user.id
+        // Run achievement check asynchronously to avoid blocking the response
+        setTimeout(async () => {
+          try {
+            const AchievementManager = require('../managers/AchievementManager')
+            await AchievementManager.updateUserAchievements(userId)
+          } catch (error) {
+            Logger.error(`[MeController] Error checking achievements:`, error)
+          }
+        }, 100)
+      } catch (error) {
+        Logger.error(`[MeController] Error scheduling achievement check:`, error)
       }
     }
 
-    if (hasUpdated) {
-      SocketAuthority.clientEmitter(req.user.id, 'user_updated', req.user.toOldJSONForBrowser())
-    }
-
-    res.sendStatus(200)
+    res.json({
+      success: hasUpdated
+    })
   }
-
+  
   /**
    * POST: /api/me/item/:id/bookmark
    *

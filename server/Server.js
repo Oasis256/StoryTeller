@@ -109,6 +109,7 @@ class Server {
     this.cronManager = new CronManager(this.podcastManager, this.playbackSessionManager)
     this.apiCacheManager = new ApiCacheManager()
     this.binaryManager = new BinaryManager()
+    this.achievementManager = AchievementManager
 
     // Routers
     this.apiRouter = new ApiRouter(this)
@@ -169,7 +170,7 @@ class Server {
     await ShareManager.init()
     await this.backupManager.init()
     await RssFeedManager.init()
-    await AchievementManager.init()
+    await this.achievementManager.init()
 
     const libraries = await Database.libraryModel.getAllWithFolders()
     await this.cronManager.init(libraries)

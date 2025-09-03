@@ -24,7 +24,7 @@
           <div class="text-xs text-gray-400">{{ $strings.WidgetAchievementsUnlocked }}</div>
         </div>
         <div class="text-center">
-          <div class="text-xl font-bold text-blue-400">{{ stats.completionPercent || 0 }}%</div>
+          <div class="text-xl font-bold text-blue-400">{{ Math.round((stats.completionRate || 0) * 100) }}%</div>
           <div class="text-xs text-gray-400">{{ $strings.WidgetAchievementsComplete }}</div>
         </div>
       </div>
@@ -105,6 +105,13 @@ export default {
   async mounted() {
     await this.loadData()
 
+    // Debug: Log achievements data
+    console.log('Achievement Widget Data:', {
+      stats: this.stats,
+      progressAchievements: this.progressAchievements,
+      recentUnlocks: this.recentUnlocks
+    })
+
     // Listen for achievement updates
     if (this.$socket) {
       this.$socket.on('achievement_unlocked', this.onAchievementUnlocked)
@@ -121,11 +128,44 @@ export default {
     async loadData() {
       this.isLoading = true
       try {
-        const [statsResponse, progressResponse, recentResponse] = await Promise.all([this.$axios.$get('/api/achievements/stats').catch(() => ({ stats: {} })), this.$axios.$get('/api/achievements/progress').catch(() => ({ achievements: [] })), this.$axios.$get('/api/achievements/recent').catch(() => ({ achievements: [] }))])
+        // Debug: Log API calls
+        console.log('Achievement Widget: Loading data from API')
+        
+        // Call APIs separately to better track errors
+        const statsResponse = await this.$axios.$get('/api/achievements/stats')
+          .catch(err => {
+            console.error('Failed to load achievement stats:', err)
+            return { stats: {} }
+          })
+          
+        const progressResponse = await this.$axios.$get('/api/achievements/progress')
+          .catch(err => {
+            console.error('Failed to load achievement progress:', err)
+            return { achievements: [] }
+          })
+          
+        const recentResponse = await this.$axios.$get('/api/achievements/recent')
+          .catch(err => {
+            console.error('Failed to load recent achievements:', err)
+            return { achievements: [] }
+          })
+
+        console.log('Achievement API responses:', {
+          stats: statsResponse,
+          progress: progressResponse, 
+          recent: recentResponse
+        })
 
         this.stats = statsResponse.stats || {}
         this.progressAchievements = progressResponse.achievements || []
         this.recentUnlocks = recentResponse.achievements || []
+        
+        // Debug: Log parsed data
+        console.log('Achievement data parsed:', {
+          stats: this.stats,
+          progressCount: this.progressAchievements.length,
+          recentCount: this.recentUnlocks.length
+        })
       } catch (error) {
         console.error('Failed to load achievement data:', error)
       } finally {
