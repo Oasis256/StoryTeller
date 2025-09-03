@@ -2,7 +2,7 @@
 > audiobookshelf@2.29.0 predev
 > bash scripts/kill-port.sh 3333
 
-Killing processes on port 3333: 3762746
+Killing processes on port 3333: 3865535
 
 > audiobookshelf@2.29.0 dev
 > npm run predev && nodemon --watch server index.js -- --dev
@@ -18,134 +18,89 @@ Killing processes on port 3333: 3762746
 [32m[nodemon] starting `node index.js --dev`[39m
 Running in development mode.
 Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
-[2025-09-03 17:35:34.644] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
-[2025-09-03 17:35:34.657] INFO: === Starting Server ===
-[2025-09-03 17:35:34.658] INFO: [Server] Init v2.29.0
-[2025-09-03 17:35:34.658] INFO: [Server] Node.js Version: v20.19.2
-[2025-09-03 17:35:34.658] INFO: [Server] Platform: linux
-[2025-09-03 17:35:34.659] INFO: [Server] Arch: x64
-[2025-09-03 17:35:34.664] INFO: [BinaryManager] Skipping check for binaries
-[2025-09-03 17:35:34.665] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
-[2025-09-03 17:35:34.684] INFO: [Database] Db connection was successful
-[2025-09-03 17:35:34.690] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
-[2025-09-03 17:35:34.691] INFO: [MigrationManager] Database is already up to date.
-[2025-09-03 17:35:34.789] DEBUG: [Database] Set up associations for model: user
-[2025-09-03 17:35:34.790] DEBUG: [Database] Set up associations for model: achievement
-[2025-09-03 17:35:34.791] DEBUG: [Database] Set up associations for model: userAchievement
-[2025-09-03 17:35:34.825] INFO: [Achievement Migration] Running achievement migrations
-[2025-09-03 17:35:34.825] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
-[2025-09-03 17:35:34.826] INFO: [Migration] Adding new columns to achievements table
-[2025-09-03 17:35:34.826] INFO: [Migration] Successfully added new columns to achievements table
-[2025-09-03 17:35:34.827] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
-[2025-09-03 17:35:34.827] INFO: [Achievement Migration] Successfully completed all achievement migrations
-[2025-09-03 17:35:34.827] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
-[2025-09-03 17:35:35.089] INFO: [Database] running ANALYZE
-[2025-09-03 17:35:35.296] INFO: [Database] ANALYZE completed
-[2025-09-03 17:35:35.298] DEBUG: Daily Log file found 2025-08-28.txt
-[2025-09-03 17:35:35.298] DEBUG: Daily Log file found 2025-08-29.txt
-[2025-09-03 17:35:35.298] DEBUG: Daily Log file found 2025-08-30.txt
-[2025-09-03 17:35:35.298] DEBUG: Daily Log file found 2025-08-31.txt
-[2025-09-03 17:35:35.298] DEBUG: Daily Log file found 2025-09-01.txt
-[2025-09-03 17:35:35.299] DEBUG: Daily Log file found 2025-09-02.txt
-[2025-09-03 17:35:35.299] DEBUG: Daily Log file found 2025-09-03.txt
-[2025-09-03 17:35:35.299] INFO: [LogManager] Init current daily log filename: 2025-09-03.txt
-[2025-09-03 17:35:35.299] DEBUG: [LogManager] Daily log file already exists - set in Logger
-[2025-09-03 17:35:35.327] DEBUG: [DailyLog] 2025-09-03: Loaded 11718 Logs
-[2025-09-03 17:35:35.345] DEBUG: [BackupManager] Backup found "2025-08-02T0130"
-[2025-09-03 17:35:35.347] DEBUG: [BackupManager] Backup found "2025-08-03T0130"
-[2025-09-03 17:35:35.347] INFO: [BackupManager] 2 Backups Found
-[2025-09-03 17:35:35.348] INFO: [BackupManager] Auto Backups are disabled
-[2025-09-03 17:35:35.350] INFO: [AchievementManager] Initializing achievement system
-[2025-09-03 17:35:35.351] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 17:35:35.352] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 17:35:35.352] INFO: [AchievementManager] Achievement system initialized successfully
-[2025-09-03 17:35:35.365] DEBUG: [CronManager] Found 1 podcast episode schedules to start
-[2025-09-03 17:35:35.366] DEBUG: [CronManager] Scheduling podcast episode check cron "0 * * * *" for 1 item(s)
-[2025-09-03 17:35:35.367] INFO: [Watcher] Initializing watcher for "AudioBooks".
-[2025-09-03 17:35:35.367] DEBUG: [Watcher] Init watcher for library folder path "/Books/Audiobooks"
-[2025-09-03 17:35:35.368] INFO: [Watcher] Initializing watcher for "Podcasts".
-[2025-09-03 17:35:35.368] DEBUG: [Watcher] Init watcher for library folder path "/Books/Podcasts"
-[2025-09-03 17:35:35.376] INFO: Listening on port :3333
-[2025-09-03 17:35:35.378] INFO: [Watcher] "AudioBooks" Ready
-[2025-09-03 17:35:35.378] INFO: [Watcher] "Podcasts" Ready
-[2025-09-03 17:35:36.696] INFO: [SocketAuthority] Socket Connected to /socket.io EfWz3TvUAnaN02BaAAAB
-[2025-09-03 17:35:36.825] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
-[2025-09-03 17:35:37.473] DEBUG: [SocketAuthority] User Offline Oasis
-[2025-09-03 17:35:37.473] INFO: [SocketAuthority] Socket EfWz3TvUAnaN02BaAAAB disconnected from client "Oasis" after 777ms (Reason: transport close)
-[2025-09-03 17:35:41.915] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:41.916] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 17:35:41.919] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:41.919] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:41.922] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
-[2025-09-03 17:35:41.936] DEBUG: [AchievementController] Found 5 recent achievements
-[2025-09-03 17:35:41.936] DEBUG: [AchievementController] Sample recent achievement: {"id":"5c9cb1b2-f59f-402b-a241-11558b13913b","key":"marathon_listener","name":"Marathon Listener","nameKey":"AchievementMarathonListenerName","description":"Listen for 8 hours in a single day","descKey":"AchievementMarathonListenerDesc","badgeIcon":"chart-bar","badgeColor":"#ef4444","badgeImage":null,"category":"milestone","targetValue":480,"targetUnit":"minutes","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-08-04T01:57:31.589Z","updatedAt":"2025-08-04T01:57:31.589Z","isUnlocked":true,"userProgress":480,"unlockedAt":"2025-09-02T22:41:23.569Z","progressPercent":100}
-[2025-09-03 17:35:41.937] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 17:35:41.952] DEBUG: [AchievementController] Found 47 achievements
-[2025-09-03 17:35:41.952] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
-[2025-09-03 17:35:41.957] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=17
-[2025-09-03 17:35:41.957] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
-[2025-09-03 17:35:41.957] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":17,"completionRate":0.3617021276595745,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 17:35:41.957] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":17,"completionRate":0.3617021276595745,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 17:35:41.957] DEBUG: [AchievementController] Unlocked achievements count: 17
-[2025-09-03 17:35:42.242] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:42.242] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 17:35:42.245] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:42.245] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 17:35:42.247] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 17:35:42.267] DEBUG: [AchievementController] Found 47 achievements
-[2025-09-03 17:35:42.268] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
-[2025-09-03 17:35:42.273] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
-[2025-09-03 17:35:42.279] DEBUG: [ApiCacheManager] count: 0 size: 0
-[2025-09-03 17:35:42.285] DEBUG: [ApiCacheManager] Cache miss: {"user":"Oasis","url":"/libraries"}
-[2025-09-03 17:35:42.294] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 17:35:42.296] DEBUG: [AchievementController] Found 5 recent achievements
-[2025-09-03 17:35:42.296] DEBUG: [AchievementController] Sample recent achievement: {"id":"5c9cb1b2-f59f-402b-a241-11558b13913b","key":"marathon_listener","name":"Marathon Listener","nameKey":"AchievementMarathonListenerName","description":"Listen for 8 hours in a single day","descKey":"AchievementMarathonListenerDesc","badgeIcon":"chart-bar","badgeColor":"#ef4444","badgeImage":null,"category":"milestone","targetValue":480,"targetUnit":"minutes","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-08-04T01:57:31.589Z","updatedAt":"2025-08-04T01:57:31.589Z","isUnlocked":true,"userProgress":480,"unlockedAt":"2025-09-02T22:41:23.569Z","progressPercent":100}
-[2025-09-03 17:35:42.302] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=17
-[2025-09-03 17:35:42.302] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
-[2025-09-03 17:35:42.302] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":17,"completionRate":0.3617021276595745,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 17:35:42.302] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":17,"completionRate":0.3617021276595745,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 17:35:42.303] DEBUG: [AchievementController] Unlocked achievements count: 17
-[2025-09-03 17:35:42.303] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 17:35:42.400] INFO: [SocketAuthority] Socket Connected to /socket.io vRIuimr8dUfJwIpBAAAD
-[2025-09-03 17:35:42.464] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
-[2025-09-03 17:35:42.476] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:42.735] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:42.869] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.020] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.145] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.304] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.438] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.614] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:43.748] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.028] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.249] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.399] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.617] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.735] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:44.902] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.036] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.186] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.303] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.454] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.605] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.755] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:45.914] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:35:46.373] DEBUG: [ApiCacheManager] userAchievement.afterUpdate: Clearing cache
-[2025-09-03 17:36:22.215] INFO: [SocketAuthority] Socket Connected to /socket.io bDQtPxVyWwPBzYnWAAAF
-[2025-09-03 17:36:22.242] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
-[2025-09-03 17:36:46.891] DEBUG: [SocketAuthority] User Offline Oasis
-[2025-09-03 17:36:46.891] INFO: [SocketAuthority] Socket bDQtPxVyWwPBzYnWAAAF disconnected from client "Oasis" after 24676ms (Reason: transport close)
-[2025-09-03 17:36:52.125] DEBUG: [SocketAuthority] User Offline Oasis
-[2025-09-03 17:36:52.125] INFO: [SocketAuthority] Socket vRIuimr8dUfJwIpBAAAD disconnected from client "Oasis" after 69725ms (Reason: ping timeout)
-[2025-09-03 17:58:28.406] INFO: [SocketAuthority] Socket Connected to /socket.io 6P2x_DsqFjiMCm8AAAAH
-[2025-09-03 17:58:28.408] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
-[2025-09-03 18:00:00.207] DEBUG: [CronManager] Start executing podcast cron 0 * * * * for 1 item(s)
-[2025-09-03 18:00:00.229] INFO: [PodcastManager] runEpisodeCheck: "Submissive Guide" | Last check: Wed Sep 03 2025 17:00:01 GMT+0300 (East Africa Time) | Latest episode pubDate: Wed Jun 04 2025 20:00:00 GMT+0300 (East Africa Time)
-[2025-09-03 18:00:00.230] DEBUG: [PodcastManager] runEpisodeCheck: "Submissive Guide" checking for episodes after Wed Jun 04 2025 20:00:00 GMT+0300 (East Africa Time)
-[2025-09-03 18:00:00.230] DEBUG: [podcastUtils] getPodcastFeed for "https://feeds.buzzsprout.com/1258205.rss"
-[2025-09-03 18:00:00.487] DEBUG: [podcastUtils] getPodcastFeed for "https://feeds.buzzsprout.com/1258205.rss" success - parsing xml
-[2025-09-03 18:00:00.712] DEBUG: [PodcastManager] runEpisodeCheck: N/A episodes found
-[2025-09-03 18:00:00.712] DEBUG: [PodcastManager] No new episodes for "Submissive Guide"
-[2025-09-03 18:00:01.417] DEBUG: [ApiCacheManager] podcast.afterUpdate: Clearing cache
-[2025-09-03 18:00:01.543] DEBUG: [ApiCacheManager] libraryItem.afterUpdate: Clearing cache
-[2025-09-03 18:00:01.554] DEBUG: [CronManager] Finished executing podcast cron 0 * * * * for 1 item(s)
+[2025-09-03 18:35:29.728] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-03 18:35:29.740] INFO: === Starting Server ===
+[2025-09-03 18:35:29.740] INFO: [Server] Init v2.29.0
+[2025-09-03 18:35:29.740] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-03 18:35:29.741] INFO: [Server] Platform: linux
+[2025-09-03 18:35:29.741] INFO: [Server] Arch: x64
+[2025-09-03 18:35:29.744] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-03 18:35:29.745] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-03 18:35:29.766] INFO: [Database] Db connection was successful
+[2025-09-03 18:35:29.772] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-03 18:35:29.773] INFO: [MigrationManager] Database is already up to date.
+[2025-09-03 18:35:29.887] DEBUG: [Database] Set up associations for model: user
+[2025-09-03 18:35:29.888] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-03 18:35:29.889] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-03 18:35:29.922] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-03 18:35:29.923] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-03 18:35:29.923] INFO: [Migration] Adding new columns to achievements table
+[2025-09-03 18:35:29.924] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-03 18:35:29.924] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-03 18:35:29.924] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-03 18:35:29.924] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-03 18:35:30.189] INFO: [Database] running ANALYZE
+[2025-09-03 18:35:30.359] INFO: [Database] ANALYZE completed
+[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-28.txt
+[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-29.txt
+[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-30.txt
+[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-31.txt
+[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-09-01.txt
+[2025-09-03 18:35:30.362] DEBUG: Daily Log file found 2025-09-02.txt
+[2025-09-03 18:35:30.362] DEBUG: Daily Log file found 2025-09-03.txt
+[2025-09-03 18:35:30.362] INFO: [LogManager] Init current daily log filename: 2025-09-03.txt
+[2025-09-03 18:35:30.362] DEBUG: [LogManager] Daily log file already exists - set in Logger
+[2025-09-03 18:35:30.456] DEBUG: [DailyLog] 2025-09-03: Loaded 12090 Logs
+[2025-09-03 18:35:30.476] DEBUG: [BackupManager] Backup found "2025-08-02T0130"
+[2025-09-03 18:35:30.478] DEBUG: [BackupManager] Backup found "2025-08-03T0130"
+[2025-09-03 18:35:30.478] INFO: [BackupManager] 2 Backups Found
+[2025-09-03 18:35:30.479] INFO: [BackupManager] Auto Backups are disabled
+[2025-09-03 18:35:30.482] INFO: [AchievementManager] Initializing achievement system
+[2025-09-03 18:35:30.482] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
+[2025-09-03 18:35:30.483] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-03 18:35:30.484] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-03 18:35:30.497] DEBUG: [CronManager] Found 1 podcast episode schedules to start
+[2025-09-03 18:35:30.497] DEBUG: [CronManager] Scheduling podcast episode check cron "0 * * * *" for 1 item(s)
+[2025-09-03 18:35:30.498] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-03 18:35:30.498] DEBUG: [Watcher] Init watcher for library folder path "/Books/Audiobooks"
+[2025-09-03 18:35:30.499] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-03 18:35:30.499] DEBUG: [Watcher] Init watcher for library folder path "/Books/Podcasts"
+[2025-09-03 18:35:30.508] INFO: Listening on port :3333
+[2025-09-03 18:35:30.509] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-03 18:35:30.510] INFO: [Watcher] "Podcasts" Ready
+[2025-09-03 18:35:32.836] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:32.837] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
+[2025-09-03 18:35:32.840] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:32.841] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:32.844] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
+[2025-09-03 18:35:32.849] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-03 18:35:32.852] DEBUG: [AchievementController] Found 5 recent achievements
+[2025-09-03 18:35:32.852] DEBUG: [AchievementController] Sample recent achievement: {"id":"655e5f82-f360-4509-beba-57b352f7b400","key":"streak_3_days","name":"3-Day Streak","nameKey":null,"description":"Listen to audio for 3 consecutive days","descKey":null,"badgeIcon":"local_fire_department","badgeColor":"#ff9800","badgeImage":null,"category":"streak","targetValue":3,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:03.485Z","updatedAt":"2025-09-03T07:30:03.485Z","isUnlocked":true,"userProgress":3,"unlockedAt":"2025-09-03T14:35:45.454Z","progressPercent":100}
+[2025-09-03 18:35:32.874] DEBUG: [AchievementController] Found 47 achievements
+[2025-09-03 18:35:32.874] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
+[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=22
+[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
+[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
+[2025-09-03 18:35:32.879] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
+[2025-09-03 18:35:32.879] DEBUG: [AchievementController] Unlocked achievements count: 22
+[2025-09-03 18:35:33.153] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:33.153] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
+[2025-09-03 18:35:33.157] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:33.157] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
+[2025-09-03 18:35:33.159] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-03 18:35:33.162] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
+[2025-09-03 18:35:33.168] DEBUG: [ApiCacheManager] count: 0 size: 0
+[2025-09-03 18:35:33.182] DEBUG: [AchievementController] Found 5 recent achievements
+[2025-09-03 18:35:33.182] DEBUG: [AchievementController] Sample recent achievement: {"id":"655e5f82-f360-4509-beba-57b352f7b400","key":"streak_3_days","name":"3-Day Streak","nameKey":null,"description":"Listen to audio for 3 consecutive days","descKey":null,"badgeIcon":"local_fire_department","badgeColor":"#ff9800","badgeImage":null,"category":"streak","targetValue":3,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:03.485Z","updatedAt":"2025-09-03T07:30:03.485Z","isUnlocked":true,"userProgress":3,"unlockedAt":"2025-09-03T14:35:45.454Z","progressPercent":100}
+[2025-09-03 18:35:33.184] DEBUG: [ApiCacheManager] Cache miss: {"user":"Oasis","url":"/libraries"}
+[2025-09-03 18:35:33.196] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
+[2025-09-03 18:35:33.199] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-03 18:35:33.205] DEBUG: [AchievementController] Found 47 achievements
+[2025-09-03 18:35:33.206] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
+[2025-09-03 18:35:33.227] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=22
+[2025-09-03 18:35:33.228] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
+[2025-09-03 18:35:33.228] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
+[2025-09-03 18:35:33.228] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
+[2025-09-03 18:35:33.228] DEBUG: [AchievementController] Unlocked achievements count: 22
+[2025-09-03 18:35:33.251] INFO: [SocketAuthority] Socket Connected to /socket.io 0M2cBadK9YAjABJDAAAB
+[2025-09-03 18:35:33.366] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
