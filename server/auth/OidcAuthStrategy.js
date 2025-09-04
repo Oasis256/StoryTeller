@@ -47,23 +47,28 @@ class OidcAuthStrategy {
         throw new Error('OpenID Connect settings are not valid')
       }
 
-      // Custom req timeout see: https://github.com/panva/node-openid-client/blob/main/docs/README.md#customizing
-      OpenIDClient.custom.setHttpOptionsDefaults({ timeout: 10000 })
+      try {
+        // Custom req timeout see: https://github.com/panva/node-openid-client/blob/main/docs/README.md#customizing
+        OpenIDClient.custom.setHttpOptionsDefaults({ timeout: 10000 })
 
-      const openIdIssuerClient = new OpenIDClient.Issuer({
-        issuer: global.ServerSettings.authOpenIDIssuerURL,
-        authorization_endpoint: global.ServerSettings.authOpenIDAuthorizationURL,
-        token_endpoint: global.ServerSettings.authOpenIDTokenURL,
-        userinfo_endpoint: global.ServerSettings.authOpenIDUserInfoURL,
-        jwks_uri: global.ServerSettings.authOpenIDJwksURL,
-        end_session_endpoint: global.ServerSettings.authOpenIDLogoutURL
-      }).Client
+        const openIdIssuerClient = new OpenIDClient.Issuer({
+          issuer: global.ServerSettings.authOpenIDIssuerURL,
+          authorization_endpoint: global.ServerSettings.authOpenIDAuthorizationURL,
+          token_endpoint: global.ServerSettings.authOpenIDTokenURL,
+          userinfo_endpoint: global.ServerSettings.authOpenIDUserInfoURL,
+          jwks_uri: global.ServerSettings.authOpenIDJwksURL,
+          end_session_endpoint: global.ServerSettings.authOpenIDLogoutURL
+        }).Client
 
-      this.client = new openIdIssuerClient({
-        client_id: global.ServerSettings.authOpenIDClientID,
-        client_secret: global.ServerSettings.authOpenIDClientSecret,
-        id_token_signed_response_alg: global.ServerSettings.authOpenIDTokenSigningAlgorithm
-      })
+        this.client = new openIdIssuerClient({
+          client_id: global.ServerSettings.authOpenIDClientID,
+          client_secret: global.ServerSettings.authOpenIDClientSecret,
+          id_token_signed_response_alg: global.ServerSettings.authOpenIDTokenSigningAlgorithm
+        })
+      } catch (error) {
+        Logger.error(`[OidcAuth] Failed to create OpenID client: ${error.message}`)
+        throw new Error(`Failed to create OpenID client: ${error.message}`)
+      }
     }
     return this.client
   }
@@ -388,31 +393,36 @@ class OidcAuthStrategy {
    * @returns {string|null}
    */
   getEndSessionUrl(req, idToken, authMethod) {
-    const client = this.getClient()
+    try {
+      const client = this.getClient()
 
-    if (client.issuer.end_session_endpoint && client.issuer.end_session_endpoint.length > 0) {
-      let postLogoutRedirectUri = null
+      if (client.issuer.end_session_endpoint && client.issuer.end_session_endpoint.length > 0) {
+        let postLogoutRedirectUri = null
 
-      if (authMethod === 'openid') {
-        const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
-        const host = req.get('host')
-        // TODO: ABS does currently not support subfolders for installation
-        // If we want to support it we need to include a config for the serverurl
-        postLogoutRedirectUri = `${protocol}://${host}${global.RouterBasePath}/login`
+        if (authMethod === 'openid') {
+          const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
+          const host = req.get('host')
+          // TODO: ABS does currently not support subfolders for installation
+          // If we want to support it we need to include a config for the serverurl
+          postLogoutRedirectUri = `${protocol}://${host}${global.RouterBasePath}/login`
+        }
+        // else for openid-mobile we keep postLogoutRedirectUri on null
+        //  nice would be to redirect to the app here, but for example Authentik does not implement
+        //  the post_logout_redirect_uri parameter at all and for other providers
+        //  we would also need again to implement (and even before get to know somehow for 3rd party apps)
+        //  the correct app link like audiobookshelf://login (and maybe also provide a redirect like mobile-redirect).
+        //   Instead because its null (and this way the parameter will be omitted completly), the client/app can simply append something like
+        //  &post_logout_redirect_uri=audiobookshelf://login to the received logout url by itself which is the simplest solution
+        //   (The URL needs to be whitelisted in the config of the SSO/ID provider)
+
+        return client.endSessionUrl({
+          id_token_hint: idToken,
+          post_logout_redirect_uri: postLogoutRedirectUri
+        })
       }
-      // else for openid-mobile we keep postLogoutRedirectUri on null
-      //  nice would be to redirect to the app here, but for example Authentik does not implement
-      //  the post_logout_redirect_uri parameter at all and for other providers
-      //  we would also need again to implement (and even before get to know somehow for 3rd party apps)
-      //  the correct app link like audiobookshelf://login (and maybe also provide a redirect like mobile-redirect).
-      //   Instead because its null (and this way the parameter will be omitted completly), the client/app can simply append something like
-      //  &post_logout_redirect_uri=audiobookshelf://login to the received logout url by itself which is the simplest solution
-      //   (The URL needs to be whitelisted in the config of the SSO/ID provider)
-
-      return client.endSessionUrl({
-        id_token_hint: idToken,
-        post_logout_redirect_uri: postLogoutRedirectUri
-      })
+    } catch (error) {
+      // If OpenID settings are invalid, log the error but don't crash logout
+      Logger.warn(`[OidcAuth] Cannot get end session URL due to invalid OpenID settings: ${error.message}`)
     }
 
     return null

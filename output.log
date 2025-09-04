@@ -2,7 +2,7 @@
 > audiobookshelf@2.29.0 predev
 > bash scripts/kill-port.sh 3333
 
-Killing processes on port 3333: 3865535
+Killing processes on port 3333: 824050
 
 > audiobookshelf@2.29.0 dev
 > npm run predev && nodemon --watch server index.js -- --dev
@@ -18,89 +18,561 @@ Killing processes on port 3333: 3865535
 [32m[nodemon] starting `node index.js --dev`[39m
 Running in development mode.
 Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
-[2025-09-03 18:35:29.728] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
-[2025-09-03 18:35:29.740] INFO: === Starting Server ===
-[2025-09-03 18:35:29.740] INFO: [Server] Init v2.29.0
-[2025-09-03 18:35:29.740] INFO: [Server] Node.js Version: v20.19.2
-[2025-09-03 18:35:29.741] INFO: [Server] Platform: linux
-[2025-09-03 18:35:29.741] INFO: [Server] Arch: x64
-[2025-09-03 18:35:29.744] INFO: [BinaryManager] Skipping check for binaries
-[2025-09-03 18:35:29.745] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
-[2025-09-03 18:35:29.766] INFO: [Database] Db connection was successful
-[2025-09-03 18:35:29.772] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
-[2025-09-03 18:35:29.773] INFO: [MigrationManager] Database is already up to date.
-[2025-09-03 18:35:29.887] DEBUG: [Database] Set up associations for model: user
-[2025-09-03 18:35:29.888] DEBUG: [Database] Set up associations for model: achievement
-[2025-09-03 18:35:29.889] DEBUG: [Database] Set up associations for model: userAchievement
-[2025-09-03 18:35:29.922] INFO: [Achievement Migration] Running achievement migrations
-[2025-09-03 18:35:29.923] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
-[2025-09-03 18:35:29.923] INFO: [Migration] Adding new columns to achievements table
-[2025-09-03 18:35:29.924] INFO: [Migration] Successfully added new columns to achievements table
-[2025-09-03 18:35:29.924] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
-[2025-09-03 18:35:29.924] INFO: [Achievement Migration] Successfully completed all achievement migrations
-[2025-09-03 18:35:29.924] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
-[2025-09-03 18:35:30.189] INFO: [Database] running ANALYZE
-[2025-09-03 18:35:30.359] INFO: [Database] ANALYZE completed
-[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-28.txt
-[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-29.txt
-[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-30.txt
-[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-08-31.txt
-[2025-09-03 18:35:30.361] DEBUG: Daily Log file found 2025-09-01.txt
-[2025-09-03 18:35:30.362] DEBUG: Daily Log file found 2025-09-02.txt
-[2025-09-03 18:35:30.362] DEBUG: Daily Log file found 2025-09-03.txt
-[2025-09-03 18:35:30.362] INFO: [LogManager] Init current daily log filename: 2025-09-03.txt
-[2025-09-03 18:35:30.362] DEBUG: [LogManager] Daily log file already exists - set in Logger
-[2025-09-03 18:35:30.456] DEBUG: [DailyLog] 2025-09-03: Loaded 12090 Logs
-[2025-09-03 18:35:30.476] DEBUG: [BackupManager] Backup found "2025-08-02T0130"
-[2025-09-03 18:35:30.478] DEBUG: [BackupManager] Backup found "2025-08-03T0130"
-[2025-09-03 18:35:30.478] INFO: [BackupManager] 2 Backups Found
-[2025-09-03 18:35:30.479] INFO: [BackupManager] Auto Backups are disabled
-[2025-09-03 18:35:30.482] INFO: [AchievementManager] Initializing achievement system
-[2025-09-03 18:35:30.482] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 18:35:30.483] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 18:35:30.484] INFO: [AchievementManager] Achievement system initialized successfully
-[2025-09-03 18:35:30.497] DEBUG: [CronManager] Found 1 podcast episode schedules to start
-[2025-09-03 18:35:30.497] DEBUG: [CronManager] Scheduling podcast episode check cron "0 * * * *" for 1 item(s)
-[2025-09-03 18:35:30.498] INFO: [Watcher] Initializing watcher for "AudioBooks".
-[2025-09-03 18:35:30.498] DEBUG: [Watcher] Init watcher for library folder path "/Books/Audiobooks"
-[2025-09-03 18:35:30.499] INFO: [Watcher] Initializing watcher for "Podcasts".
-[2025-09-03 18:35:30.499] DEBUG: [Watcher] Init watcher for library folder path "/Books/Podcasts"
-[2025-09-03 18:35:30.508] INFO: Listening on port :3333
-[2025-09-03 18:35:30.509] INFO: [Watcher] "AudioBooks" Ready
-[2025-09-03 18:35:30.510] INFO: [Watcher] "Podcasts" Ready
-[2025-09-03 18:35:32.836] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:32.837] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 18:35:32.840] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:32.841] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:32.844] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
-[2025-09-03 18:35:32.849] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 18:35:32.852] DEBUG: [AchievementController] Found 5 recent achievements
-[2025-09-03 18:35:32.852] DEBUG: [AchievementController] Sample recent achievement: {"id":"655e5f82-f360-4509-beba-57b352f7b400","key":"streak_3_days","name":"3-Day Streak","nameKey":null,"description":"Listen to audio for 3 consecutive days","descKey":null,"badgeIcon":"local_fire_department","badgeColor":"#ff9800","badgeImage":null,"category":"streak","targetValue":3,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:03.485Z","updatedAt":"2025-09-03T07:30:03.485Z","isUnlocked":true,"userProgress":3,"unlockedAt":"2025-09-03T14:35:45.454Z","progressPercent":100}
-[2025-09-03 18:35:32.874] DEBUG: [AchievementController] Found 47 achievements
-[2025-09-03 18:35:32.874] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
-[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=22
-[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
-[2025-09-03 18:35:32.879] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 18:35:32.879] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 18:35:32.879] DEBUG: [AchievementController] Unlocked achievements count: 22
-[2025-09-03 18:35:33.153] DEBUG: [AchievementController] Getting achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:33.153] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 18:35:33.157] DEBUG: [AchievementController] Getting stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:33.157] DEBUG: [AchievementAdapter] Getting achievement stats for user: 342530ce-7653-403e-a6a4-95c724aaca89
-[2025-09-03 18:35:33.159] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 18:35:33.162] DEBUG: [AchievementController] Getting recent achievements for user: 342530ce-7653-403e-a6a4-95c724aaca89, limit: 5
-[2025-09-03 18:35:33.168] DEBUG: [ApiCacheManager] count: 0 size: 0
-[2025-09-03 18:35:33.182] DEBUG: [AchievementController] Found 5 recent achievements
-[2025-09-03 18:35:33.182] DEBUG: [AchievementController] Sample recent achievement: {"id":"655e5f82-f360-4509-beba-57b352f7b400","key":"streak_3_days","name":"3-Day Streak","nameKey":null,"description":"Listen to audio for 3 consecutive days","descKey":null,"badgeIcon":"local_fire_department","badgeColor":"#ff9800","badgeImage":null,"category":"streak","targetValue":3,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:03.485Z","updatedAt":"2025-09-03T07:30:03.485Z","isUnlocked":true,"userProgress":3,"unlockedAt":"2025-09-03T14:35:45.454Z","progressPercent":100}
-[2025-09-03 18:35:33.184] DEBUG: [ApiCacheManager] Cache miss: {"user":"Oasis","url":"/libraries"}
-[2025-09-03 18:35:33.196] DEBUG: [AchievementAdapter] Found 0 achievement definitions to ensure
-[2025-09-03 18:35:33.199] INFO: [AchievementAdapter] Total achievement definitions: 47
-[2025-09-03 18:35:33.205] DEBUG: [AchievementController] Found 47 achievements
-[2025-09-03 18:35:33.206] DEBUG: [AchievementController] Sample achievement: {"id":"cc8a9968-c2d0-464b-8299-d2bfefccaa24","key":"series_complete_1","name":"Series Completer","nameKey":null,"description":"Complete your first book series","descKey":null,"badgeIcon":"playlist_add_check","badgeColor":"#ff5722","badgeImage":null,"category":"diversity","targetValue":1,"targetUnit":"units","rarity":"common","xpValue":10,"isSecret":false,"unlockMessage":null,"isActive":true,"createdAt":"2025-09-03T07:30:05.475Z","updatedAt":"2025-09-03T07:30:05.475Z","isUnlocked":false,"userProgress":0,"unlockedAt":null,"progressPercent":0}
-[2025-09-03 18:35:33.227] DEBUG: [AchievementAdapter] Stats for user 342530ce-7653-403e-a6a4-95c724aaca89: Total=47, Unlocked=22
-[2025-09-03 18:35:33.228] DEBUG: [AchievementAdapter] Sample unlocked achievement: First Steps
-[2025-09-03 18:35:33.228] DEBUG: [AchievementAdapter] Returning stats: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 18:35:33.228] DEBUG: [AchievementController] Stats response: {"totalAchievements":47,"unlockedAchievements":22,"completionRate":0.46808510638297873,"totalListeningMinutes":8628,"booksCompleted":822,"currentStreak":4}
-[2025-09-03 18:35:33.228] DEBUG: [AchievementController] Unlocked achievements count: 22
-[2025-09-03 18:35:33.251] INFO: [SocketAuthority] Socket Connected to /socket.io 0M2cBadK9YAjABJDAAAB
-[2025-09-03 18:35:33.366] DEBUG: [SocketAuthority] Authenticating socket to user "Oasis"
+[2025-09-04 09:22:21.631] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:22:21.643] INFO: === Starting Server ===
+[2025-09-04 09:22:21.644] INFO: [Server] Init v2.29.0
+[2025-09-04 09:22:21.644] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:22:21.644] INFO: [Server] Platform: linux
+[2025-09-04 09:22:21.644] INFO: [Server] Arch: x64
+[2025-09-04 09:22:21.647] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/d2b4219c-54d2-4e5d-be6e-672e84d81410"
+[2025-09-04 09:22:21.726] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/d2b4219c-54d2-4e5d-be6e-672e84d81410/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/d2b4219c-54d2-4e5d-be6e-672e84d81410/files.txt'
+}
+[2025-09-04 09:22:21.729] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:22:21.757] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:22:21.776] INFO: [Database] Db connection was successful
+[2025-09-04 09:22:21.781] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:22:21.782] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:22:21.872] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:22:21.873] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:22:21.874] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:22:21.911] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:22:21.911] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:22:21.912] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:22:21.913] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:22:21.913] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:22:21.913] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:22:21.913] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:22:22.195] INFO: [Database] running ANALYZE
+[2025-09-04 09:22:22.398] INFO: [Database] ANALYZE completed
+[2025-09-04 09:22:22.399] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:22:22.551] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:22:22.559] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:22:22.561] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:22:22.561] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:22:22.572] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:22:22.574] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:22:22.582] INFO: Listening on port :3333
+[2025-09-04 09:22:22.584] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-04 09:22:22.584] INFO: [Watcher] "Podcasts" Ready
+[2025-09-04 09:22:34.135] INFO: [LocalAuth] User "Oasis" logged in from ip ::ffff:172.16.17.156
+[2025-09-04 09:22:35.617] INFO: [SocketAuthority] Socket Connected to /socket.io uiK7HEy7mtYsHpogAAAB
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:33:36.344] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:33:36.357] INFO: === Starting Server ===
+[2025-09-04 09:33:36.357] INFO: [Server] Init v2.29.0
+[2025-09-04 09:33:36.357] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:33:36.358] INFO: [Server] Platform: linux
+[2025-09-04 09:33:36.358] INFO: [Server] Arch: x64
+[2025-09-04 09:33:36.362] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:33:36.501] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:33:36.504] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:33:36.525] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:33:36.769] INFO: [Database] Db connection was successful
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:33:42.263] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:33:42.281] INFO: === Starting Server ===
+[2025-09-04 09:33:42.281] INFO: [Server] Init v2.29.0
+[2025-09-04 09:33:42.282] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:33:42.282] INFO: [Server] Platform: linux
+[2025-09-04 09:33:42.282] INFO: [Server] Arch: x64
+[2025-09-04 09:33:42.290] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:33:42.504] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:33:42.517] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:33:42.558] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:33:42.595] INFO: [Database] Db connection was successful
+[2025-09-04 09:33:47.466] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:33:47.468] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:33:47.637] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:33:47.638] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:33:47.640] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:33:48.521] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:33:48.522] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:33:48.523] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:33:48.523] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:33:48.524] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:33:48.524] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:33:48.524] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:33:49.255] INFO: [Database] running ANALYZE
+[2025-09-04 09:33:49.504] INFO: [Database] ANALYZE completed
+[2025-09-04 09:33:49.506] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:33:49.541] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:33:49.551] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:33:49.553] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:33:49.553] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:33:49.567] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:33:49.569] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:33:49.582] FATAL: [Server] Uncaught exception origin: uncaughtException, error: Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+
+Node.js v20.19.2
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:34:14.772] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:34:14.803] INFO: === Starting Server ===
+[2025-09-04 09:34:14.806] INFO: [Server] Init v2.29.0
+[2025-09-04 09:34:14.806] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:34:14.807] INFO: [Server] Platform: linux
+[2025-09-04 09:34:14.807] INFO: [Server] Arch: x64
+[2025-09-04 09:34:14.843] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:34:15.109] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:34:15.112] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:34:15.152] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:34:15.184] INFO: [Database] Db connection was successful
+[2025-09-04 09:34:15.192] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:34:15.193] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:34:15.308] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:34:15.309] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:34:15.310] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:34:15.406] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:34:15.406] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:34:15.407] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:34:15.408] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:34:15.409] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:34:15.409] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:34:15.409] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:34:16.290] INFO: [Database] running ANALYZE
+[2025-09-04 09:34:16.525] INFO: [Database] ANALYZE completed
+[2025-09-04 09:34:16.527] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:34:16.549] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:34:16.558] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:34:16.560] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:34:16.560] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:34:16.579] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:34:16.581] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:34:16.613] FATAL: [Server] Uncaught exception origin: uncaughtException, error: Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+
+Node.js v20.19.2
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:34:28.057] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:34:28.069] INFO: === Starting Server ===
+[2025-09-04 09:34:28.069] INFO: [Server] Init v2.29.0
+[2025-09-04 09:34:28.070] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:34:28.070] INFO: [Server] Platform: linux
+[2025-09-04 09:34:28.070] INFO: [Server] Arch: x64
+[2025-09-04 09:34:28.072] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:34:28.211] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:34:28.214] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:34:28.238] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:34:28.258] INFO: [Database] Db connection was successful
+[2025-09-04 09:34:28.264] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:34:28.264] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:34:28.397] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:34:28.398] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:34:28.399] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:34:28.441] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:34:28.441] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:34:28.442] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:34:28.444] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:34:28.444] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:34:28.444] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:34:28.444] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:34:29.045] INFO: [Database] running ANALYZE
+[2025-09-04 09:34:29.209] INFO: [Database] ANALYZE completed
+[2025-09-04 09:34:29.211] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:34:29.233] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:34:29.239] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:34:29.240] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:34:29.241] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:34:29.251] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:34:29.252] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:34:29.260] INFO: Listening on port :3333
+[2025-09-04 09:34:29.262] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-04 09:34:29.262] INFO: [Watcher] "Podcasts" Ready
+[2025-09-04 09:34:29.703] INFO: [SocketAuthority] Socket Connected to /socket.io NLFoTe_wM6_mZ26dAAAB
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:35:03.666] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:35:03.681] INFO: === Starting Server ===
+[2025-09-04 09:35:03.682] INFO: [Server] Init v2.29.0
+[2025-09-04 09:35:03.682] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:35:03.682] INFO: [Server] Platform: linux
+[2025-09-04 09:35:03.683] INFO: [Server] Arch: x64
+[2025-09-04 09:35:03.698] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:35:04.127] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:35:04.130] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:35:04.154] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:35:04.178] INFO: [Database] Db connection was successful
+[2025-09-04 09:35:04.186] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:35:04.188] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:35:04.344] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:35:04.354] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:35:04.356] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:35:04.396] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:35:04.397] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:35:04.398] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:35:04.399] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:35:04.399] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:35:04.399] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:35:04.399] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:35:04.708] INFO: [Database] running ANALYZE
+[2025-09-04 09:35:04.896] INFO: [Database] ANALYZE completed
+[2025-09-04 09:35:04.898] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:35:05.253] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:35:05.260] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:35:05.261] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:35:05.262] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:35:05.272] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:35:05.274] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:35:05.282] FATAL: [Server] Uncaught exception origin: uncaughtException, error: Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+
+Node.js v20.19.2
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        [32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:33:36.344] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:33:36.357] INFO: === Starting Server ===
+[2025-09-04 09:33:36.357] INFO: [Server] Init v2.29.0
+[2025-09-04 09:33:36.357] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:33:36.358] INFO: [Server] Platform: linux
+[2025-09-04 09:33:36.358] INFO: [Server] Arch: x64
+[2025-09-04 09:33:36.365] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:33:36.498] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:33:36.501] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:33:36.531] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:33:36.767] INFO: [Database] Db connection was successful
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:33:42.299] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:33:42.313] INFO: === Starting Server ===
+[2025-09-04 09:33:42.314] INFO: [Server] Init v2.29.0
+[2025-09-04 09:33:42.314] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:33:42.315] INFO: [Server] Platform: linux
+[2025-09-04 09:33:42.315] INFO: [Server] Arch: x64
+[2025-09-04 09:33:42.326] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:33:42.492] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:33:42.495] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:33:42.524] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:33:42.552] INFO: [Database] Db connection was successful
+[2025-09-04 09:33:47.469] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:33:47.470] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:33:47.615] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:33:47.617] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:33:47.618] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:33:48.421] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:33:48.421] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:33:48.422] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:33:48.423] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:33:48.423] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:33:48.423] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:33:48.423] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:33:48.942] INFO: [Database] running ANALYZE
+[2025-09-04 09:33:49.161] INFO: [Database] ANALYZE completed
+[2025-09-04 09:33:49.163] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:33:49.430] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:33:49.519] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:33:49.524] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:33:49.524] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:33:49.539] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:33:49.541] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:33:49.552] INFO: Listening on port :3333
+[2025-09-04 09:33:49.554] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-04 09:33:49.555] INFO: [Watcher] "Podcasts" Ready
+[2025-09-04 09:33:54.185] INFO: [SocketAuthority] Socket Connected to /socket.io 6U_qEQ0nU9DqYwNbAAAB
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:34:14.677] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:34:14.691] INFO: === Starting Server ===
+[2025-09-04 09:34:14.692] INFO: [Server] Init v2.29.0
+[2025-09-04 09:34:14.692] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:34:14.693] INFO: [Server] Platform: linux
+[2025-09-04 09:34:14.693] INFO: [Server] Arch: x64
+[2025-09-04 09:34:14.699] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:34:14.842] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/final-output.m3u8'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/final-output.m3u8'
+}
+[2025-09-04 09:34:14.845] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:34:14.867] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:34:14.899] INFO: [Database] Db connection was successful
+[2025-09-04 09:34:14.905] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:34:14.905] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:34:15.030] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:34:15.031] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:34:15.032] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:34:15.072] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:34:15.073] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:34:15.073] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:34:15.075] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:34:15.075] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:34:15.075] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:34:15.075] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:34:15.419] INFO: [Database] running ANALYZE
+[2025-09-04 09:34:15.582] INFO: [Database] ANALYZE completed
+[2025-09-04 09:34:15.583] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:34:15.609] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:34:15.617] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:34:15.618] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:34:15.619] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:34:15.630] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:34:15.631] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:34:15.639] INFO: Listening on port :3333
+[2025-09-04 09:34:15.641] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-04 09:34:15.641] INFO: [Watcher] "Podcasts" Ready
+[2025-09-04 09:34:15.689] INFO: [SocketAuthority] Socket Connected to /socket.io AYS2yJmuD1TwMxHiAAAB
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:34:28.068] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:34:28.080] INFO: === Starting Server ===
+[2025-09-04 09:34:28.081] INFO: [Server] Init v2.29.0
+[2025-09-04 09:34:28.081] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:34:28.081] INFO: [Server] Platform: linux
+[2025-09-04 09:34:28.081] INFO: [Server] Arch: x64
+[2025-09-04 09:34:28.084] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:34:28.214] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:34:28.219] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:34:28.242] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:34:28.263] INFO: [Database] Db connection was successful
+[2025-09-04 09:34:28.272] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:34:28.273] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:34:28.395] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:34:28.397] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:34:28.398] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:34:28.440] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:34:28.441] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:34:28.442] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:34:28.443] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:34:28.443] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:34:28.443] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:34:28.443] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:34:29.288] INFO: [Database] running ANALYZE
+[2025-09-04 09:34:29.468] INFO: [Database] ANALYZE completed
+[2025-09-04 09:34:29.470] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:34:29.493] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:34:29.499] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:34:29.501] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:34:29.501] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:34:29.511] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:34:29.512] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:34:29.522] FATAL: [Server] Uncaught exception origin: uncaughtException, error: Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use :::3333
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at Server.listen (node:net:2067:7)
+    at Server.start (/home/Oasis/sVault/Prog/AudbleTales/server/Server.js:421:19)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3333
+}
+
+Node.js v20.19.2
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `node index.js --dev`[39m
+Running in development mode.
+Options: CONFIG_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config, METADATA_PATH=/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata, PORT=3333, HOST=undefined, SOURCE=local, ROUTER_BASE_PATH=
+[2025-09-04 09:35:03.247] DEBUG: [RateLimiterFactory] Created auth rate limiter: 40 attempts per 10 minutes
+[2025-09-04 09:35:03.261] INFO: === Starting Server ===
+[2025-09-04 09:35:03.262] INFO: [Server] Init v2.29.0
+[2025-09-04 09:35:03.262] INFO: [Server] Node.js Version: v20.19.2
+[2025-09-04 09:35:03.263] INFO: [Server] Platform: linux
+[2025-09-04 09:35:03.263] INFO: [Server] Arch: x64
+[2025-09-04 09:35:03.269] DEBUG: [PlaybackSessionManager] Removing orphan stream "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123"
+[2025-09-04 09:35:03.435] ERROR: [PlaybackSessionManager] cleanOrphanStreams failed [Error: EACCES: permission denied, unlink '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'] {
+  errno: -13,
+  code: 'EACCES',
+  syscall: 'unlink',
+  path: '/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Metadata/streams/72314027-13d6-43a3-aa6f-b3db5f49f123/files.txt'
+}
+[2025-09-04 09:35:03.438] INFO: [BinaryManager] Skipping check for binaries
+[2025-09-04 09:35:03.460] INFO: [Database] Initializing db at "/home/Oasis/Vault/config/Swag/AudbleTales/Configs/Config/absdatabase.sqlite"
+[2025-09-04 09:35:03.490] INFO: [Database] Db connection was successful
+[2025-09-04 09:35:03.496] DEBUG: [MigrationManager] Database version: 2.29.0, Max version: 2.29.0, Server version: 2.29.0
+[2025-09-04 09:35:03.497] INFO: [MigrationManager] Database is already up to date.
+[2025-09-04 09:35:03.614] DEBUG: [Database] Set up associations for model: user
+[2025-09-04 09:35:03.615] DEBUG: [Database] Set up associations for model: achievement
+[2025-09-04 09:35:03.617] DEBUG: [Database] Set up associations for model: userAchievement
+[2025-09-04 09:35:03.675] INFO: [Achievement Migration] Running achievement migrations
+[2025-09-04 09:35:03.675] INFO: [Achievement Migration] Running migration: add_achievement_columns.js
+[2025-09-04 09:35:03.676] INFO: [Migration] Adding new columns to achievements table
+[2025-09-04 09:35:03.677] INFO: [Migration] Successfully added new columns to achievements table
+[2025-09-04 09:35:03.677] INFO: [Achievement Migration] Successfully ran migration: add_achievement_columns.js
+[2025-09-04 09:35:03.677] INFO: [Achievement Migration] Successfully completed all achievement migrations
+[2025-09-04 09:35:03.678] INFO: [Database] Db initialized with models: user, session, apiKey, library, libraryFolder, book, podcast, podcastEpisode, libraryItem, mediaProgress, series, bookSeries, author, bookAuthor, collection, collectionBook, playlist, playlistMediaItem, device, playbackSession, feed, feedEpisode, setting, customMetadataProvider, mediaItemShare, achievement, userAchievement
+[2025-09-04 09:35:03.988] INFO: [Database] running ANALYZE
+[2025-09-04 09:35:04.162] INFO: [Database] ANALYZE completed
+[2025-09-04 09:35:04.164] INFO: [LogManager] Init current daily log filename: 2025-09-04.txt
+[2025-09-04 09:35:04.190] INFO: [BackupManager] 2 Backups Found
+[2025-09-04 09:35:04.207] INFO: [AchievementManager] Initializing achievement system
+[2025-09-04 09:35:04.208] INFO: [AchievementAdapter] Total achievement definitions: 47
+[2025-09-04 09:35:04.209] INFO: [AchievementManager] Achievement system initialized successfully
+[2025-09-04 09:35:04.249] INFO: [Watcher] Initializing watcher for "AudioBooks".
+[2025-09-04 09:35:04.251] INFO: [Watcher] Initializing watcher for "Podcasts".
+[2025-09-04 09:35:04.260] INFO: Listening on port :3333
+[2025-09-04 09:35:04.261] INFO: [Watcher] "AudioBooks" Ready
+[2025-09-04 09:35:04.262] INFO: [Watcher] "Podcasts" Ready
+[2025-09-04 09:35:04.725] INFO: [SocketAuthority] Socket Connected to /socket.io 0dDl19efIh7x6RkSAAAB
+[2025-09-04 09:39:57.034] INFO: [SocketAuthority] Socket 0dDl19efIh7x6RkSAAAB disconnected from client "Oasis" after 292309ms (Reason: transport close)

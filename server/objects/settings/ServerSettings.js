@@ -278,7 +278,14 @@ class ServerSettings {
    * Auth settings required for openid to be valid
    */
   get isOpenIDAuthSettingsValid() {
-    return this.authOpenIDIssuerURL && this.authOpenIDAuthorizationURL && this.authOpenIDTokenURL && this.authOpenIDUserInfoURL && this.authOpenIDJwksURL && this.authOpenIDClientID && this.authOpenIDClientSecret && this.authOpenIDTokenSigningAlgorithm
+    const isValid = this.authOpenIDIssuerURL && this.authOpenIDAuthorizationURL && this.authOpenIDTokenURL && this.authOpenIDUserInfoURL && this.authOpenIDJwksURL && this.authOpenIDClientID && this.authOpenIDClientSecret && this.authOpenIDTokenSigningAlgorithm
+
+    // Safety check: if OpenID is enabled but settings are invalid, log a warning
+    if (this.authActiveAuthMethods.includes('openid') && !isValid) {
+      Logger.warn(`[ServerSettings] OpenID Connect is enabled but settings are invalid. Required: issuerURL, authorizationURL, tokenURL, userInfoURL, jwksURL, clientID, clientSecret, tokenSigningAlgorithm`)
+    }
+
+    return isValid
   }
 
   get authenticationSettings() {
