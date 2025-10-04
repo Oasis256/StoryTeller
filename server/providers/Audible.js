@@ -3,7 +3,7 @@ const Logger = require('../Logger')
 const { isValidASIN } = require('../utils/index')
 
 class Audible {
-  #responseTimeout = 30000
+  #responseTimeout = 10000
 
   constructor() {
     this.regionMap = {
@@ -176,7 +176,7 @@ class Audible {
           return Promise.all(res.data.products.map((result) => this.asinSearch(result.asin, region, timeout)))
         })
         .catch((error) => {
-          Logger.error('[Audible] query search error', error)
+          Logger.error('[Audible] query search error', error.message)
           return []
         })
     }
