@@ -38,7 +38,6 @@ const CronManager = require('./managers/CronManager')
 const ApiCacheManager = require('./managers/ApiCacheManager')
 const BinaryManager = require('./managers/BinaryManager')
 const ShareManager = require('./managers/ShareManager')
-const AchievementManager = require('./managers/AchievementManager')
 const LibraryScanner = require('./scanner/LibraryScanner')
 
 //Import the main Passport and Express-Session library
@@ -109,7 +108,6 @@ class Server {
     this.cronManager = new CronManager(this.podcastManager, this.playbackSessionManager)
     this.apiCacheManager = new ApiCacheManager()
     this.binaryManager = new BinaryManager()
-    this.achievementManager = AchievementManager
 
     // Routers
     this.apiRouter = new ApiRouter(this)
@@ -170,8 +168,6 @@ class Server {
     await ShareManager.init()
     await this.backupManager.init()
     await RssFeedManager.init()
-    await this.achievementManager.init()
-
     const libraries = await Database.libraryModel.getAllWithFolders()
     await this.cronManager.init(libraries)
     this.apiCacheManager.init()

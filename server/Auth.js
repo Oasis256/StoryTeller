@@ -20,9 +20,7 @@ class Auth {
     const escapedRouterBasePath = escapeRegExp(global.RouterBasePath)
     this.ignorePatterns = [
       new RegExp(`^(${escapedRouterBasePath}/api)?/items/[^/]+/cover$`), 
-      new RegExp(`^(${escapedRouterBasePath}/api)?/authors/[^/]+/image$`),
-      new RegExp(`^(${escapedRouterBasePath}/api)?/upcoming/cover/[^/]+/[^/]+$`),
-      new RegExp(`^(${escapedRouterBasePath}/api)?/upcoming/health$`)
+      new RegExp(`^(${escapedRouterBasePath}/api)?/authors/[^/]+/image$`)
     ]
 
     /** @type {import('express-rate-limit').RateLimitRequestHandler} */

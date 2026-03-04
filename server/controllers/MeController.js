@@ -154,24 +154,6 @@ class MeController {
       return res.status(400).send({ error: mediaProgressResponse.error })
     }
 
-    // Check if the media is finished, and if so, check for achievements
-    if (mediaProgressResponse.isFinished) {
-      try {
-        const userId = req.user.id
-        // Run achievement check asynchronously to avoid blocking the response
-        setTimeout(async () => {
-          try {
-            const AchievementManager = require('../managers/AchievementManager')
-            await AchievementManager.updateUserAchievements(userId)
-          } catch (error) {
-            Logger.error(`[MeController] Error checking achievements:`, error)
-          }
-        }, 100)
-      } catch (error) {
-        Logger.error(`[MeController] Error scheduling achievement check:`, error)
-      }
-    }
-
     res.json(mediaProgressResponse)
   }
 
@@ -190,7 +172,6 @@ class MeController {
     }
 
     let hasUpdated = false
-    let hasFinishedItems = false
     
     for (const itemProgress of itemProgressPayloads) {
       const mediaProgressResponse = await req.user.createUpdateMediaProgressFromPayload(itemProgress)
@@ -198,29 +179,6 @@ class MeController {
         Logger.error(`[MeController] batchUpdateMediaProgress: ${mediaProgressResponse.error}`)
       } else if (mediaProgressResponse.updated) {
         hasUpdated = true
-        
-        // Check if any items were finished
-        if (mediaProgressResponse.isFinished) {
-          hasFinishedItems = true
-        }
-      }
-    }
-    
-    // If any items were finished, check achievements
-    if (hasFinishedItems) {
-      try {
-        const userId = req.user.id
-        // Run achievement check asynchronously to avoid blocking the response
-        setTimeout(async () => {
-          try {
-            const AchievementManager = require('../managers/AchievementManager')
-            await AchievementManager.updateUserAchievements(userId)
-          } catch (error) {
-            Logger.error(`[MeController] Error checking achievements:`, error)
-          }
-        }, 100)
-      } catch (error) {
-        Logger.error(`[MeController] Error scheduling achievement check:`, error)
       }
     }
 

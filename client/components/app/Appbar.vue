@@ -6,6 +6,9 @@
           <img src="~static/icon.svg" :alt="$strings.ButtonHome" class="w-8 min-w-8 h-8 mr-2 sm:w-10 sm:min-w-10 sm:h-10 sm:mr-4" />
         </nuxt-link>
 
+        <ui-libraries-dropdown class="mr-2" />
+        <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
+
         <h1 class="text-2xl font-book mr-6 hidden lg:block center">
           <nuxt-link to="/">
             <nlp class="above"></nlp>
@@ -21,9 +24,6 @@
           </nuxt-link>
         </h1>
 
-        <ui-libraries-dropdown class="mr-2" />
-
-        <controls-global-search v-if="currentLibrary" class="mr-1 sm:mr-0" />
         <div class="grow" />
 
         <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom" text="Casting requires a secure connection" class="flex items-center">
@@ -38,12 +38,6 @@
         <nuxt-link v-if="currentLibrary" to="/config/stats" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
           <ui-tooltip :text="$strings.HeaderYourStats" direction="bottom" class="flex items-center">
             <span class="material-symbols text-2xl" aria-label="User Stats" role="button">&#xe01d;</span>
-          </ui-tooltip>
-        </nuxt-link>
-
-        <nuxt-link v-if="currentLibrary" to="/achievements" class="hover:text-gray-200 cursor-pointer w-8 h-8 hidden sm:flex items-center justify-center mx-1">
-          <ui-tooltip text="Achievements" direction="bottom" class="flex items-center">
-            <span class="material-symbols text-2xl" aria-label="Achievements" role="button">emoji_events</span>
           </ui-tooltip>
         </nuxt-link>
 

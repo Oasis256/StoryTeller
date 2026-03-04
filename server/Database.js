@@ -162,16 +162,6 @@ class Database {
     return this.models.device
   }
 
-  /** @type {typeof import('./models/Achievement')} */
-  get achievementModel() {
-    return this.models.achievement
-  }
-
-  /** @type {typeof import('./models/UserAchievement')} */
-  get userAchievementModel() {
-    return this.models.userAchievement
-  }
-
   /**
    * Check if db file exists
    * @returns {boolean}
@@ -355,8 +345,6 @@ class Database {
     require('./models/Setting').init(this.sequelize)
     require('./models/CustomMetadataProvider').init(this.sequelize)
     require('./models/MediaItemShare').init(this.sequelize)
-    require('./models/Achievement').init(this.sequelize)
-    require('./models/UserAchievement').init(this.sequelize)
 
     // Set up model associations
     // This is where Sequelize models define their relationships to other models
@@ -370,10 +358,6 @@ class Database {
 
     // First sync without alter: true to avoid foreign key issues
     await this.sequelize.sync({ force })
-    
-    // Run achievement migrations
-    const achievementMigration = require('./utils/achievementMigration')
-    await achievementMigration.runAchievementMigrations()
     
     return true
   }

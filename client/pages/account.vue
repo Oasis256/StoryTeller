@@ -3,11 +3,6 @@
     <div class="w-full max-w-xl mx-auto">
       <h1 class="text-2xl">{{ $strings.HeaderAccount }}</h1>
 
-      <!-- Achievement Widget -->
-      <div class="my-6">
-        <widgets-achievement-widget />
-      </div>
-
       <div class="my-4">
         <div class="flex -mx-2">
           <div class="w-2/3 px-2">

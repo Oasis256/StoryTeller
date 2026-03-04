@@ -209,8 +209,8 @@ Bookshelf Label
 .center {
   color: #0ff;
   font-weight: bolder;
-  position: fixed;
-  left: 50%;
+  position: relative;
+  left: 25%;
 }
 .text {
   left: 10%;

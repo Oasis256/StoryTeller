@@ -35,9 +35,6 @@ const MiscController = require('../controllers/MiscController')
 const ShareController = require('../controllers/ShareController')
 const StatsController = require('../controllers/StatsController')
 const ApiKeyController = require('../controllers/ApiKeyController')
-const UpcomingBookController = require('../controllers/UpcomingBookController')
-const ReadingGoalsController = require('../controllers/ReadingGoalsController')
-const AchievementController = require('../controllers/AchievementController')
 
 class ApiRouter {
   constructor(Server) {
@@ -58,9 +55,6 @@ class ApiRouter {
     /** @type {import('../managers/EmailManager')} */
     this.emailManager = Server.emailManager
     this.apiCacheManager = Server.apiCacheManager
-
-    // Initialize controllers
-    this.upcomingBookController = new UpcomingBookController()
 
     this.router = express()
     this.router.disable('x-powered-by')
@@ -132,7 +126,6 @@ class ApiRouter {
     this.router.get('/items/:id/file/:fileid/download', LibraryItemController.middleware.bind(this), LibraryItemController.downloadLibraryFile.bind(this))
     this.router.get('/items/:id/ebook/:fileid?', LibraryItemController.middleware.bind(this), LibraryItemController.getEBookFile.bind(this))
     this.router.patch('/items/:id/ebook/:fileid/status', LibraryItemController.middleware.bind(this), LibraryItemController.updateEbookFileStatus.bind(this))
-    this.router.get('/items/:id/upcoming', this.upcomingBookController.getUpcomingBookForItem.bind(this.upcomingBookController))
 
     //
     // User Routes
@@ -242,7 +235,7 @@ class ApiRouter {
     // TODO: Update these endpoints because they are only for open playback sessions
     this.router.get('/session/:id', SessionController.openSessionMiddleware.bind(this), SessionController.getOpenSession.bind(this))
     this.router.post('/session/:id/sync', SessionController.openSessionMiddleware.bind(this), SessionController.sync.bind(this))
-    this.router.post('/session/:id/close', SessionController.openSessionMiddleware.bind(this), SessionController.close.bind(this), this.checkAchievements.bind(this))
+    this.router.post('/session/:id/close', SessionController.openSessionMiddleware.bind(this), SessionController.close.bind(this))
 
     //
     // Podcast Routes
@@ -341,59 +334,6 @@ class ApiRouter {
     this.router.post('/api-keys', ApiKeyController.middleware.bind(this), ApiKeyController.create.bind(this))
     this.router.patch('/api-keys/:id', ApiKeyController.middleware.bind(this), ApiKeyController.update.bind(this))
     this.router.delete('/api-keys/:id', ApiKeyController.middleware.bind(this), ApiKeyController.delete.bind(this))
-
-    //
-    // Upcoming Books Routes
-    //
-    this.router.get('/upcoming/stats', this.upcomingBookController.getStats.bind(this.upcomingBookController))
-    this.router.get('/upcoming/cache/stats', this.upcomingBookController.getCacheStats.bind(this.upcomingBookController))
-    this.router.get('/upcoming/cache/list', this.upcomingBookController.listCachedBooks.bind(this.upcomingBookController))
-    this.router.get('/upcoming/cache/structure', this.upcomingBookController.getCacheStructure.bind(this.upcomingBookController))
-    this.router.delete('/upcoming/cache', this.upcomingBookController.clearCache.bind(this.upcomingBookController))
-    this.router.post('/upcoming/cache/maintenance', this.upcomingBookController.performMaintenance.bind(this.upcomingBookController))
-    this.router.post('/upcoming/refresh', this.upcomingBookController.refreshBookData.bind(this.upcomingBookController))
-    this.router.post('/upcoming/batch-process', this.upcomingBookController.batchProcessBooks.bind(this.upcomingBookController))
-    this.router.get('/upcoming/health', this.upcomingBookController.getHealthStatus.bind(this.upcomingBookController))
-    this.router.get('/upcoming/cover/:seriesName/:authorName', this.upcomingBookController.getCover.bind(this.upcomingBookController))
-    this.router.get('/upcoming/debug-cover/:seriesName/:authorName', this.upcomingBookController.debugCover.bind(this.upcomingBookController))
-    this.router.post('/upcoming/clear-stuck', this.upcomingBookController.clearStuckDiscoveries.bind(this.upcomingBookController))
-    this.router.post('/upcoming/force-restart', this.upcomingBookController.forceRestart.bind(this.upcomingBookController))
-    this.router.get('/upcoming/test-discovery', this.upcomingBookController.testDiscovery.bind(this.upcomingBookController))
-    this.router.get('/upcoming/status', this.upcomingBookController.getDiscoveryStatus.bind(this.upcomingBookController))
-    this.router.delete('/upcoming/cache/:seriesName/:authorName', this.upcomingBookController.clearUpcomingBookCache.bind(this.upcomingBookController))
-    this.router.delete('/upcoming/cache', this.upcomingBookController.clearAllUpcomingCache.bind(this.upcomingBookController))
-
-    //
-    // Upcoming Books Admin Settings Routes
-    //
-    this.router.get('/upcoming/admin/settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminSettings.bind(this.upcomingBookController))
-    this.router.patch('/upcoming/admin/settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.updateAdminSettings.bind(this.upcomingBookController))
-    this.router.post('/upcoming/admin/test-providers', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.testProviders.bind(this.upcomingBookController))
-    this.router.post('/upcoming/admin/reset-settings', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.resetAdminSettings.bind(this.upcomingBookController))
-    this.router.post('/upcoming/admin/clear-cache', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.clearAllCaches.bind(this.upcomingBookController))
-    this.router.get('/upcoming/admin/stats', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminStats.bind(this.upcomingBookController))
-    this.router.post('/upcoming/admin/maintenance', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.performAdminMaintenance.bind(this.upcomingBookController))
-    this.router.get('/upcoming/admin/health', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.getAdminHealth.bind(this.upcomingBookController))
-    this.router.post('/upcoming/admin/reset', this.upcomingBookController.adminMiddleware.bind(this.upcomingBookController), this.upcomingBookController.resetAdminSettings.bind(this.upcomingBookController))
-
-    //
-    // Reading Goals Routes
-    //
-    this.router.get('/reading-goals/templates', ReadingGoalsController.getTemplates.bind(this))
-    this.router.get('/reading-goals/stats', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getStats.bind(this))
-    this.router.post('/reading-goals/recalculate', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.recalculateProgress.bind(this))
-    this.router.get('/reading-goals', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getGoals.bind(this))
-    this.router.post('/reading-goals', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.createGoal.bind(this))
-    this.router.get('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.getGoal.bind(this))
-    this.router.patch('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateGoal.bind(this))
-    this.router.delete('/reading-goals/:id', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.deleteGoal.bind(this))
-    this.router.post('/reading-goals/:id/progress', ReadingGoalsController.middleware.bind(this), ReadingGoalsController.updateProgress.bind(this))
-
-    //
-    // Achievement Routes
-    //
-    const achievementController = new AchievementController()
-    achievementController.registerRoutes(this.router)
 
     //
     // Misc Routes
@@ -585,33 +525,6 @@ class ApiRouter {
     return userSessions.sort((a, b) => b.updatedAt - a.updatedAt)
   }
 
-  /**
-   * Check achievements for a user after a session is completed
-   * @param {express.Request} req - Express request
-   * @param {express.Response} res - Express response
-   * @param {express.NextFunction} next - Express next
-   */
-  async checkAchievements(req, res, next) {
-    try {
-      if (!req.user?.id) return next()
-      
-      // Get the user ID from the request
-      const userId = req.user.id
-      
-      // Check achievements for this user
-      Logger.debug(`[ApiRouter] Checking achievements for user ${userId}`)
-      
-      const AchievementManager = require('../managers/AchievementManager')
-      await AchievementManager.updateUserAchievements(userId)
-      
-      // Continue with the request
-      next()
-    } catch (error) {
-      Logger.error(`[ApiRouter] Error checking achievements:`, error)
-      next()
-    }
-  }
-  
   async getUserListeningStatsHelpers(userId) {
     const today = date.format(new Date(), 'YYYY-MM-DD')
 

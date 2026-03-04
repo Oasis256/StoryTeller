@@ -115,11 +115,6 @@ export default {
           title: this.$strings.HeaderAuthentication,
           path: '/config/authentication'
         },
-        {
-          id: 'config-upcoming-books',
-          title: 'Upcoming Books',
-          path: '/config/upcoming-books'
-        }
       ]
 
       if (this.currentLibraryId) {

@@ -124,31 +124,6 @@ class MediaProgress extends Model {
       }
     })
 
-    // Hook to update reading goals when media progress changes
-    MediaProgress.addHook('afterUpdate', async (instance, options) => {
-      if (instance.changed('isFinished') && instance.isFinished && instance.mediaItemType === 'book') {
-        // Book was just finished, update reading goals
-        try {
-          const ReadingGoal = sequelize.models.readingGoal
-          if (ReadingGoal) {
-            await ReadingGoal.recalculateProgressForUser(instance.userId)
-          }
-        } catch (error) {
-          // Don't fail the main operation if goal update fails
-          console.error('Error updating reading goals after book completion:', error)
-        }
-
-        // Update achievements when a book is finished
-        try {
-          const AchievementManager = require('../managers/AchievementManager')
-          await AchievementManager.updateUserAchievements(instance.userId)
-        } catch (error) {
-          // Don't fail the main operation if achievement update fails
-          console.error('Error updating achievements after book completion:', error)
-        }
-      }
-    })
-
     // make sure to call the afterDestroy hook for each instance
     MediaProgress.addHook('beforeBulkDestroy', (options) => {
       options.individualHooks = true
