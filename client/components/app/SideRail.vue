@@ -4,6 +4,7 @@
     <div v-if="isShowingBookshelfToolbar" class="absolute top-0 -right-4 w-4 bg-bg h-10 pointer-events-none" />
 
     <div id="siderail-buttons-container" role="navigation" aria-label="Library Navigation" :class="{ 'player-open': streamLibraryItem }" class="w-full overflow-y-auto overflow-x-hidden">
+      <plugins-plugin-slot slot-name="nav.sidebar.top" :slot-context="{ libraryId: currentLibraryId, libraryMediaType: currentLibraryMediaType }" />
       <nuxt-link :to="`/library/${currentLibraryId}`" class="w-full h-20 flex flex-col items-center justify-center text-white border-b border-primary border-opacity-70 hover:bg-primary cursor-pointer relative" :class="homePage ? 'bg-primary bg-opacity-80' : 'bg-bg bg-opacity-60'">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -113,6 +114,7 @@
           <p class="text-xs font-mono pb-0.5">{{ numIssues }}</p>
         </div>
       </nuxt-link>
+      <plugins-plugin-slot slot-name="nav.sidebar.bottom" :slot-context="{ libraryId: currentLibraryId, libraryMediaType: currentLibraryMediaType }" />
     </div>
 
     <div class="w-full h-12 px-1 py-2 border-t border-black/20 bg-bg absolute left-0" :style="{ bottom: streamLibraryItem ? '224px' : '65px' }">

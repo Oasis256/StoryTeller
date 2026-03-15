@@ -26,6 +26,8 @@
 
         <div class="grow" />
 
+        <plugins-plugin-slot slot-name="appbar.actions" :slot-context="{ libraryId: currentLibrary?.id || null, libraryMediaType }" />
+
         <ui-tooltip v-if="isChromecastInitialized && !isHttps" direction="bottom" text="Casting requires a secure connection" class="flex items-center">
           <span class="material-symbols text-2xl text-warning/50"> cast </span>
         </ui-tooltip>
