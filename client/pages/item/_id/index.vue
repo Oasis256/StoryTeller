@@ -46,6 +46,7 @@
               <p v-else class="mb-2 mt-0.5 text-gray-200 text-xl">by Unknown</p>
 
               <content-library-item-details :library-item="libraryItem" />
+              <plugins-plugin-slot slot-name="item.details.after-metadata" :slot-context="{ libraryItem }" />
             </div>
             <div class="hidden md:block grow" />
           </div>

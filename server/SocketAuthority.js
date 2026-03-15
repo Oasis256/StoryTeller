@@ -232,6 +232,8 @@ class SocketAuthority {
           Logger.debug(`[SocketAuthority] Received ping from socket ${user.username || 'No User'}`)
           socket.emit('pong')
         })
+
+        this.Server?.pluginManager?.bindSocketHandlers(socket, () => this.clients[socket.id])
       })
     })
   }
@@ -303,6 +305,12 @@ class SocketAuthority {
       initialPayload.usersOnline = this.getUsersOnline()
     }
     client.socket.emit('init', initialPayload)
+    await this.Server?.pluginManager?.emitLifecycleEvent('socket:authenticated', {
+      socket,
+      client,
+      user: client.user,
+      socketAuthority: this
+    })
   }
 
   cancelScan(id) {

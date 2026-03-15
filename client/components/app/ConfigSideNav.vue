@@ -115,6 +115,11 @@ export default {
           title: this.$strings.HeaderAuthentication,
           path: '/config/authentication'
         },
+        {
+          id: 'config-plugins',
+          title: 'Plugins',
+          path: '/config/plugins'
+        }
       ]
 
       if (this.currentLibraryId) {

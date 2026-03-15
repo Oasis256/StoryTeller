@@ -38,6 +38,7 @@ const CronManager = require('./managers/CronManager')
 const ApiCacheManager = require('./managers/ApiCacheManager')
 const BinaryManager = require('./managers/BinaryManager')
 const ShareManager = require('./managers/ShareManager')
+const PluginManager = require('./managers/PluginManager')
 const LibraryScanner = require('./scanner/LibraryScanner')
 
 //Import the main Passport and Express-Session library
@@ -108,6 +109,7 @@ class Server {
     this.cronManager = new CronManager(this.podcastManager, this.playbackSessionManager)
     this.apiCacheManager = new ApiCacheManager()
     this.binaryManager = new BinaryManager()
+    this.pluginManager = new PluginManager()
 
     // Routers
     this.apiRouter = new ApiRouter(this)
@@ -181,6 +183,9 @@ class Server {
         LibraryScanner.scanFilesChanged(pendingFileUpdates, pendingTask)
       })
     }
+
+    await this.pluginManager.initialize(this)
+    await this.pluginManager.emitLifecycleEvent('server:initialized', { server: this })
   }
 
   /**
@@ -310,9 +315,11 @@ class Server {
     // Skip JSON parsing for internal-api routes
     router.use(/^(?!\/internal-api).*/, express.json({ limit: '10mb' }))
 
-    router.use('/api', this.auth.ifAuthNeeded(this.authMiddleware.bind(this)), this.apiRouter.router)
+    const authenticatedApiMiddleware = this.auth.ifAuthNeeded(this.authMiddleware.bind(this))
+    router.use('/api', authenticatedApiMiddleware, this.apiRouter.router)
     router.use('/hls', this.hlsRouter.router)
     router.use('/public', this.publicRouter.router)
+    this.pluginManager.mountHttpRoutes(router, authenticatedApiMiddleware)
 
     // Static folder
     router.use(express.static(Path.join(global.appRoot, 'static')))
@@ -421,6 +428,7 @@ class Server {
 
     // Start listening for socket connections
     SocketAuthority.initialize(this)
+    await this.pluginManager.emitLifecycleEvent('server:started', { server: this })
   }
 
   async initializeServer(req, res) {
@@ -498,6 +506,8 @@ class Server {
    */
   async stop() {
     Logger.info('=== Stopping Server ===')
+    await this.pluginManager.emitLifecycleEvent('server:stopping', { server: this })
+    await this.pluginManager.shutdown()
     Watcher.close()
     Logger.info('[Server] Watcher Closed')
     await SocketAuthority.close()
