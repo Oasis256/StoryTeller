@@ -90,12 +90,28 @@
                 <span class="text-white/70">Cover cache enabled</span>
               </div>
               <div class="flex items-center gap-2">
+                <ui-toggle-switch v-model="upcomingSettings.debugBypassCache" small />
+                <span class="text-white/70">Debug: bypass response cache</span>
+              </div>
+              <div class="flex items-center gap-2">
                 <span class="text-white/70 w-40">Cache days</span>
                 <ui-text-input type="number" v-model="upcomingSettings.coverCacheDays" no-spinner class="w-20" />
               </div>
               <div class="flex items-center gap-2">
                 <ui-toggle-switch v-model="upcomingSettings.purgeOnLibraryAdd" small />
                 <span class="text-white/70">Purge when book added to library</span>
+              </div>
+              <div class="pt-2 border-t border-white/10"></div>
+              <div class="flex items-center gap-2">
+                <ui-toggle-switch v-model="upcomingSettings.providersEnabled.audble" small />
+                <span class="text-white/70">Enable Audble</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <ui-toggle-switch v-model="upcomingSettings.providersEnabled.risingshadow" small />
+                <span class="text-white/70">Enable RisingShadow</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <ui-dropdown v-model="upcomingSettings.defaultProvider" :items="upcomingProviderOptions" label="Default provider" small class="max-w-56" />
               </div>
             </div>
             <div v-else class="text-xs text-white/60">Load settings to edit cache behavior.</div>
@@ -159,9 +175,23 @@ export default {
       upcomingSettings: {
         coverCacheEnabled: true,
         coverCacheDays: 30,
-        purgeOnLibraryAdd: true
+        purgeOnLibraryAdd: true,
+        debugBypassCache: false,
+        providersEnabled: {
+          audble: true,
+          risingshadow: true
+        },
+        defaultProvider: 'audble'
       },
       errorMessage: null
+    }
+  },
+  computed: {
+    upcomingProviderOptions() {
+      return [
+        { value: 'audble', text: 'Audble' },
+        { value: 'risingshadow', text: 'RisingShadow' }
+      ]
     }
   },
   mounted() {

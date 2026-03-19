@@ -38,7 +38,8 @@ RUN case "$TARGETPLATFORM" in \
   unzip /tmp/library.zip -d $NUSQLITE3_DIR && \
   rm /tmp/library.zip
 
-RUN npm ci --only=production
+# RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 ### STAGE 2: Create minimal runtime image ###
 FROM node:20-alpine

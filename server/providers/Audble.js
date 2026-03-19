@@ -1,618 +1,587 @@
-const axios = require('axios')
-const Logger = require('../Logger')
 const Audible = require('./Audible')
+const axios = require('axios').default
+const cheerio = require('cheerio')
 
-/**
- * Audble Provider - Enhanced provider for upcoming book discovery
- * First uses the existing Audible provider for searching, then falls back to web scraping
- * for upcoming books that Audible doesn't find by default
- *
- * Features:
- * - Uses existing Audible provider first (reusing tested code)
- * - Falls back to intelligent web scraping for upcoming books
- * - Proper rate limiting and error handling
- * - Respectful crawling practices
- */
-class Audble {
+class Audble extends Audible {
   constructor() {
-    this.name = 'audble'
-    this.baseUrl = 'https://www.audible.com'
-    this.searchUrl = 'https://www.audible.com/search'
-    this.rateLimitDelay = 2000 // 2 seconds between requests
-    this.maxRetries = 3
-    this.timeout = 30000 // 30 seconds
-
-    // Initialize the existing Audible provider
-    this.audibleProvider = new Audible()
-
-    // User agent rotation for respectful scraping
-    this.userAgents = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36']
-
-    this.lastRequestTime = 0
-    Logger.info('[Audble] Provider initialized with Audible provider integration')
+    super()
+    this._futureAsinRetryLimit = 1
+    this.seriesMetadata = null // Store series metadata during scraping
   }
 
   /**
-   * Main search method - follows provider interface
-   * Strategy: Search for UPCOMING books in the series, not the current book
+   * Make HTTP request to audible.com directly
    */
-  async search(title, author, asin, region = 'us') {
+  async makeAudibleRequest(url, options = {}) {
+    const defaultOptions = {
+      timeout: 30000,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        Connection: 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        'Cache-Control': 'max-age=0'
+      }
+    }
+
+    const requestOptions = { ...defaultOptions, ...options }
+
     try {
-      Logger.info(`[Audble] Searching for upcoming books in series: "${title}" by "${author}" (current book ASIN: ${asin})`)
-
-      let results = []
-
-      // Strategy 1: Web scraping for upcoming books (primary method)
-      Logger.info('[Audble] Trying web scraping for upcoming books...')
-      results = await this.searchWithWebScraping(title, author, asin, region)
-
-      if (results.length > 0) {
-        Logger.info(`[Audble] Found ${results.length} results with web scraping`)
-        return results
-      }
-
-      // Strategy 2: Fallback to search for upcoming books using current book info
-      Logger.info('[Audble] Web scraping failed, trying Audible API fallback...')
-      const audibleResults = await this.searchWithAudibleProvider(title, author, null, region) // Don't pass current ASIN
-
-      if (audibleResults.length > 0) {
-        Logger.info(`[Audble] Found ${audibleResults.length} results with Audible API fallback`)
-        return audibleResults
-      }
-
-      Logger.info('[Audble] No upcoming books found')
-      return []
-    } catch (error) {
-      Logger.error('[Audble] Search failed:', error.message)
-      return []
-    }
-  }
-
-  /**
-   * Search using the existing Audible provider
-   */
-  async searchWithAudibleProvider(title, author, asin, region) {
-    try {
-      Logger.info(`[Audble] Searching with Audible provider: "${title}" by "${author}"`)
-      Logger.info(`[Audble] Title contains "welcome to the multiverse": ${title && title.toLowerCase().includes('welcome to the multiverse')}`)
-
-      // Fallback to normal search
-      const results = await this.audibleProvider.search(title, author, asin, region, this.timeout)
-
-      if (!results || results.length === 0) {
-        Logger.info('[Audble] Audible provider returned no results')
-        return []
-      }
-
-      Logger.info(`[Audble] Audible provider found ${results.length} results:`)
-      results.forEach((result, index) => {
-        Logger.info(`[Audble] Result ${index + 1}: "${result.title}" by ${result.author} (ASIN: ${result.asin})`)
-      })
-
-      // Convert Audible provider results to our format
-      return results.map((result) => this.convertAudibleResult(result))
-    } catch (error) {
-      Logger.info(`[Audble] Audible provider search failed: ${error.message}`)
-
-      // Check if the error contains an ASIN (future release date case)
-      const asinFromError = this.extractASINFromError(error)
-      if (asinFromError) {
-        Logger.info(`[Audble] Found ASIN in error: ${asinFromError} - attempting direct scraping`)
-        const scrapedResult = await this.scrapeBookByASIN(asinFromError)
-        if (scrapedResult) {
-          Logger.info(`[Audble] Successfully scraped book with ASIN: ${asinFromError}`)
-          return [scrapedResult]
-        }
-      }
-
-      return []
-    }
-  }
-
-  /**
-   * Convert Audible provider result to our format
-   */
-  convertAudibleResult(audibleResult) {
-    // Extract sequence number from series data if available
-    let sequence = null
-    let seriesName = null
-
-    if (audibleResult.series && Array.isArray(audibleResult.series) && audibleResult.series.length > 0) {
-      const primarySeries = audibleResult.series[0]
-      seriesName = primarySeries.series || primarySeries.name
-      sequence = primarySeries.sequence || null
-
-      // Log the extracted sequence for debugging
-      if (sequence) {
-        Logger.info(`[Audble] Extracted sequence ${sequence} from series "${seriesName}" for book "${audibleResult.title}"`)
-      }
-    }
-
-    return {
-      title: audibleResult.title,
-      author: audibleResult.author,
-      asin: audibleResult.asin,
-      releaseDate: audibleResult.publishedYear ? new Date(audibleResult.publishedYear, 0, 1) : null,
-      cover: audibleResult.cover,
-      description: audibleResult.description,
-      series: audibleResult.series,
-      sequence: sequence, // Add sequence number for ProviderResultAdapter
-      source: 'audible_provider',
-      url: audibleResult.asin ? `${this.baseUrl}/pd/${audibleResult.asin}` : null,
-      // Additional fields from Audible provider
-      narrator: audibleResult.narrator,
-      publisher: audibleResult.publisher,
-      duration: audibleResult.duration,
-      language: audibleResult.language,
-      genres: audibleResult.genres,
-      tags: audibleResult.tags,
-      rating: audibleResult.rating,
-      abridged: audibleResult.abridged
-    }
-  }
-
-  /**
-   * Fallback web scraping search for upcoming books
-   */
-  async searchWithWebScraping(title, author, asin, region) {
-    try {
-      // Rate limiting
-      await this.respectRateLimit()
-
-      let results = []
-
-      // Strategy 1: Use ASIN to find series and search for upcoming books
-      if (asin) {
-        Logger.info(`[Audble] Using ASIN ${asin} to search for upcoming books in series`)
-        results = await this.searchForUpcomingByASIN(asin, title, author)
-        if (results.length > 0) {
-          Logger.info(`[Audble] Found ${results.length} upcoming books via ASIN-based series search`)
-          return results
-        }
-      }
-
-      // Strategy 2: Series search for upcoming books
-      if (title) {
-        Logger.info(`[Audble] Searching for upcoming books in series: "${title}"`)
-        results = await this.searchForUpcomingInSeries(title, author)
-        if (results.length > 0) {
-          Logger.info(`[Audble] Found ${results.length} upcoming books in series via scraping`)
-          return results
-        }
-      }
-
-      // Strategy 3: Title + Author search (fallback)
-      if (title && author) {
-        Logger.info(`[Audble] Fallback: searching by title and author`)
-        results = await this.searchByTitleAndAuthor(title, author)
-        if (results.length > 0) {
-          Logger.info(`[Audble] Found ${results.length} results by title/author scraping`)
-          return results
-        }
-      }
-
-      return []
-    } catch (error) {
-      Logger.debug(`[Audble] Web scraping search failed: ${error.message}`)
-      return []
-    }
-  }
-
-  /**
-   * Search by ASIN (Amazon Standard Identification Number)
-   */
-  async searchByASIN(asin) {
-    try {
-      // Validate ASIN format
-      if (!this.isValidASIN(asin)) {
-        Logger.debug(`[Audble] Invalid ASIN format: ${asin}`)
-        return []
-      }
-
-      const url = `${this.baseUrl}/pd/${asin}`
-      const response = await this.makeRequest(url)
-
-      if (!response) return []
-
-      // Parse the product page
-      const bookData = this.parseProductPage(response.data, asin)
-      return bookData ? [bookData] : []
-    } catch (error) {
-      Logger.debug(`[Audble] ASIN search failed for ${asin}:`, error.message)
-      return []
-    }
-  }
-
-  /**
-   * Search by title and author
-   */
-  async searchByTitleAndAuthor(title, author) {
-    try {
-      const query = `${title} ${author}`.replace(/\s+/g, '+')
-      const url = `${this.searchUrl}?keywords=${encodeURIComponent(query)}`
-
-      const response = await this.makeRequest(url)
-      if (!response) return []
-
-      return this.parseSearchResults(response.data)
-    } catch (error) {
-      Logger.debug(`[Audble] Title/author search failed:`, error.message)
-      return []
-    }
-  }
-
-  /**
-   * Search for upcoming books using ASIN to find series information
-   */
-  async searchForUpcomingByASIN(asin, seriesName, authorName) {
-    try {
-      Logger.info(`[Audble] Searching for upcoming books using ASIN: ${asin}`)
-
-      // First, get the product page to extract series information
-      const productUrl = `${this.baseUrl}/pd/${asin}`
-      const response = await this.makeRequest(productUrl)
-
-      if (!response) {
-        Logger.info(`[Audble] Failed to fetch product page for ASIN: ${asin}`)
-        return []
-      }
-
-      // Extract series information from the product page
-      const seriesInfo = this.extractSeriesInfo(response.data)
-      if (!seriesInfo || seriesInfo.length === 0) {
-        Logger.info(`[Audble] No series information found for ASIN: ${asin}`)
-        return []
-      }
-
-      Logger.info(`[Audble] Found series info: ${JSON.stringify(seriesInfo)}`)
-
-      // Search for upcoming books in the series
-      const results = []
-      for (const series of seriesInfo) {
-        if (series.name) {
-          Logger.info(`[Audble] Searching for upcoming books in series: "${series.name}"`)
-          const seriesResults = await this.searchForUpcomingInSeries(series.name, authorName)
-          results.push(...seriesResults)
-        }
-      }
-
-      Logger.info(`[Audble] ASIN-based search completed, found ${results.length} upcoming books`)
-      return results
-    } catch (error) {
-      Logger.info(`[Audble] ASIN-based upcoming search failed:`, error.message)
-      return []
-    }
-  }
-
-  /**
-   * Search for upcoming books in a series
-   */
-  async searchForUpcomingInSeries(seriesName, authorName) {
-    try {
-      Logger.info(`[Audble] Searching Audible.com for upcoming books: "${seriesName}" by "${authorName}"`)
-
-      // Strategy 1: Search for pre-order books in the series
-      let results = []
-
-      // Try different search terms that might reveal pre-orders
-      const searchTerms = [`${seriesName} ${authorName} preorder`, `${seriesName} ${authorName} pre-order`, `${seriesName} ${authorName} coming soon`, `${seriesName} ${authorName} 2024 2025`, `"${seriesName}" "${authorName}"`]
-
-      for (const query of searchTerms) {
-        Logger.info(`[Audble] Trying search: ${query}`)
-        const url = `${this.searchUrl}?keywords=${encodeURIComponent(query)}`
-
-        const response = await this.makeRequest(url)
-        if (!response) continue
-
-        const searchResults = this.parseSearchResults(response.data)
-        Logger.info(`[Audble] Found ${searchResults.length} results for "${query}"`)
-
-        // Filter for upcoming books
-        const upcomingBooks = searchResults.filter((book) => this.isUpcomingBook(book))
-        if (upcomingBooks.length > 0) {
-          Logger.info(`[Audble] Found ${upcomingBooks.length} upcoming books with search: ${query}`)
-          results.push(...upcomingBooks)
-        }
-      }
-
-      return results
-    } catch (error) {
-      Logger.debug(`[Audble] Series upcoming search failed:`, error.message)
-      return []
-    }
-  }
-
-  /**
-   * Make HTTP request with proper headers and rate limiting
-   */
-  async makeRequest(url, retries = 0) {
-    try {
-      // Rate limiting
-      await this.respectRateLimit()
-
-      const userAgent = this.userAgents[Math.floor(Math.random() * this.userAgents.length)]
-
-      const response = await axios.get(url, {
-        headers: {
-          'User-Agent': userAgent,
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.5',
-          'Accept-Encoding': 'gzip, deflate, br',
-          Connection: 'keep-alive',
-          'Upgrade-Insecure-Requests': '1',
-          Referer: this.baseUrl
-        },
-        timeout: this.timeout
-      })
-
-      this.lastRequestTime = Date.now()
+    // Keep logs minimal; rely on errors for visibility.
+      const response = await axios.get(url, requestOptions)
       return response
     } catch (error) {
-      if (retries < this.maxRetries && this.isRetryableError(error)) {
-        Logger.debug(`[Audble] Request failed, retrying (${retries + 1}/${this.maxRetries}): ${error.message}`)
-        await this.delay(1000 * (retries + 1)) // Exponential backoff
-        return this.makeRequest(url, retries + 1)
+    this.logWarn(`[Audble] Audible.com request failed: ${error.message}`)
+      if (error.response) {
+      this.logWarn(`[Audble] Response status: ${error.response.status}`)
+        if (error.response.status === 403 || error.response.status === 503) {
+        this.logWarn('[Audble] Possible bot block detected on audible.com')
+        }
       }
-
-      Logger.debug(`[Audble] Request failed after ${retries} retries: ${error.message}`)
-      return null
+      throw error
     }
   }
 
-  /**
-   * Respect rate limiting
-   */
-  async respectRateLimit() {
-    const timeSinceLastRequest = Date.now() - this.lastRequestTime
-    if (timeSinceLastRequest < this.rateLimitDelay) {
-      const delay = this.rateLimitDelay - timeSinceLastRequest
-      await this.delay(delay)
+  cleanResult(item) {
+    const cleaned = super.cleanResult(item)
+    const rawDate = item?.releaseDate || item?.datePublished || null
+    if (rawDate) {
+      cleaned.releaseDate = rawDate
+    }
+    const seriesAsin = item?.seriesPrimary?.asin || item?.seriesPrimary?.id || (Array.isArray(item?.series) ? item.series[0]?.asin || item.series[0]?.id : null) || item?.series?.asin || item?.series?.id || null
+    if (seriesAsin) cleaned.seriesAsin = String(seriesAsin).toUpperCase()
+    if (!cleaned.seriesName && Array.isArray(cleaned.series) && cleaned.series[0]?.series) {
+      cleaned.seriesName = cleaned.series[0].series
+    }
+    if (!cleaned.seriesPosition && Array.isArray(cleaned.series) && cleaned.series[0]?.sequence) {
+      cleaned.seriesPosition = cleaned.series[0].sequence
+    }
+    return cleaned
+  }
+
+  extractAsinFromError(err) {
+    if (!err) return null
+    const message = err?.response?.data?.message || err?.message || ''
+    if (!message || typeof message !== 'string') return null
+
+    // audnex future release returns JSON with message containing ASIN
+    const match = message.match(/ASIN\s*[:\-]?\s*([A-Z0-9]{10})/i)
+    if (!match || !match[1]) return null
+    const candidate = match[1].toUpperCase()
+    if (!/^[A-Z0-9]{10}$/.test(candidate)) return null
+    return candidate
+  }
+
+  parseDurationToMinutes(duration) {
+    if (!duration) return 0
+    if (typeof duration === 'number') return duration
+    if (typeof duration !== 'string') return 0
+
+    // ISO 8601 duration: PT6H45M
+    let match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?/i)
+    if (match) {
+      const hours = Number(match[1] || 0)
+      const minutes = Number(match[2] || 0)
+      return hours * 60 + minutes
+    }
+
+    // Human readable duration: 6 hrs and 45 mins
+    match = duration.match(/(\d+)\s*(?:h|hrs|hours?)\b(?:\s*(?:and|,)\s*(\d+)\s*(?:m|min|mins|minutes?)\b)?/i)
+    if (match) {
+      const hours = Number(match[1] || 0)
+      const minutes = Number(match[2] || 0)
+      return hours * 60 + minutes
+    }
+    match = duration.match(/(\d+)\s*(?:m|min|mins|minutes?)\b/i)
+    if (match) {
+      return Number(match[1])
+    }
+
+    // Fallback to numbers only
+    match = duration.match(/(\d+)/)
+    return match ? Number(match[1]) : 0
+  }
+
+  logInfo(...args) {
+    if (this.logger?.info) {
+      this.logger.info(...args)
+    } else {
+      console.log(...args)
     }
   }
 
+  logWarn(...args) {
+    if (this.logger?.warn) {
+      this.logger.warn(...args)
+    } else {
+      console.warn(...args)
+    }
+  }
+
+  extractAsinFromHref(href) {
+    if (!href || typeof href !== 'string') return null
+    const match = href.match(/\/pd\/([A-Z0-9]{10})/i)
+    return match ? match[1].toUpperCase() : null
+  }
+
+  async scrapeNextInSeriesAsin(currentAsin, timeout = 30000) {
+    if (!currentAsin) return null
+    const url = `https://www.audible.com/pd/${encodeURIComponent(currentAsin)}`
+    // Silence verbose logging for regular requests.
+
+    const response = await this.makeAudibleRequest(url, { timeout })
+    const html = response?.data
+    if (!html || typeof html !== 'string') return null
+
+    const $ = cheerio.load(html)
+    const candidates = []
+
+    // Common "next" link patterns
+    const relNext = $('a[rel="next"][href*="/pd/"]').attr('href')
+    const relNextAsin = this.extractAsinFromHref(relNext)
+    if (relNextAsin) candidates.push(relNextAsin)
+
+    // Look for explicit "Next in series" section
+    $('*').each((_, el) => {
+      const text = $(el).text()
+      if (text && /next in series/i.test(text)) {
+        const link = $(el).find('a[href*="/pd/"]').first().attr('href')
+        const asin = this.extractAsinFromHref(link)
+        if (asin) candidates.push(asin)
+      }
+    })
+
+    // Fallback: take the first /pd/ link that is not the current ASIN
+    $('a[href*="/pd/"]').each((_, el) => {
+      const asin = this.extractAsinFromHref($(el).attr('href'))
+      if (asin) candidates.push(asin)
+    })
+
+    const unique = Array.from(new Set(candidates))
+    const upperCurrent = String(currentAsin).toUpperCase()
+    const nextAsin = unique.find((asin) => asin !== upperCurrent) || null
+    if (!nextAsin) {
+      this.logWarn('[Audble] No next-in-series ASIN found on page')
+    }
+    return nextAsin
+  }
+
+  parseSeriesSequence(text) {
+    if (!text || typeof text !== 'string') return null
+    const match = text.match(/(?:Book|#|bk)\s*(\d+(?:\.\d+)?)/i) || text.match(/(\d+(?:\.\d+)?)/)
+    if (!match) return null
+    const value = Number(match[1])
+    return Number.isFinite(value) ? value : null
+  }
+
   /**
-   * Parse product page HTML
+   * Get series metadata from the last scrape
    */
-  parseProductPage(html, asin) {
+  getSeriesMetadata() {
+    return this.seriesMetadata || { title: null, description: null }
+  }
+
+  /**
+   * Scrape Audible series page with full pagination support
+   */
+  async scrapeAudibleSeriesPage(seriesAsin, timeout = 30000) {
+    if (!seriesAsin) return []
+
+    let allEntries = []
+    let page = 1
+    let hasMorePages = true
+    const maxPages = 20 // Safety limit to prevent infinite loops
+    const pageSize = 30
+
+    // Reduce verbosity for series scraping.
+
+    let totalPages = null
+
+    while (hasMorePages && page <= maxPages) {
+      try {
+        // Construct URL with pagination parameter
+        const url =
+          page === 1
+            ? `https://www.audible.com/series/${encodeURIComponent(seriesAsin)}?pageSize=${pageSize}`
+            : `https://www.audible.com/series/${encodeURIComponent(seriesAsin)}?page=${page}&pageSize=${pageSize}`
+
+        // Page-level logging suppressed to reduce noise.
+
+        const response = await this.makeAudibleRequest(url, { timeout })
+        const html = response?.data
+        if (!html || typeof html !== 'string') {
+          this.logWarn(`[Audble] No HTML returned for page ${page}`)
+          break
+        }
+
+        const $ = cheerio.load(html)
+        const pageEntries = []
+
+        const addEntry = (asin, title, sequence) => {
+          if (!asin) return
+          pageEntries.push({
+            asin,
+            title: title || null,
+            sequence: sequence ?? null
+          })
+        }
+
+        // Look for book elements with data-asin attributes
+        $('[data-asin], [data-product-id]').each((_, el) => {
+          const asin = ($(el).attr('data-asin') || $(el).attr('data-product-id') || '').toUpperCase()
+          if (!asin) return
+          const text = $(el).text() || ''
+          const sequence = this.parseSeriesSequence(text)
+          const title = $(el).find('a').first().text().trim() || $(el).find('img').attr('alt') || null
+          addEntry(asin, title, sequence)
+        })
+
+        // Also look for links to book pages
+        $('a[href*="/pd/"]').each((_, el) => {
+          const asin = this.extractAsinFromHref($(el).attr('href'))
+          if (!asin) return
+          const card = $(el).closest('li, div.bc-list-item, div.productListItem')
+          const text = card.text() || ''
+          const sequence = this.parseSeriesSequence(text)
+          const title = $(el).text().trim() || card.find('img').attr('alt') || null
+          addEntry(asin, title, sequence)
+        })
+
+        // Check for series description and metadata on first page
+        if (page === 1) {
+          const seriesTitle = $('h1.bc-heading').first().text().trim() || $('meta[property="og:title"]').attr('content') || null
+          const seriesDescription = $('meta[name="description"]').attr('content') || $('.bc-section--description').text().trim() || null
+
+          this.seriesMetadata = {
+            title: seriesTitle,
+            description: seriesDescription
+          }
+
+          const pageNumbers = $('.pageNumberElement')
+            .map((_, el) => parseInt($(el).text().trim(), 10))
+            .get()
+            .filter((num) => Number.isFinite(num))
+          if (pageNumbers.length) {
+            totalPages = Math.max(...pageNumbers)
+            // Pagination discovery logged via debug response if needed.
+          }
+        }
+
+        // Check if we found any entries on this page
+        if (pageEntries.length === 0) {
+          // No entries found; stop pagination.
+          hasMorePages = false
+          break
+        }
+
+        // Add entries to our collection
+        allEntries = [...allEntries, ...pageEntries]
+        // Per-page entry logging suppressed.
+
+        // Check for "next page" indicators
+        const nextButton = $('.nextButton a, .pagination-next a, a[aria-label="Next"]').first()
+        const hasNext = nextButton.length > 0 && !nextButton.closest('.bc-button-disabled').length && !nextButton.attr('aria-disabled')
+
+        if (totalPages !== null) {
+          hasMorePages = page < totalPages
+        } else {
+          hasMorePages = hasNext && pageEntries.length > 0
+        }
+
+        page++
+
+        // Add a small delay between pages to be respectful
+        if (hasMorePages) {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
+        }
+      } catch (error) {
+        this.logWarn(`[Audble] Error scraping page ${page}: ${error.message}`)
+        hasMorePages = false
+      }
+    }
+
+    // Remove duplicates by ASIN (keep the one with the most complete data)
+    const uniqueEntries = new Map()
+    for (const entry of allEntries) {
+      if (!uniqueEntries.has(entry.asin)) {
+        uniqueEntries.set(entry.asin, entry)
+      } else {
+        // If we already have this ASIN, prefer the one with a title
+        const existing = uniqueEntries.get(entry.asin)
+        if (!existing.title && entry.title) {
+          uniqueEntries.set(entry.asin, entry)
+        }
+      }
+    }
+
+    const finalEntries = Array.from(uniqueEntries.values())
+
+    // Sort by sequence if available
+    finalEntries.sort((a, b) => {
+      if (a.sequence && b.sequence) return a.sequence - b.sequence
+      return 0
+    })
+
+    // Summary log suppressed to reduce noise.
+
+    return finalEntries
+  }
+
+  async scrapeAudiblePage(asin, timeout = 30000) {
+    if (!asin) return null
+    const url = `https://www.audible.com/pd/${encodeURIComponent(asin)}`
+    // Keep logs minimal; rely on warnings/errors.
+
     try {
-      // Extract title
-      const titleMatch = html.match(/<h1[^>]*class="[^"]*bc-heading[^"]*"[^>]*>([^<]+)<\/h1>/i)
-      const title = titleMatch ? titleMatch[1].trim() : null
+      const response = await this.makeAudibleRequest(url, { timeout })
+      const html = response?.data
+      if (!html || typeof html !== 'string') return null
 
-      // Extract author
-      const authorMatch = html.match(/By:\s*<a[^>]*>([^<]+)<\/a>/i)
-      const author = authorMatch ? authorMatch[1].trim() : null
+      const $ = cheerio.load(html)
+      let metadata = null
 
-      // Extract release date
-      const releaseMatch = html.match(/Release date:\s*([^<\n]+)/i)
-      const releaseDate = releaseMatch ? this.parseReleaseDate(releaseMatch[1].trim()) : null
-
-      // Extract cover image
-      const coverMatch = html.match(/<img[^>]*src="(https:\/\/m\.media-amazon\.com\/images\/I\/[^"]+\._SL\d+_\.jpg)"[^>]*>/i)
-      const cover = coverMatch ? coverMatch[1] : null
-
-      // Extract description
-      const descMatch = html.match(/<span[^>]*class="[^"]*bc-text[^"]*"[^>]*>([^<]+)<\/span>/i)
-      const description = descMatch ? descMatch[1].trim() : null
-
-      // Extract series information
-      const series = this.extractSeriesInfo(html)
-
-      if (!title || !author) {
-        return null
-      }
-
-      return {
-        title,
-        author,
-        asin,
-        releaseDate,
-        cover,
-        description,
-        series,
-        source: 'audble_scraping',
-        url: `${this.baseUrl}/pd/${asin}`
-      }
-    } catch (error) {
-      Logger.debug(`[Audble] Product page parsing failed: ${error.message}`)
-      return null
-    }
-  }
-
-  /**
-   * Parse search results HTML
-   */
-  parseSearchResults(html) {
-    const results = []
-
-    try {
-      // Extract ASINs from search results
-      const asinMatches = html.match(/\/pd\/([A-Z0-9]{10})/g)
-      if (!asinMatches) return results
-
-      // Get unique ASINs
-      const asins = [...new Set(asinMatches.map((match) => match.split('/pd/')[1]))]
-
-      // For each ASIN, try to get product details
-      for (const asin of asins.slice(0, 5)) {
-        // Limit to first 5 results
-        const productUrl = `${this.baseUrl}/pd/${asin}`
-
-        // Make a quick request to get product details
-        this.makeRequest(productUrl)
-          .then((response) => {
-            if (response) {
-              const bookData = this.parseProductPage(response.data, asin)
-              if (bookData) {
-                results.push(bookData)
+      const ldJsonScripts = $('script[type="application/ld+json"]')
+        .toArray()
+        .map((el) => $(el).html())
+        .filter(Boolean)
+      for (const scriptText of ldJsonScripts) {
+        try {
+          const parsed = JSON.parse(scriptText)
+          if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed)) {
+              const product = parsed.find((obj) => obj && obj['@type'] && obj['@type'].toLowerCase().includes('product'))
+              if (product) {
+                metadata = product
+                break
               }
+            } else if (parsed['@type'] && parsed['@type'].toLowerCase().includes('product')) {
+              metadata = parsed
+              break
+            } else if (parsed['@type'] && parsed['@type'].toLowerCase().includes('audiobook')) {
+              metadata = parsed
+              break
             }
-          })
-          .catch((error) => {
-            Logger.debug(`[Audble] Failed to get details for ASIN ${asin}: ${error.message}`)
-          })
-      }
-    } catch (error) {
-      Logger.debug(`[Audble] Search results parsing failed: ${error.message}`)
-    }
-
-    return results
-  }
-
-  /**
-   * Extract series information from HTML
-   */
-  extractSeriesInfo(html) {
-    try {
-      // Look for series information in various patterns
-      const patterns = [/<li[^>]*>[^<]*Series:\s*<a[^>]*>([^<]+)<\/a>/i, /<span[^>]*class="[^"]*series[^"]*"[^>]*><a[^>]*>([^<]+)<\/a><\/span>/i, /"series"\s*:\s*"([^"]+)"/i]
-
-      for (const pattern of patterns) {
-        const match = html.match(pattern)
-        if (match) {
-          return [{ name: match[1].trim(), sequence: null }]
+          }
+        } catch (parseErr) {
+          this.logWarn('[Audble] Failed to parse ld+json metadata', parseErr)
         }
       }
 
-      return []
-    } catch (error) {
-      return []
-    }
-  }
-
-  /**
-   * Parse release date string
-   */
-  parseReleaseDate(dateString) {
-    try {
-      if (!dateString) return null
-
-      // Try various date formats
-      const date = new Date(dateString)
-      if (!isNaN(date.getTime())) {
-        return date
+      const appJsonScripts = $('script[type="application/json"]')
+        .toArray()
+        .map((el) => $(el).html())
+        .filter(Boolean)
+      for (const scriptText of appJsonScripts) {
+        try {
+          const parsed = JSON.parse(scriptText)
+          if (parsed && typeof parsed === 'object') {
+            if (!metadata && (parsed.duration || parsed.releaseDate || parsed.series)) {
+              metadata = parsed
+              break
+            }
+            if (!metadata && parsed.product && Array.isArray(parsed.product) && parsed.product[0]?.productInfo) {
+              metadata = {
+                name: parsed.product[0].productInfo.productName,
+                asin: parsed.product[0].productInfo.productID,
+                publisher: { name: parsed.product[0].productInfo.publisherName },
+                language: parsed.product[0].productInfo.language,
+                duration: parsed.product[0].productInfo.duration,
+                releaseDate: parsed.product[0].productInfo.releaseDate
+              }
+              break
+            }
+            if (metadata && (parsed.duration || parsed.releaseDate || parsed.series || parsed.publisher || parsed.language || parsed.categories)) {
+              metadata.duration = metadata.duration || parsed.duration
+              metadata.datePublished = metadata.datePublished || parsed.releaseDate
+              metadata.releaseDate = metadata.releaseDate || parsed.releaseDate
+              metadata.series = metadata.series || parsed.series
+              metadata.publisher = metadata.publisher || parsed.publisher
+              metadata.language = metadata.language || parsed.language
+              metadata.categories = metadata.categories || parsed.categories
+            }
+          }
+        } catch (parseErr) {
+          // not JSON, skip
+        }
       }
 
-      // Try DD MMM YYYY format
-      const match = dateString.match(/(\d{1,2}) ([A-Za-z]{3,}) (\d{4})/)
-      if (match) {
-        return new Date(`${match[3]}-${match[2]}-${match[1]}`)
+      if (!metadata) {
+        const canonicalAsinMatch = html.match(/"asin"\s*:\s*"([A-Z0-9]{10})"/i)
+        if (!canonicalAsinMatch) return null
+        metadata = {
+          name: $('meta[property="og:title"]').attr('content') || $('title').text().trim() || 'Unknown',
+          description: $('meta[property="og:description"]').attr('content') || $('meta[name="description"]').attr('content') || null,
+          image: $('meta[property="og:image"]').attr('content') || $('img[class*="cover"]')?.attr('src') || null,
+          datePublished: $('meta[itemprop="datePublished"]').attr('content') || null,
+          publisher: { name: $('a[data-ga="publisher"]')?.text() || $('li[data-testid="publisher"]')?.text() || null },
+          author: [{ name: $('a[data-ga="author"]')?.text() || $('li[data-testid="author"]')?.text() || '' }],
+          duration: $('meta[itemprop="duration"]').attr('content') || null,
+          asin: canonicalAsinMatch[1]
+        }
       }
 
-      return null
-    } catch (error) {
-      return null
-    }
-  }
-
-  /**
-   * Check if book is upcoming (not yet released)
-   */
-  isUpcomingBook(book) {
-    if (!book.releaseDate) return false
-
-    const today = new Date()
-    return book.releaseDate > today
-  }
-
-  /**
-   * Validate ASIN format
-   */
-  isValidASIN(asin) {
-    if (!asin || typeof asin !== 'string') return false
-
-    // ASIN should be 10 characters, alphanumeric
-    const asinPattern = /^[A-Z0-9]{10}$/
-    return asinPattern.test(asin)
-  }
-
-  /**
-   * Check if error is retryable
-   */
-  isRetryableError(error) {
-    const retryableCodes = [408, 429, 500, 502, 503, 504]
-    return error.response && retryableCodes.includes(error.response.status)
-  }
-
-  /**
-   * Extract ASIN from error message (for future release date books)
-   */
-  extractASINFromError(error) {
-    try {
-      if (!error) return null
-
-      // Check if error has a response with data (Axios error structure)
-      if (error.response && error.response.data) {
-        const responseData = error.response.data
-
-        // Check response.data.message
-        if (responseData.message) {
-          const asinPattern = /[A-Z0-9]{10}/g
-          const matches = responseData.message.match(asinPattern)
-
-          if (matches && matches.length > 0) {
-            const asin = matches[0]
-            Logger.info(`[Audble] Extracted ASIN from error.response.data.message: ${asin}`)
-            return asin
+      const title = metadata.name || metadata.title || $('h1').first().text().trim() || null
+      const summary = metadata.description || metadata.summary || $('meta[property="og:description"]').attr('content') || null
+      const image = metadata.image || metadata.thumbnailUrl || $('meta[property="og:image"]').attr('content') || null
+      let releaseDate = metadata.datePublished || metadata.releaseDate || null
+      if (releaseDate && /^\d{2}-\d{2}-\d{2}$/.test(releaseDate)) {
+        const [m, d, y] = releaseDate.split('-').map(Number)
+        releaseDate = `20${y.toString().padStart(2, '0')}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`
+      }
+      if (!releaseDate) {
+        const bodyText = $('body').text().replace(/\s+/g, ' ')
+        const dateMatch = bodyText.match(/Release date:\s*([0-9]{2}[\/-][0-9]{2}[\/-][0-9]{2,4})/i)
+        if (dateMatch && dateMatch[1]) {
+          const parts = dateMatch[1].split(/[\/-]/).map((val) => val.trim())
+          if (parts.length === 3) {
+            const [m, d, y] = parts.map((v) => Number(v))
+            if (!isNaN(m) && !isNaN(d) && !isNaN(y)) {
+              const fullYear = y < 100 ? 2000 + y : y
+              releaseDate = `${fullYear.toString().padStart(4, '0')}-${m.toString().padStart(2, '0')}-${d.toString().padStart(2, '0')}`
+            }
           }
         }
       }
 
-      // Fallback: Check error.message
-      if (error.message) {
-        const asinPattern = /[A-Z0-9]{10}/g
-        const matches = error.message.match(asinPattern)
+      let language = metadata.inLanguage || metadata.language || $('adbl-toggle-chip[selected]').text().trim() || metadata.language
+      if (typeof language === 'string') language = language.split(',')[0]
 
-        if (matches && matches.length > 0) {
-          const asin = matches[0]
-          Logger.info(`[Audble] Extracted ASIN from error.message: ${asin}`)
-          return asin
+      const seriesPrimaryData = metadata.series ? (Array.isArray(metadata.series) ? metadata.series[0] : metadata.series) : null
+      let seriesPrimary = null
+      if (seriesPrimaryData) {
+        const seriesName = seriesPrimaryData.name || seriesPrimaryData.series || null
+        let sequence = null
+        if (seriesPrimaryData.part) sequence = seriesPrimaryData.part.replace(/Book\s*/i, '').trim()
+        if (!sequence && seriesPrimaryData.position) sequence = seriesPrimaryData.position
+        if (!sequence && typeof seriesPrimaryData.sequence === 'string') sequence = seriesPrimaryData.sequence
+        seriesPrimary = {
+          name: seriesName || null,
+          position: sequence || null
         }
       }
 
-      Logger.info(`[Audble] No ASIN found in error response`)
-      return null
-    } catch (extractError) {
-      Logger.info(`[Audble] Error extracting ASIN from error: ${extractError.message}`)
-      return null
-    }
-  }
-
-  /**
-   * Scrape book directly by ASIN from Audible.com
-   */
-  async scrapeBookByASIN(asin) {
-    try {
-      Logger.info(`[Audble] Scraping book directly by ASIN: ${asin}`)
-
-      const url = `https://www.audible.com/pd/${asin}`
-      const response = await this.makeRequest(url)
-
-      if (!response) {
-        Logger.info(`[Audble] Failed to fetch Audible page for ASIN: ${asin}`)
-        return null
+      const authors = []
+      if (metadata.author) {
+        if (Array.isArray(metadata.author)) {
+          metadata.author.forEach((author) => {
+            if (typeof author === 'string') authors.push(author)
+            else if (author?.name) authors.push(author.name)
+          })
+        } else if (typeof metadata.author === 'string') {
+          authors.push(metadata.author)
+        } else if (metadata.author?.name) {
+          authors.push(metadata.author.name)
+        }
+      }
+      if (!authors.length) {
+        const byline = $('a[data-ga="author"]').first().text().trim() || $('li[data-testid="author"]').first().text().trim()
+        if (byline) authors.push(byline)
       }
 
-      // Parse the product page
-      const bookData = this.parseProductPage(response.data, asin)
-      if (!bookData) {
-        Logger.info(`[Audble] Failed to parse book data for ASIN: ${asin}`)
-        return null
+      const narrators = []
+      if (metadata.performer) {
+        if (Array.isArray(metadata.performer)) {
+          metadata.performer.forEach((performer) => {
+            if (typeof performer === 'string') narrators.push(performer)
+            else if (performer?.name) narrators.push(performer.name)
+          })
+        } else if (typeof metadata.performer === 'string') {
+          narrators.push(metadata.performer)
+        } else if (metadata.performer?.name) {
+          narrators.push(metadata.performer.name)
+        }
       }
 
-      Logger.info(`[Audble] Successfully scraped book: "${bookData.title}"`)
-      return bookData
+      const publisherName = metadata.publisher?.name || metadata.publisher || $('a[data-ga="publisher"]').text().trim() || null
+
+      const runtimeLengthMin = this.parseDurationToMinutes(metadata.duration || metadata.timeRequired || metadata.audioDuration || null)
+
+      return {
+        title,
+        subtitle: metadata.subtitle || null,
+        asin: asin.toUpperCase(),
+        authors: authors.length ? authors.map((name) => ({ name })) : null,
+        narrators: narrators.length ? narrators.map((name) => ({ name })) : null,
+        publisherName,
+        summary,
+        releaseDate,
+        image,
+        genres: [],
+        seriesPrimary,
+        seriesSecondary: null,
+        language,
+        runtimeLengthMin,
+        formatType: 'audiobook'
+      }
     } catch (error) {
-      Logger.info(`[Audble] Failed to scrape book by ASIN ${asin}: ${error.message}`)
-      return null
+      this.logWarn(`[Audble] Failed to scrape Audible page: ${error.message}`)
+      throw error
     }
   }
 
-  /**
-   * Delay helper
-   */
-  delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+  async asinSearch(asin, region, timeout) {
+    if (!asin) return null
+
+    try {
+      // Reduce verbose ASIN search logging.
+
+      const result = await super.asinSearch(asin, region, timeout)
+
+      if (result && typeof result === 'object') {
+        const rawDate = result.releaseDate || result.datePublished
+        const yearOnly = typeof rawDate === 'string' && /^\d{4}$/.test(rawDate.trim())
+        if (!rawDate || yearOnly) {
+          try {
+            const scraped = await this.scrapeAudiblePage(asin, timeout)
+            if (scraped?.releaseDate && (!rawDate || yearOnly)) {
+              result.releaseDate = scraped.releaseDate
+            }
+          } catch (scrapeErr) {
+            this.logWarn('[Audble] Audible page scrape for release date failed', scrapeErr)
+          }
+        }
+      }
+      return result
+    } catch (error) {
+      const extractedAsin = this.extractAsinFromError(error)
+      const scrapeAsin = extractedAsin || asin
+      if (extractedAsin) {
+        global.upcomingBookASIN = extractedAsin
+        this.logWarn(`[Audble] Extracted upcoming ASIN ${extractedAsin} from error`)
+      }
+
+      // Fallback to scraping audible.com/pd/${scrapeAsin} for future releases.
+      try {
+        const scraped = await this.scrapeAudiblePage(scrapeAsin, timeout)
+        if (scraped) {
+          global.upcomingBookASIN = scrapeAsin.toUpperCase()
+          // Successful scrape; no log to reduce noise.
+          return scraped
+        }
+      } catch (scrapeErr) {
+        this.logWarn('[Audble] Audible page scrape fallback failed', scrapeErr)
+      }
+
+      throw error
+    }
+  }
+
+  async getBookDetails(asin, region) {
+    // Reduce verbose logging for book details.
+
+    try {
+      const result = await super.getBookDetails(asin, region)
+      return result
+    } catch (error) {
+      this.logWarn(`[Audble] getBookDetails failed: ${error.message}`)
+      throw error
+    }
   }
 }
 
