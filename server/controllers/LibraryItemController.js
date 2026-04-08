@@ -111,7 +111,7 @@ class LibraryItemController {
       }
     }
 
-    await this.handleDeleteLibraryItem(req.libraryItem.id, mediaItemIds)
+    await this.handleDeleteLibraryItem(req.libraryItem.id, mediaItemIds, req.libraryItem.libraryId)
     if (hardDelete) {
       Logger.info(`[LibraryItemController] Deleting library item from file system at "${libraryItemPath}"`)
       await fs.remove(libraryItemPath).catch((error) => {
@@ -565,7 +565,7 @@ class LibraryItemController {
           authorIds.push(...libraryItem.media.authors.map((au) => au.id))
         }
       }
-      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds)
+      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds, libraryItem.libraryId)
       if (hardDelete) {
         Logger.info(`[LibraryItemController] Deleting library item from file system at "${libraryItemPath}"`)
         await fs.remove(libraryItemPath).catch((error) => {

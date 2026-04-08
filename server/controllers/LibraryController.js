@@ -462,7 +462,7 @@ class LibraryController {
               }
             }
             Logger.info(`[LibraryController] Removing library item "${libraryItem.id}" from folder "${folder.path}"`)
-            await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds)
+            await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds, req.library.id)
           }
 
           if (authorIds.length) {
@@ -563,7 +563,7 @@ class LibraryController {
         mediaItemIds.push(libraryItem.mediaId)
       }
       Logger.info(`[LibraryController] Removing library item "${libraryItem.id}" from library "${req.library.name}"`)
-      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds)
+      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds, req.library.id)
     }
 
     // Set PlaybackSessions libraryId to null
@@ -714,7 +714,7 @@ class LibraryController {
         }
       }
       Logger.info(`[LibraryController] Removing library item "${libraryItem.id}" with issue`)
-      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds)
+      await this.handleDeleteLibraryItem(libraryItem.id, mediaItemIds, req.library.id)
     }
 
     if (authorIds.length) {
