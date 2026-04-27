@@ -1,6 +1,7 @@
 const { Request, Response, NextFunction } = require('express')
 const Path = require('path')
 const fs = require('../libs/fsExtra')
+const cron = require('../libs/nodeCron')
 const uaParserJs = require('../libs/uaParser')
 const Logger = require('../Logger')
 const SocketAuthority = require('../SocketAuthority')
@@ -219,6 +220,11 @@ class LibraryItemController {
         isPodcastAutoDownloadUpdated = true
       } else if (mediaPayload.autoDownloadSchedule !== undefined && req.libraryItem.media.autoDownloadSchedule !== mediaPayload.autoDownloadSchedule) {
         isPodcastAutoDownloadUpdated = true
+      }
+
+      if (mediaPayload.autoDownloadSchedule && !cron.validate(mediaPayload.autoDownloadSchedule)) {
+        Logger.error(`[LibraryItemController] Invalid auto download schedule cron expression "${mediaPayload.autoDownloadSchedule}" for library item "${req.libraryItem.media.title}"`)
+        return res.status(400).send('Invalid auto download schedule cron expression')
       }
     }
 
@@ -658,6 +664,11 @@ class LibraryItemController {
     for (const updatePayload of updatePayloads) {
       const mediaPayload = updatePayload.mediaPayload
       const libraryItem = libraryItems.find((li) => li.id === updatePayload.id)
+
+      if (libraryItem.isPodcast && mediaPayload.autoDownloadSchedule && !cron.validate(mediaPayload.autoDownloadSchedule)) {
+        Logger.warn(`[LibraryItemController] Invalid auto download schedule cron expression "${mediaPayload.autoDownloadSchedule}" for library item "${libraryItem.media.title}" - skipping update`)
+        continue
+      }
 
       let hasUpdates = await libraryItem.media.updateFromRequest(mediaPayload)
 
