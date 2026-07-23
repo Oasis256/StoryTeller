@@ -4,6 +4,7 @@ const OpenIDClient = require('openid-client')
 const axios = require('axios')
 const Database = require('../Database')
 const Logger = require('../Logger')
+const { getRequestOrigin } = require('../utils/requestUtils')
 
 /**
  * OpenID Connect authentication strategy
@@ -47,28 +48,23 @@ class OidcAuthStrategy {
         throw new Error('OpenID Connect settings are not valid')
       }
 
-      try {
-        // Custom req timeout see: https://github.com/panva/node-openid-client/blob/main/docs/README.md#customizing
-        OpenIDClient.custom.setHttpOptionsDefaults({ timeout: 10000 })
+      // Custom req timeout see: https://github.com/panva/node-openid-client/blob/main/docs/README.md#customizing
+      OpenIDClient.custom.setHttpOptionsDefaults({ timeout: 10000 })
 
-        const openIdIssuerClient = new OpenIDClient.Issuer({
-          issuer: global.ServerSettings.authOpenIDIssuerURL,
-          authorization_endpoint: global.ServerSettings.authOpenIDAuthorizationURL,
-          token_endpoint: global.ServerSettings.authOpenIDTokenURL,
-          userinfo_endpoint: global.ServerSettings.authOpenIDUserInfoURL,
-          jwks_uri: global.ServerSettings.authOpenIDJwksURL,
-          end_session_endpoint: global.ServerSettings.authOpenIDLogoutURL
-        }).Client
+      const openIdIssuerClient = new OpenIDClient.Issuer({
+        issuer: global.ServerSettings.authOpenIDIssuerURL,
+        authorization_endpoint: global.ServerSettings.authOpenIDAuthorizationURL,
+        token_endpoint: global.ServerSettings.authOpenIDTokenURL,
+        userinfo_endpoint: global.ServerSettings.authOpenIDUserInfoURL,
+        jwks_uri: global.ServerSettings.authOpenIDJwksURL,
+        end_session_endpoint: global.ServerSettings.authOpenIDLogoutURL
+      }).Client
 
-        this.client = new openIdIssuerClient({
-          client_id: global.ServerSettings.authOpenIDClientID,
-          client_secret: global.ServerSettings.authOpenIDClientSecret,
-          id_token_signed_response_alg: global.ServerSettings.authOpenIDTokenSigningAlgorithm
-        })
-      } catch (error) {
-        Logger.error(`[OidcAuth] Failed to create OpenID client: ${error.message}`)
-        throw new Error(`Failed to create OpenID client: ${error.message}`)
-      }
+      this.client = new openIdIssuerClient({
+        client_id: global.ServerSettings.authOpenIDClientID,
+        client_secret: global.ServerSettings.authOpenIDClientSecret,
+        id_token_signed_response_alg: global.ServerSettings.authOpenIDTokenSigningAlgorithm
+      })
     }
     return this.client
   }
@@ -294,8 +290,8 @@ class OidcAuthStrategy {
     const sessionKey = strategy._key
 
     try {
-      const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
-      const hostUrl = new URL(`${protocol}://${req.get('host')}`)
+      const { origin } = getRequestOrigin(req)
+      const hostUrl = new URL(origin)
       const isMobileFlow = req.query.response_type === 'code' || req.query.redirect_uri || req.query.code_challenge
 
       // Only allow code flow (for mobile clients)
@@ -393,36 +389,30 @@ class OidcAuthStrategy {
    * @returns {string|null}
    */
   getEndSessionUrl(req, idToken, authMethod) {
-    try {
-      const client = this.getClient()
+    const client = this.getClient()
 
-      if (client.issuer.end_session_endpoint && client.issuer.end_session_endpoint.length > 0) {
-        let postLogoutRedirectUri = null
+    if (client.issuer.end_session_endpoint && client.issuer.end_session_endpoint.length > 0) {
+      let postLogoutRedirectUri = null
 
-        if (authMethod === 'openid') {
-          const protocol = req.secure || req.get('x-forwarded-proto') === 'https' ? 'https' : 'http'
-          const host = req.get('host')
-          // TODO: ABS does currently not support subfolders for installation
-          // If we want to support it we need to include a config for the serverurl
-          postLogoutRedirectUri = `${protocol}://${host}${global.RouterBasePath}/login`
-        }
-        // else for openid-mobile we keep postLogoutRedirectUri on null
-        //  nice would be to redirect to the app here, but for example Authentik does not implement
-        //  the post_logout_redirect_uri parameter at all and for other providers
-        //  we would also need again to implement (and even before get to know somehow for 3rd party apps)
-        //  the correct app link like audiobookshelf://login (and maybe also provide a redirect like mobile-redirect).
-        //   Instead because its null (and this way the parameter will be omitted completly), the client/app can simply append something like
-        //  &post_logout_redirect_uri=audiobookshelf://login to the received logout url by itself which is the simplest solution
-        //   (The URL needs to be whitelisted in the config of the SSO/ID provider)
-
-        return client.endSessionUrl({
-          id_token_hint: idToken,
-          post_logout_redirect_uri: postLogoutRedirectUri
-        })
+      if (authMethod === 'openid') {
+        const { origin } = getRequestOrigin(req)
+        // TODO: ABS does currently not support subfolders for installation
+        // If we want to support it we need to include a config for the serverurl
+        postLogoutRedirectUri = `${origin}${global.RouterBasePath}/login`
       }
-    } catch (error) {
-      // If OpenID settings are invalid, log the error but don't crash logout
-      Logger.warn(`[OidcAuth] Cannot get end session URL due to invalid OpenID settings: ${error.message}`)
+      // else for openid-mobile we keep postLogoutRedirectUri on null
+      //  nice would be to redirect to the app here, but for example Authentik does not implement
+      //  the post_logout_redirect_uri parameter at all and for other providers
+      //  we would also need again to implement (and even before get to know somehow for 3rd party apps)
+      //  the correct app link like audiobookshelf://login (and maybe also provide a redirect like mobile-redirect).
+      //   Instead because its null (and this way the parameter will be omitted completly), the client/app can simply append something like
+      //  &post_logout_redirect_uri=audiobookshelf://login to the received logout url by itself which is the simplest solution
+      //   (The URL needs to be whitelisted in the config of the SSO/ID provider)
+
+      return client.endSessionUrl({
+        id_token_hint: idToken,
+        post_logout_redirect_uri: postLogoutRedirectUri
+      })
     }
 
     return null
@@ -525,42 +515,33 @@ class OidcAuthStrategy {
     if (!callbackUrl) return false
 
     try {
-      // Handle relative URLs - these are always safe if they start with router base path
-      if (callbackUrl.startsWith('/')) {
-        // Only allow relative paths that start with the router base path
-        if (callbackUrl.startsWith(global.RouterBasePath + '/')) {
-          return true
-        }
+      // Reject protocol-relative (//host) and backslash-prefixed (/\host) values,
+      // which browsers resolve to a cross-origin absolute URL.
+      if (callbackUrl.startsWith('//') || callbackUrl.startsWith('/\\')) {
+        Logger.warn(`[OidcAuth] Rejected protocol-relative callback URL: ${callbackUrl}`)
+        return false
+      }
+
+      const { origin: serverOrigin } = getRequestOrigin(req)
+      const resolvedUrl = callbackUrl.startsWith('/') ? new URL(callbackUrl, serverOrigin) : new URL(callbackUrl)
+
+      if (resolvedUrl.origin !== serverOrigin) {
+        Logger.warn(`[OidcAuth] Rejected callback URL to different origin: ${callbackUrl} (expected ${serverOrigin})`)
+        return false
+      }
+
+      const pathname = decodeURIComponent(resolvedUrl.pathname)
+      if (pathname.startsWith('//') || pathname.startsWith('/\\')) {
+        Logger.warn(`[OidcAuth] Rejected protocol-relative callback URL path: ${callbackUrl}`)
+        return false
+      }
+
+      if (!resolvedUrl.pathname.startsWith(global.RouterBasePath + '/')) {
         Logger.warn(`[OidcAuth] Rejected callback URL outside router base path: ${callbackUrl}`)
         return false
       }
 
-      // For absolute URLs, ensure they point to the same origin
-      const callbackUrlObj = new URL(callbackUrl)
-      // NPM appends both http and https in x-forwarded-proto sometimes, so we need to check for both
-      const xfp = (req.get('x-forwarded-proto') || '').toLowerCase()
-      const currentProtocol =
-        req.secure ||
-        xfp
-          .split(',')
-          .map((s) => s.trim())
-          .includes('https')
-          ? 'https'
-          : 'http'
-      const currentHost = req.get('host')
-
-      // Check if protocol and host match exactly
-      if (callbackUrlObj.protocol === currentProtocol + ':' && callbackUrlObj.host === currentHost) {
-        // Additional check: ensure path starts with router base path
-        if (callbackUrlObj.pathname.startsWith(global.RouterBasePath + '/')) {
-          return true
-        }
-        Logger.warn(`[OidcAuth] Rejected same-origin callback URL outside router base path: ${callbackUrl}`)
-        return false
-      }
-
-      Logger.warn(`[OidcAuth] Rejected callback URL to different origin: ${callbackUrl} (expected ${currentProtocol}://${currentHost})`)
-      return false
+      return true
     } catch (error) {
       Logger.error(`[OidcAuth] Invalid callback URL format: ${callbackUrl}`, error)
       return false

@@ -102,7 +102,7 @@ class BackupManager {
 
   async uploadBackup(req, res) {
     const backupFile = req.files.file
-    if (Path.extname(backupFile.name) !== '.audiobookshelf') {
+    if (Path.extname(backupFile.name) !== '.tales') {
       Logger.error(`[BackupManager] Invalid backup file uploaded "${backupFile.name}"`)
       return res.status(500).send('Invalid backup file')
     }
@@ -131,10 +131,10 @@ class BackupManager {
       return res.status(400).send('Failed to read backup file - backup might not be a valid .zip file')
     }
     if (!entries['absdatabase.sqlite']) {
-      Logger.error(`[BackupManager] Invalid backup with no absdatabase.sqlite file - might be a backup created on an old Audiobookshelf server.`)
+      Logger.error(`[BackupManager] Invalid backup with no absdatabase.sqlite file - might be a backup created on an old AudbleTales server.`)
       await zip.close().catch(() => {})
       await fs.remove(tempPath).catch((err) => Logger.error(`[BackupManager] Failed to remove rejected backup file "${tempPath}"`, err))
-      return res.status(500).send('Invalid backup with no absdatabase.sqlite file - might be a backup created on an old Audiobookshelf server.')
+      return res.status(500).send('Invalid backup with no absdatabase.sqlite file - might be a backup created on an old AudbleTales server.')
     }
 
     const detailsEntry = entries['details']
@@ -272,7 +272,7 @@ class BackupManager {
 
       for (let i = 0; i < filesInDir.length; i++) {
         const filename = filesInDir[i]
-        if (filename.endsWith('.audiobookshelf')) {
+        if (filename.endsWith('.tales')) {
           const fullFilePath = Path.join(this.backupPath, filename)
 
           let zip = null

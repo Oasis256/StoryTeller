@@ -265,10 +265,7 @@
   "LabelBonus": "Bonus",
   "LabelBooks": "Kirjat",
   "LabelButtonText": "Painikkeen teksti",
-<<<<<<< HEAD
-=======
   "LabelByAuthor": "Tekijältä: {0}",
->>>>>>> e5c0a9d22c5148a4c1d6c2fee20c9669578eb1e3
   "LabelChangePassword": "Vaihda salasana",
   "LabelChannels": "Kanavat",
   "LabelChapterCount": "{0} lukua",
