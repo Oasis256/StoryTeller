@@ -1,10 +1,12 @@
 const { Request, Response } = require('express')
+const { Op } = require('sequelize')
 const Logger = require('../Logger')
 const SocketAuthority = require('../SocketAuthority')
 const Database = require('../Database')
 const { sort } = require('../libs/fastSort')
-const { toNumber, isNullOrNaN } = require('../utils/index')
+const { toNumber, isNullOrNaN, isUUID } = require('../utils/index')
 const userStats = require('../utils/queries/userStats')
+const parseUserAgent = require('../utils/parsers/parseUserAgent')
 
 /**
  * @typedef RequestUserObject
@@ -24,6 +26,81 @@ class MeController {
    */
   getCurrentUser(req, res) {
     res.json(req.user.toOldJSONForBrowser())
+  }
+
+  /**
+   * GET: /api/me/sessions
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   */
+  async getSessions(req, res) {
+    const page = Math.max(0, toNumber(req.query.page, 0))
+    const itemsPerPage = Math.max(1, toNumber(req.query.itemsPerPage, 10))
+
+    if (req.user.isGuest) {
+      return res.json({ sessions: [], total: 0, numPages: 0, page, itemsPerPage })
+    }
+
+    const refreshToken = req.cookies.refresh_token || req.headers['x-refresh-token']
+    const { rows, count } = await Database.sessionModel.findAndCountAll({
+      where: {
+        userId: req.user.id,
+        expiresAt: { [Op.gt]: new Date() }
+      },
+      order: [['updatedAt', 'DESC']],
+      limit: itemsPerPage,
+      offset: itemsPerPage * page
+    })
+
+    res.json({
+      total: count,
+      numPages: Math.ceil(count / itemsPerPage),
+      page,
+      itemsPerPage,
+      sessions: rows.map((session) => ({
+        id: session.id,
+        ipAddress: session.ipAddress,
+        userAgent: session.userAgent,
+        // For display convenience
+        deviceInfo: parseUserAgent(session.userAgent),
+        createdAt: session.createdAt?.valueOf() ?? null,
+        updatedAt: session.updatedAt?.valueOf() ?? null,
+        current: !!refreshToken && (session.refreshToken === refreshToken || session.lastRefreshToken === refreshToken)
+      }))
+    })
+  }
+
+  /**
+   * DELETE: /api/me/sessions/:id
+   *
+   * @param {RequestWithUser} req
+   * @param {Response} res
+   */
+  async deleteSession(req, res) {
+    if (req.user.isGuest) {
+      return res.sendStatus(403)
+    }
+
+    if (!isUUID(req.params.id)) {
+      return res.sendStatus(400)
+    }
+
+    const session = await Database.sessionModel.findOne({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      }
+    })
+
+    if (!session) {
+      return res.sendStatus(404)
+    }
+
+    await Database.sessionModel.destroy({ where: { id: session.id } })
+    Logger.info(`[MeController] User ${req.user.username} deleted auth session ${session.id}`)
+
+    res.sendStatus(200)
   }
 
   /**
