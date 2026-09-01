@@ -162,8 +162,8 @@
       <ui-btn color="bg-bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeCache">{{ $strings.ButtonPurgeAllCache }}</ui-btn>
       <ui-btn color="bg-bg" small :padding-x="4" class="mr-2 text-xs md:text-sm" :loading="isPurgingCache" @click.stop="purgeItemsCache">{{ $strings.ButtonPurgeItemsCache }}</ui-btn>
     </div>
-
-    <!-- <div class="flex items-center py-4">
+    <!--
+    <div class="flex items-center py-4">
       <div class="grow" />
       <p class="pr-2 text-sm text-yellow-400">
         {{ $strings.MessageReportBugsAndContribute }}
@@ -195,7 +195,8 @@
           </defs>
         </svg>
       </a>
-    </div> -->
+    </div>
+  -->
 
     <div class="h-0.5 bg-primary/30 w-full" />
 
