@@ -116,6 +116,7 @@ module.exports = {
   proxy,
 
   io: {
+    server: false,
     sockets: [
       {
         name: 'dev',
